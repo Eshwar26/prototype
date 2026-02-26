@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cinefied</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
+      --accent:#ff3f3f;--accent2:#ff8c42;--text:#e8e8f0;--muted:#7070a0;
+      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,63,63,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 90%,rgba(63,100,255,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+    .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:24px 16px;animation:fadeIn .35s ease}
+    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,12vw,96px);letter-spacing:4px;line-height:1;color:var(--text);text-align:center}
+    .logo span{color:var(--accent)}
+    .tagline{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:6px;text-align:center}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:420px}
+    .card-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+    input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;letter-spacing:2px;outline:none;transition:border-color .2s;margin-bottom:12px}
+    input[type=text]::placeholder{color:var(--muted);letter-spacing:1px;font-size:13px}
+    input[type=text]:focus{border-color:var(--accent)}
+    .btn{display:block;width:100%;padding:15px;border:none;border-radius:10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;transition:transform .15s,opacity .15s,box-shadow .2s}
+    .btn:active{transform:scale(.97)}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn-primary{background:var(--accent);color:#fff;font-weight:600}
+    .btn-primary:hover:not(:disabled){box-shadow:0 0 24px rgba(255,63,63,.4)}
+    .btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);margin-top:10px}
+    .btn-ghost{background:var(--surface2);color:var(--muted);margin-top:8px}
+    .btn-green{background:var(--green);color:#050f0a;font-weight:700;margin-top:10px}
+    .btn-green:hover:not(:disabled){box-shadow:0 0 24px rgba(63,255,160,.35)}
+    .room-code-display{text-align:center;margin:20px 0}
+    .room-code-display .label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+    .room-code-display .code{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:12px;color:var(--accent);line-height:1}
+    .player-list{margin:16px 0;display:flex;flex-direction:column;gap:8px}
+    .player-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px}
+    .player-item .pip{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+    .player-item .badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--accent2);background:rgba(255,140,66,.12);padding:3px 8px;border-radius:6px}
+    .word-card{background:var(--surface2);border:1px solid var(--accent);border-radius:16px;padding:32px;text-align:center;margin:20px 0;position:relative;overflow:hidden;width:100%;max-width:420px}
+    .word-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,63,63,.08),transparent 70%)}
+    .word-card .word-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;position:relative}
+    .word-card .word-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,10vw,72px);letter-spacing:4px;color:var(--text);position:relative}
+    .word-card.imposter-card{animation:pulseRed 2s ease-in-out infinite}
+    .word-card.imposter-card .word-text{color:var(--accent)}
+    @keyframes pulseRed{0%,100%{box-shadow:0 0 0 rgba(255,63,63,0)}50%{box-shadow:0 0 40px rgba(255,63,63,.25)}}
+    .vote-grid{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+    .vote-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s,background .2s}
+    .vote-btn:hover{border-color:var(--accent);background:rgba(255,63,63,.06)}
+    .vote-btn.selected{border-color:var(--accent);background:rgba(255,63,63,.12)}
+    .vote-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+    .result-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,15vw,96px);letter-spacing:4px;text-align:center;line-height:1;margin:20px 0}
+    .result-big.win{color:var(--green)}
+    .result-big.lose{color:var(--accent)}
+    .lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .lb-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--text)}
+    .lb-round-badge{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--accent2);background:rgba(255,140,66,.12);padding:5px 10px;border-radius:8px}
+    .lb-row{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;position:relative;overflow:hidden}
+    .lb-row.me{border-color:var(--blue)}
+    .lb-row.top{border-color:var(--yellow)}
+    .lb-row.top::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,217,61,.06),transparent)}
+    .lb-rank{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);width:28px;text-align:center;flex-shrink:0}
+    .lb-name{font-size:15px;font-weight:600;flex:1;position:relative}
+    .lb-you{font-size:10px;font-family:'DM Mono',monospace;color:var(--blue);margin-left:6px}
+    .lb-score-block{text-align:right}
+    .lb-score{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);line-height:1}
+    .lb-score-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted)}
+    .progress-bar-wrap{margin:4px 0 8px}
+    .progress-bar-label{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:6px}
+    .progress-bar-track{height:4px;background:var(--surface2);border-radius:4px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .5s ease}
+    .rh-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+    .rh-list{display:flex;flex-direction:column;gap:6px}
+    .rh-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px}
+    .rh-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:20px}
+    .rh-word{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--accent2)}
+    .rh-imposter{font-size:12px;color:var(--muted);flex:1}
+    .rh-caught{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:5px}
+    .rh-caught.yes{background:rgba(63,255,160,.12);color:var(--green)}
+    .rh-caught.no{background:rgba(255,63,63,.12);color:var(--accent)}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px}
+    .toggle-label{font-size:13px;color:var(--text)}
+    .toggle-sub{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:2px}
+    .toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+    .toggle-switch input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:24px;cursor:pointer;transition:.2s}
+    .toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.2s}
+    .toggle-switch input:checked+.toggle-slider{background:rgba(255,63,63,.3);border:1px solid var(--accent)}
+    .toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px);background:var(--accent)}
+    .vote-voters{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;line-height:1.5;text-align:left}
+    .voter-chip{display:inline-block;background:rgba(91,143,255,.12);border:1px solid rgba(91,143,255,.25);color:var(--blue);padding:1px 7px;border-radius:5px;margin:2px 2px 0 0;font-size:10px;letter-spacing:.5px}
+    .rounds-selector{display:flex;gap:8px;margin-top:10px}
+    .rounds-btn{flex:1;padding:10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s}
+    .rounds-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(255,63,63,.1)}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .tag{padding:6px 12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;color:var(--muted);transition:all .2s}
+    .tag.selected{border-color:var(--accent);color:var(--accent);background:rgba(255,63,63,.1)}
+    .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:20px 0}
+    .podium-place{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .podium-block{width:80px;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px}
+    .podium-block.p1{height:90px;background:rgba(255,217,61,.2);border:1px solid var(--yellow);color:var(--yellow)}
+    .podium-block.p2{height:65px;background:rgba(176,184,200,.15);border:1px solid #b0b8c8;color:#b0b8c8}
+    .podium-block.p3{height:45px;background:rgba(205,140,90,.15);border:1px solid #cd8c5a;color:#cd8c5a}
+    .podium-name{font-size:12px;font-weight:600;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .podium-score{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+    .spacer{height:20px}
+    .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+    .center{text-align:center}
+    .small-muted{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+    .mt{margin-top:12px}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--text);z-index:999;transition:transform .3s ease;white-space:nowrap}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    .broadcast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(255,63,63,.15);border:1px solid rgba(255,63,63,.4);border-radius:10px;padding:10px 18px;font-size:13px;font-family:'DM Mono',monospace;color:var(--accent);z-index:1000;transition:transform .3s ease;white-space:nowrap;letter-spacing:1px;backdrop-filter:blur(8px)}
+    .broadcast.show{transform:translateX(-50%) translateY(0)}
+    .loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
+    @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+    .waiting-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+    .phase-indicator{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-align:center;text-transform:uppercase;margin-bottom:8px}
+    .revealed-word-small{text-align:center;margin:8px 0 16px}
+    .revealed-word-small .rw-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+    .revealed-word-small .rw-word{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--accent2)}
+
+    /* ── TIER LIST ── */
+    .tier-row{display:flex;align-items:stretch;margin-bottom:6px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+    .tier-label{width:52px;min-width:52px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;flex-shrink:0}
+    .tier-s .tier-label{background:#ff7070;color:#1a0000}
+    .tier-a .tier-label{background:#ffb347;color:#1a0800}
+    .tier-b .tier-label{background:#ffd93d;color:#1a1000}
+    .tier-c .tier-label{background:#c8f77a;color:#0a1400}
+    .tier-d .tier-label{background:#7affb2;color:#001a0a}
+    .tier-slots{flex:1;min-height:56px;display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--surface2);align-content:flex-start}
+    .tier-slots.drag-over{background:rgba(255,255,255,.05);outline:2px dashed var(--border)}
+    .tier-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--text);cursor:grab;user-select:none;white-space:nowrap;transition:transform .15s,box-shadow .15s}
+    .tier-chip:active{cursor:grabbing;transform:scale(1.05);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+    .tier-chip.dragging{opacity:.4}
+    .unranked-pool{display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;min-height:60px;margin-top:6px}
+    .unranked-pool.drag-over{background:rgba(255,255,255,.03);outline:2px dashed var(--border)}
+    .vote-approve{background:rgba(63,255,160,.15);border:1px solid var(--green);color:var(--green)}
+    .vote-approve:hover{background:rgba(63,255,160,.25);box-shadow:0 0 20px rgba(63,255,160,.2)}
+    .vote-disapprove{background:rgba(255,63,63,.15);border:1px solid var(--accent);color:var(--accent)}
+    .vote-disapprove:hover{background:rgba(255,63,63,.25);box-shadow:0 0 20px rgba(255,63,63,.2)}
+    .vote-result-bar{height:6px;border-radius:4px;margin-top:6px;overflow:hidden;background:var(--surface2);display:flex}
+    .vote-result-yes{background:var(--green);transition:width .6s ease}
+    .vote-result-no{background:var(--accent);transition:width .6s ease}
+    .player-vote-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;margin:3px}
+    .pvc-approve{border-color:rgba(63,255,160,.4);background:rgba(63,255,160,.06);color:var(--green)}
+    .pvc-disapprove{border-color:rgba(255,63,63,.4);background:rgba(255,63,63,.06);color:var(--accent)}
+    .tier-viewer-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--text);white-space:nowrap}
+
+    /* ── HEADS UP ── */
+    #screen-hu-play{padding:0;overflow:hidden}
+    .hu-arena{position:fixed;inset:0;display:flex;flex-direction:column}
+    .hu-top{flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background .1s;position:relative;overflow:hidden}
+    .hu-top{background:rgba(63,255,160,.08);border-bottom:2px solid rgba(63,255,160,.2)}
+    .hu-top:active{background:rgba(63,255,160,.22)}
+    .hu-top-label{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,56px);letter-spacing:4px;color:var(--green);opacity:.5;pointer-events:none}
+    .hu-bottom{flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;position:relative;overflow:hidden}
+    .hu-bottom{background:rgba(255,63,63,.08);border-top:2px solid rgba(255,63,63,.2)}
+    .hu-bottom:active{background:rgba(255,63,63,.22)}
+    .hu-bottom-label{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,56px);letter-spacing:4px;color:var(--accent);opacity:.5;pointer-events:none}
+    .hu-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;text-align:center;pointer-events:none;width:90vw}
+    .hu-word{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,11vw,80px);letter-spacing:3px;color:var(--text);line-height:1.1;text-align:center}
+    .hu-timer{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,5vw,36px);letter-spacing:4px;margin-top:6px}
+    .hu-timer.urgent{color:var(--accent);animation:pulseRed 0.6s ease-in-out infinite}
+    .hu-score-row{display:flex;gap:12px;margin-top:8px;justify-content:center}
+    .hu-score-pill{font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px}
+    .hu-correct-pill{background:rgba(63,255,160,.15);color:var(--green);border:1px solid rgba(63,255,160,.3)}
+    .hu-skip-pill{background:rgba(255,63,63,.12);color:var(--accent);border:1px solid rgba(255,63,63,.25)}
+    .hu-flash{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .05s}
+    .hu-flash.green{background:rgba(63,255,160,.35)}
+    .hu-flash.red{background:rgba(255,63,63,.25)}
+    .hu-flash.show{opacity:1}
+    /* result list */
+    .hu-result-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;font-size:13px}
+    .hu-result-item.correct{background:rgba(63,255,160,.08);border:1px solid rgba(63,255,160,.2)}
+    .hu-result-item.skipped{background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.15);opacity:.7}
+    .hu-result-icon{font-size:16px;flex-shrink:0}
+    .hu-result-word{font-weight:600;flex:1}
+
+    /* ── CHAT ── */
+    .chat-wrap{width:100%;max-width:500px;margin-top:10px}
+    .chat-feed{background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 0 0;height:140px;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+    .chat-feed::-webkit-scrollbar{width:4px}
+    .chat-feed::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .chat-msg{font-size:13px;line-height:1.4;animation:fadeIn .2s ease}
+    .chat-msg .chat-name{font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);margin-right:6px;font-weight:600}
+    .chat-msg.mine .chat-name{color:var(--accent2)}
+    .chat-presets{background:var(--surface2);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px}
+    .chat-preset-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 11px;font-size:12px;color:var(--text);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .chat-preset-btn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(255,140,66,.08)}
+    .chat-preset-btn:active{transform:scale(.95)}
+    .chat-section-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;width:100%;margin-top:4px;margin-bottom:2px}
+
+    /* ── COLLABORATE ── */
+    .collab-popup{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+    .collab-popup-inner{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:420px;animation:fadeIn .2s ease}
+    .collab-popup h3{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;margin-bottom:6px}
+    .collab-popup p{font-size:13px;color:var(--muted);margin-bottom:16px;font-family:'DM Mono',monospace}
+    .collab-actions{display:flex;gap:10px}
+    .btn-collab-approve{flex:1;padding:12px;border-radius:10px;border:none;background:var(--green);color:#050f0a;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer;font-weight:700}
+    .btn-collab-reject{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer}
+    .collaborator-badge{display:inline-block;background:rgba(91,143,255,.12);border:1px solid rgba(91,143,255,.3);color:var(--blue);font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:6px;margin-left:6px}
+  </style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div class="screen active" id="screen-landing">
+  <div class="logo">CINE<span>FIED</span></div>
+  <div class="tagline">// pick your game</div>
+  <div class="spacer"></div>
+  <div class="card">
+    <div class="card-title">// enter your name</div>
+    <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" style="flex:1" onclick="goToLobby('imposter')">IMPOSTER</button>
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')">TIER LIST</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()">HEADS UP</button>
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')">WHO ARE YOU</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOBBY CHOICE -->
+<div class="screen" id="screen-lobby-choice">
+  <div class="logo" style="font-size:48px">LOBBY</div>
+  <div class="spacer"></div>
+  <div class="card">
+    <button class="btn btn-primary" onclick="createRoom()">＋ CREATE ROOM</button>
+    <hr class="divider" />
+    <div class="card-title">// join existing room</div>
+    <input type="text" id="join-code-input" placeholder="ENTER CODE" maxlength="6"
+      style="text-transform:uppercase;text-align:center;font-size:22px;letter-spacing:6px;" />
+    <button class="btn btn-secondary" onclick="joinRoom()">JOIN ROOM →</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
+  </div>
+</div>
+
+<!-- WAITING ROOM -->
+<div class="screen" id="screen-waiting">
+  <div class="room-code-display">
+    <div class="label">// room code</div>
+    <div class="code" id="display-room-code">----</div>
+    <div class="small-muted mt" style="cursor:pointer" onclick="copyCode()">tap to copy</div>
+  </div>
+  <div class="card" style="max-width:420px;width:100%">
+    <div class="card-title">// players <span id="player-count">0</span>/8</div>
+    <div class="player-list" id="waiting-player-list"></div>
+    <div class="waiting-text" id="waiting-msg">Waiting for players<span class="loading-dots"></span></div>
+    <div id="leader-controls" style="display:none">
+      <hr class="divider" />
+      <div class="card-title">// word category</div>
+      <div class="tag-row" id="category-tags"></div>
+      <hr class="divider" />
+      <div class="card-title">// number of rounds</div>
+      <div class="rounds-selector" id="rounds-selector"></div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:8px;">you voted imposter → +3 pts &nbsp;|&nbsp; imposter escapes → +5 pts</div>
+      <hr class="divider" />
+      <div class="card-title">// voting style</div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Anonymous Voting</div>
+          <div class="toggle-sub">on = hide who voted whom &nbsp;|&nbsp; off = show voter names</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="anon-toggle" onchange="toggleAnonymous(this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <hr class="divider" />
+      <button class="btn btn-green" id="start-btn" onclick="startGame()">START GAME</button>
+    </div>
+
+    <!-- TIER LIST leader controls -->
+    <div id="tier-leader-controls" style="display:none">
+      <hr class="divider" />
+      <div class="card-title">// word category</div>
+      <div class="tag-row" id="tier-category-tags"></div>
+      <hr class="divider" />
+      <div class="card-title">// how many items to rank</div>
+      <div class="rounds-selector" id="tier-count-selector"></div>
+      <hr class="divider" />
+      <button class="btn btn-green" id="tier-start-btn" onclick="startTierGame()" disabled>START TIER LIST</button>
+    </div>
+
+    <!-- WHO ARE YOU leader controls -->
+    <div id="way-leader-controls" style="display:none">
+      <hr class="divider" />
+      <div class="card-title">// word category</div>
+      <div class="tag-row" id="way-category-tags"></div>
+      <hr class="divider" />
+      <button class="btn btn-green" id="way-start-btn" onclick="startWayGame()" disabled>START GAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORD REVEAL -->
+<div class="screen" id="screen-reveal">
+  <div class="phase-indicator" id="reveal-phase-label">round 1 // your word</div>
+  <div id="word-reveal-content"></div>
+  <div class="card" style="max-width:420px;width:100%;margin-top:20px">
+    <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.6">
+      Everyone gets the same secret word — except the imposter.<br/><br/>
+      Discuss it. Stay vague enough that the imposter can't tell, but specific enough to prove you know it.
+    </p>
+    <button class="btn btn-primary mt" id="ready-btn" onclick="markReady()">I'VE READ MY WORD →</button>
+    <div class="waiting-text" id="ready-status">Waiting for others<span class="loading-dots"></span></div>
+  </div>
+</div>
+
+<!-- VOTING -->
+<div class="screen" id="screen-vote">
+  <div class="phase-indicator" id="vote-phase-label">phase 2 // vote</div>
+  <div class="revealed-word-small" id="voting-word-display"></div>
+  <div class="card" style="max-width:420px;width:100%">
+    <div class="card-title">// who is the imposter?</div>
+    <div class="vote-grid" id="vote-grid"></div>
+    <div id="votes-on-me-section" style="display:none;margin-top:14px;padding:10px 14px;background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.2);border-radius:10px;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">// votes on you</div>
+      <div id="votes-on-me-names" style="font-size:13px;color:var(--text);line-height:1.8"></div>
+    </div>
+    <button class="btn btn-primary mt" id="cast-vote-btn" onclick="castVote()" disabled>CAST VOTE</button>
+    <div class="waiting-text" id="vote-status"></div>
+  </div>
+</div>
+
+<!-- ROUND RESULT -->
+<div class="screen" id="screen-result">
+  <div id="result-content"></div>
+  <div class="card" style="max-width:420px;width:100%;margin-top:10px">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">
+        <span id="pb-label">round 1 of 5</span>
+        <span id="pb-pct">20%</span>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="pb-fill" style="width:20%"></div></div>
+    </div>
+    <hr class="divider" />
+    <div class="lb-header">
+      <div class="lb-title">SCORES</div>
+      <div class="lb-round-badge" id="lb-round-badge">after round 1</div>
+    </div>
+    <div id="lb-rows"></div>
+    <hr class="divider" />
+    <div class="rh-label">// round history</div>
+    <div class="rh-list" id="rh-list"></div>
+    <hr class="divider" />
+    <div id="result-action-area"></div>
+  </div>
+</div>
+
+<!-- WINNER -->
+<div class="screen" id="screen-winner">
+  <div class="phase-indicator">// game over</div>
+  <div class="logo" style="font-size:52px;color:var(--yellow)">LEADERBOARD</div>
+  <div class="podium" id="winner-podium"></div>
+  <div class="card" style="max-width:420px;width:100%;margin-top:10px">
+    <div class="lb-header"><div class="lb-title">FINAL SCORES</div></div>
+    <div id="final-lb-rows"></div>
+    <hr class="divider" />
+    <div class="rh-label">// all rounds</div>
+    <div class="rh-list" id="final-rh-list"></div>
+    <hr class="divider" />
+    <div id="winner-action-area"></div>
+  </div>
+</div>
+
+<!-- TIER LIST — BUILD SCREEN (leader drags, others watch) -->
+<div class="screen" id="screen-tier-build">
+  <div class="phase-indicator" id="tier-phase-label">// tier list</div>
+  <div style="width:100%;max-width:500px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px" id="tier-cat-title">TIER LIST</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)" id="tier-leader-label"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <!-- shown to non-leader non-collaborators -->
+        <button id="tier-collab-btn" style="display:none;padding:8px 14px;border-radius:8px;border:1px solid var(--blue);background:rgba(91,143,255,.1);color:var(--blue);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer" onclick="requestCollaborate()">🤝 COLLABORATE</button>
+        <!-- shown to collaborators + leader when it's their turn to confirm done -->
+        <div id="tier-done-btn-wrap" style="display:none">
+          <button class="btn btn-green" style="width:auto;padding:10px 20px;margin:0" onclick="tierDone()">DONE RANKING →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- who still needs to click done -->
+    <div id="tier-done-status" style="display:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;text-align:right"></div>
+
+    <!-- tiers -->
+    <div id="tier-rows"></div>
+
+    <!-- unranked pool -->
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin:12px 0 6px;text-transform:uppercase">// drag to rank</div>
+    <div class="unranked-pool" id="unranked-pool"></div>
+
+    <!-- viewer status -->
+    <div id="tier-viewer-msg" style="display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:14px"></div>
+
+    <!-- chat -->
+    <div class="chat-wrap" id="tier-build-chat"></div>
+  </div>
+</div>
+
+<!-- TIER LIST — VOTE SCREEN -->
+<div class="screen" id="screen-tier-vote">
+  <div class="phase-indicator">// vote on the ranking</div>
+  <div style="width:100%;max-width:500px">
+
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:14px">THE FINAL TIER LIST</div>
+
+    <!-- readonly tier display -->
+    <div id="tier-vote-rows"></div>
+
+    <div class="card" style="margin-top:14px;padding:20px 24px">
+      <div class="card-title">// do you approve this ranking?</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button class="btn vote-approve" id="btn-approve" onclick="castTierVote('approve')" style="flex:1;margin:0">👍 APPROVE</button>
+        <button class="btn vote-disapprove" id="btn-disapprove" onclick="castTierVote('disapprove')" style="flex:1;margin:0">👎 DISAPPROVE</button>
+      </div>
+      <div id="tier-vote-tally" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center"></div>
+    </div>
+
+    <!-- chat -->
+    <div class="chat-wrap" id="tier-vote-chat"></div>
+
+  </div>
+</div>
+
+<!-- TIER LIST — RESULT SCREEN -->
+<div class="screen" id="screen-tier-result">
+  <div class="phase-indicator">// verdict</div>
+  <div style="width:100%;max-width:500px">
+
+    <div id="tier-verdict-banner" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,12vw,80px);letter-spacing:4px;text-align:center;margin-bottom:10px"></div>
+
+    <!-- readonly tier display -->
+    <div id="tier-result-rows" style="margin-bottom:14px"></div>
+
+    <div class="card" style="padding:20px 24px">
+      <div class="card-title">// player votes</div>
+      <div id="tier-result-votes"></div>
+      <hr class="divider"/>
+      <div id="tier-result-actions"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HEADS UP — SETUP -->
+<div class="screen" id="screen-hu-setup">
+  <div class="logo" style="font-size:52px">HEADS<span>UP</span></div>
+  <div class="tagline">// hold the phone to your head</div>
+  <div class="spacer"></div>
+  <div class="card">
+    <div class="card-title">// category</div>
+    <div class="tag-row" id="hu-category-tags"></div>
+    <hr class="divider"/>
+    <div class="card-title">// time limit</div>
+    <div class="rounds-selector" id="hu-time-selector"></div>
+    <hr class="divider"/>
+    <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7;text-align:center">
+      tap <span style="color:var(--green)">top half</span> = ✓ got it &nbsp;|&nbsp; tap <span style="color:var(--accent)">bottom half</span> = ↓ skip
+    </p>
+    <button class="btn btn-green" style="margin-top:16px" onclick="startHeadsUp()">START →</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
+  </div>
+</div>
+
+<!-- HEADS UP — PLAY -->
+<div class="screen" id="screen-hu-play">
+  <div class="hu-arena" id="hu-arena">
+    <div class="hu-top" id="hu-top-zone" onclick="huCorrect()">
+      <div class="hu-flash green" id="hu-flash-green"></div>
+      <div class="hu-top-label">✓ GOT IT</div>
+    </div>
+    <div class="hu-center">
+      <div class="hu-word" id="hu-word">---</div>
+      <div class="hu-timer" id="hu-timer">1:00</div>
+      <div class="hu-score-row">
+        <div class="hu-score-pill hu-correct-pill">✓ <span id="hu-correct-count">0</span></div>
+        <div class="hu-score-pill hu-skip-pill">↓ <span id="hu-skip-count">0</span></div>
+      </div>
+    </div>
+    <div class="hu-bottom" id="hu-bottom-zone" onclick="huSkip()">
+      <div class="hu-flash red" id="hu-flash-red"></div>
+      <div class="hu-bottom-label">↓ SKIP</div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADS UP — RESULTS -->
+<div class="screen" id="screen-hu-result">
+  <div class="logo" style="font-size:52px;color:var(--yellow)">RESULTS</div>
+  <div class="spacer"></div>
+  <div class="card" style="max-width:420px;width:100%">
+    <div style="display:flex;justify-content:center;gap:24px;margin-bottom:20px">
+      <div style="text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--green);line-height:1" id="hu-final-correct">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px">CORRECT</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--accent);line-height:1" id="hu-final-skipped">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px">SKIPPED</div>
+      </div>
+    </div>
+    <hr class="divider"/>
+    <div class="card-title">// word by word</div>
+    <div id="hu-result-list"></div>
+    <hr class="divider"/>
+    <button class="btn btn-green" onclick="huPlayAgain()">PLAY AGAIN</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← HOME</button>
+  </div>
+</div>
+
+<!-- WHO ARE YOU — PLAY SCREEN -->
+<div class="screen" id="screen-way-play">
+  <div style="width:100%;max-width:460px">
+
+    <!-- header -->
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase">// round <span id="way-round-num">1</span> · category</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--accent2)" id="way-cat-display">HEROES</div>
+    </div>
+
+    <!-- my word = big ? -->
+    <div style="background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:24px 20px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,63,63,.06),transparent 70%)"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;position:relative">// your word</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;letter-spacing:8px;color:var(--accent);line-height:1;position:relative">?</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:6px;position:relative">you cannot see your own word</div>
+    </div>
+
+    <!-- other players' words -->
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">// everyone else is</div>
+    <div id="way-others-grid" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+
+    <!-- instructions -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px">// how to play</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8">
+        🎭 You have a secret word on your head — you can't see it.<br/>
+        👀 You can see everyone else's word.<br/>
+        💬 Ask yes/no questions to figure out who you are.<br/>
+        🔄 Once everyone figures it out, move to the next round.
+      </div>
+    </div>
+
+    <!-- next round -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px">
+      <button class="btn btn-green" id="way-next-btn" onclick="wayMarkReady()" style="margin:0">✓ READY FOR NEXT ROUND</button>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center;margin-top:10px" id="way-ready-status"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="broadcast" id="broadcast"></div>
+
+<!-- COLLABORATE POPUP (shown to leader when someone requests) -->
+<div class="collab-popup" id="collab-popup" style="display:none">
+  <div class="collab-popup-inner">
+    <h3>🤝 COLLABORATE REQUEST</h3>
+    <p id="collab-popup-msg">— wants to help rank</p>
+    <div class="collab-actions">
+      <button class="btn-collab-approve" onclick="respondCollab(true)">✓ APPROVE</button>
+      <button class="btn-collab-reject"  onclick="respondCollab(false)">✗ REJECT</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  // ── Firebase shims ───────────────────────────
+  const initializeApp = cfg => firebase.initializeApp(cfg);
+  const getDatabase   = ()  => firebase.database();
+  const dbRef  = (path)     => db.ref(path);
+  const dbSet  = (path, v)  => db.ref(path).set(v);
+  const dbGet  = (path)     => db.ref(path).get();
+  const dbUpd  = (path, v)  => db.ref(path).update(v);
+  const dbDel  = (path)     => db.ref(path).remove();
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBP-rCJhSzUOsqx9gY46BDZiVJC_xpMKy4",
+    authDomain: "imposter-game-b01ef.firebaseapp.com",
+    databaseURL: "https://imposter-game-b01ef-default-rtdb.firebaseio.com",
+    projectId: "imposter-game-b01ef",
+    storageBucket: "imposter-game-b01ef.firebasestorage.app",
+    messagingSenderId: "5466723581",
+    appId: "1:5466723581:web:9362edc935fbb3affd1a94"
+  };
+
+  // ── State ────────────────────────────────────
+  let myName='', myId='', roomCode='', isLeader=false, myWord='';
+  let selectedVote=null, hasVoted=false, hasMarkedReady=false;
+  let selectedCategory='mixed', selectedRounds=5, anonymousVoting=false;
+  let currentGame='imposter'; // 'imposter' | 'tierlist'
+  let selectedTierCount=10;
+
+  // ONE master room listener — never duplicated
+  let roomListener = null;
+  let lastNotifTs = 0;
+
+  // flags to prevent double-firing tally
+  let tallyDone = false;
+  let readyAdvanceDone = false;
+
+  // ── Word bank ────────────────────────────────
+  const WORDS = {
+    heroes: [
+      'Pawan Kalyan','Mahesh Babu','NTR','Ram Charan','Allu Arjun','Prabhas','Nani',
+      'Chiranjeevi','Balakrishna','Nagarjuna','Venkatesh','Ravi Teja','Allu Sirish',
+      'Bellamkonda Srinivas','Sai Dharam Tej','Varun Tej','Adivi Sesh','Sharwanand',
+      'Nikhil Siddhartha','Navdeep','Vishwak Sen','Raj Tarun','Kalyan Ram'
+    ],
+    movies: [
+      'Baahubali 2: The Conclusion','Pushpa 2: The Rule','RRR','Kalki 2898 AD',
+      'Salaar: Part 1 – Ceasefire','Baahubali: The Beginning','Saaho','Adipurush',
+      'Devara: Part 1','Pushpa: The Rise','Hanu-Man','They Call Him OG',
+      'Mana Shankara Vara Prasad Garu','Ala Vaikunthapurramuloo','Sarileru Neekevvaru',
+      'Sankranthiki Vasthunam','Sye Raa Narasimha Reddy','Waltair Veerayya',
+      'Bharat Ane Nenu','Rangasthalam','The RajaSaab','Srimanthudu','Game Changer',
+      'Aravinda Sametha Veera Raghava','Attarintiki Daredi','Guntur Kaaram',
+      'Sarkaru Vaari Paata','Maharshi','Khaidi No. 150','Bheemla Nayak','Magadheera',
+      'Jai Lava Kusa','Gabbar Singh','Janatha Garage','DJ: Duvvada Jagannadham',
+      'Spyder','Akhanda','Mirai','Radhe Shyam','Bhagavanth Kesari','Vakeel Saab',
+      'Tillu Square','Veera Simha Reddy','Geetha Govindam','Daaku Maharaaj',
+      'Akhanda 2: Thaandavam','Sarrainodu','F2: Fun and Frustration',
+      'Race Gurram','Eega'
+    ],
+    directors: [
+      'Rajamouli','Trivikram','Puri Jagannadh','Sreenu Vaitla','Sukumar',
+      'Boyapati Srinu','Harish Shankar','Vamshi Paidipally','Ram Gopal Varma',
+      'Krishna Vamsi','Surender Reddy','Maruthi','Srikanth Addala','Koratala Siva',
+      'Sandeep Vanga','Krish Jagarlamudi','Anil Ravipudi','Gopichand Malineni'
+    ],
+    politics: [
+      'Chandrababu Naidu','YS Jagan','Narendra Modi','KCR','YS Rajasekhara Reddy',
+      'Pawan Kalyan','Nandamuri Taraka Rama Rao','Indira Gandhi','Amit Shah',
+      'Revanth Reddy'
+    ]
+  };
+  // mixed = everything from all categories combined, shuffled at runtime
+  const categories   = ['mixed','heroes','movies','directors','politics'];
+  const roundOptions = [3, 5, 7, 10];
+
+  // ── Helpers ──────────────────────────────────
+  window.showScreen = id => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  };
+  function toast(msg, dur=2500){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),dur);
+  }
+  function genCode(){ return Math.random().toString(36).substring(2,8).toUpperCase(); }
+  function genId(){   return Math.random().toString(36).substring(2,12); }
+
+  // ── Single master listener ───────────────────
+  // We attach ONE listener to the whole room object.
+  // It fires whenever anything changes and routes to the right screen.
+  function attachRoomListener(){
+    if(roomListener) roomListener.off();
+    roomListener = db.ref(`rooms/${roomCode}`);
+    roomListener.on('value', snap => {
+      if(!snap.exists()) return;
+      const room = snap.val();
+      const phase = room.phase;
+      const currentScreen = document.querySelector('.screen.active')?.id;
+
+      if(phase === 'reveal' && currentScreen !== 'screen-reveal'){
+        enterReveal(room);
+      }
+      if(phase === 'vote' && currentScreen !== 'screen-vote'){
+        enterVote(room);
+      }
+      if(phase === 'result' && currentScreen !== 'screen-result'){
+        enterResult(room);
+      }
+      if(phase === 'winner' && currentScreen !== 'screen-winner'){
+        enterWinner(room);
+      }
+      if(phase === 'waiting' && currentScreen !== 'screen-waiting'){
+        showScreen('screen-waiting');
+      }
+      if(phase === 'tier-build' && currentScreen !== 'screen-tier-build'){
+        enterTierBuild(room);
+      }
+      if(phase === 'tier-vote' && currentScreen !== 'screen-tier-vote'){
+        enterTierVote(room);
+      }
+      if(phase === 'tier-result' && currentScreen !== 'screen-tier-result'){
+        enterTierResult(room);
+      }
+      if(phase === 'way-play' && currentScreen !== 'screen-way-play'){
+        enterWayPlay(room);
+      }
+
+      // live updates within current screen
+      if(phase === 'reveal' && currentScreen === 'screen-reveal'){
+        updateReadyStatus(room);
+      }
+      if(phase === 'vote' && currentScreen === 'screen-vote'){
+        updateVoteCounts(room);
+      }
+      if(phase === 'tier-build' && currentScreen === 'screen-tier-build'){
+        updateTierBuild(room);
+      }
+      if(phase === 'tier-vote' && currentScreen === 'screen-tier-vote'){
+        updateTierVote(room);
+      }
+      if(phase === 'way-play' && currentScreen === 'screen-way-play'){
+        updateWayPlay(room);
+      }
+    });
+  }
+
+  // ── Landing ──────────────────────────────────
+  window.goToLobby = (game) => {
+    myName = document.getElementById('player-name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); return; }
+    currentGame = game;
+    showScreen('screen-lobby-choice');
+  };
+  // keep old name working just in case
+  window.goToLobbyChoice = () => goToLobby('imposter');
+
+  // ── Create room ──────────────────────────────
+  window.createRoom = async () => {
+    roomCode=genCode(); myId=genId(); isLeader=true;
+    await dbSet(`rooms/${roomCode}`, {
+      leader:myId, phase:'waiting', game:currentGame,
+      category:'mixed', totalRounds:5, currentRound:0,
+      anonymousVoting:false, createdAt:Date.now()
+    });
+    await dbSet(`rooms/${roomCode}/players/${myId}`, {name:myName,ready:false,vote:null,score:0});
+    db.ref(`rooms/${roomCode}/players/${myId}`).onDisconnect().remove();
+    db.ref(`rooms/${roomCode}/notifications`).onDisconnect().set({msg:`${myName} disconnected`,ts:Date.now()});
+    enterWaitingRoom();
+  };
+
+  // ── Join room ────────────────────────────────
+  let joiningRoom = false; // prevent double-tap
+  window.joinRoom = async () => {
+    if(joiningRoom) return;
+    joiningRoom = true;
+    const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
+    if(joinBtn) joinBtn.disabled = true;
+
+    const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+    if(code.length<4){ toast('Enter a valid code'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
+    const snap = await dbGet(`rooms/${code}`);
+    if(!snap.exists()){ toast('Room not found!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
+    const room = snap.val();
+    if(room.phase!=='waiting'){ toast('Game already started!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
+
+    // check if this name is already in the room (double join guard)
+    const existingPlayers = room.players || {};
+    const nameTaken = Object.values(existingPlayers).some(p => p.name.toLowerCase()===myName.toLowerCase());
+    if(nameTaken){ toast('Your name is already in this room!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
+
+    roomCode=code; myId=genId(); isLeader=false;
+    currentGame = room.game || 'imposter';
+    await dbSet(`rooms/${roomCode}/players/${myId}`, {name:myName,ready:false,vote:null,score:0});
+
+    // auto-remove on disconnect
+    db.ref(`rooms/${roomCode}/players/${myId}`).onDisconnect().remove();
+    db.ref(`rooms/${roomCode}/notifications`).onDisconnect().set({
+      msg: `${myName} disconnected`, ts: Date.now()
+    });
+
+    joiningRoom=false;
+    enterWaitingRoom();
+  };
+
+  // ── Waiting room ─────────────────────────────
+  function enterWaitingRoom(){
+    document.getElementById('display-room-code').textContent = roomCode;
+    if(isLeader){
+      if(currentGame==='tierlist'){
+        document.getElementById('tier-leader-controls').style.display='block';
+        renderTierCategories(); renderTierCountOptions();
+      } else if(currentGame==='whoareyou'){
+        document.getElementById('way-leader-controls').style.display='block';
+        renderWayCategories();
+      } else {
+        document.getElementById('leader-controls').style.display='block';
+        renderCategories(); renderRoundOptions();
+      }
+    }
+    showScreen('screen-waiting');
+    attachRoomListener();
+    watchForKick();
+    watchNotifications();
+
+    // separate player list watcher for waiting room
+    db.ref(`rooms/${roomCode}/players`).on('value', snap=>{
+      const players=snap.val()||{};
+      const count=Object.keys(players).length;
+      const list=document.getElementById('waiting-player-list');
+      document.getElementById('player-count').textContent=count;
+      list.innerHTML='';
+      Object.entries(players).forEach(([id,p])=>{
+        const el=document.createElement('div');
+        el.className='player-item';
+        const isMe = id===myId;
+        const kickBtn = (isLeader && !isMe)
+          ? `<button onclick="kickPlayer('${id}')" style="margin-left:auto;background:rgba(255,63,63,.15);border:1px solid rgba(255,63,63,.3);color:var(--accent);font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:6px;cursor:pointer;letter-spacing:1px;">KICK</button>`
+          : '';
+        el.innerHTML=`<div class="pip"></div><span>${p.name}</span>${isMe?'<span class="badge">YOU</span>':''}${kickBtn}`;
+        list.appendChild(el);
+      });
+      const sb=document.getElementById('start-btn');
+      if(sb) sb.disabled=count<2;
+      const tsb=document.getElementById('tier-start-btn');
+      if(tsb) tsb.disabled=count<2;
+      const wsb=document.getElementById('way-start-btn');
+      if(wsb) wsb.disabled=count<2;
+      document.getElementById('waiting-msg').textContent=
+        count<2?'Need at least 2 players':`${count} player${count>1?'s':''} in lobby`;
+    });
+  }
+
+  function renderCategories(){
+    const el=document.getElementById('category-tags'); el.innerHTML='';
+    categories.forEach(cat=>{
+      const t=document.createElement('div');
+      t.className='tag'+(cat===selectedCategory?' selected':'');
+      t.textContent=cat;
+      t.onclick=()=>{ selectedCategory=cat; dbUpd(`rooms/${roomCode}`,{category:cat}); renderCategories(); };
+      el.appendChild(t);
+    });
+  }
+
+  function renderRoundOptions(){
+    const el=document.getElementById('rounds-selector'); el.innerHTML='';
+    roundOptions.forEach(n=>{
+      const b=document.createElement('div');
+      b.className='rounds-btn'+(n===selectedRounds?' selected':'');
+      b.textContent=n;
+      b.onclick=()=>{ selectedRounds=n; dbUpd(`rooms/${roomCode}`,{totalRounds:n}); renderRoundOptions(); };
+      el.appendChild(b);
+    });
+  }
+
+  window.toggleAnonymous = (val) => {
+    anonymousVoting = val;
+    dbUpd(`rooms/${roomCode}`, { anonymousVoting: val });
+  };
+
+  window.copyCode = () => {
+    navigator.clipboard.writeText(roomCode).then(()=>toast('Code copied!'));
+  };
+
+  // ── Start game ───────────────────────────────
+  window.startGame = async () => {
+    const snap=await dbGet(`rooms/${roomCode}/players`);
+    const players=snap.val();
+    const ids=Object.keys(players);
+    if(ids.length<2){ toast('Need at least 2 players!'); return; }
+    await launchRound(ids, 1);
+  };
+
+  async function launchRound(ids, roundNum){
+    const catSnap   = await dbGet(`rooms/${roomCode}/category`);
+    const totalSnap = await dbGet(`rooms/${roomCode}/totalRounds`);
+    const cat   = catSnap.val()   || 'mixed';
+    const total = totalSnap.val() || 5;
+
+    // avoid repeat words
+    const histSnap  = await dbGet(`rooms/${roomCode}/history`);
+    const history   = histSnap.val() || [];
+    const usedWords = history.map(h=>h.word);
+    // mixed = all categories combined
+    const fullList  = cat==='mixed'
+      ? Object.values(WORDS).flat()
+      : WORDS[cat];
+    const pool      = fullList.filter(w=>!usedWords.includes(w));
+    const wordList  = pool.length>0 ? pool : fullList;
+    const word      = wordList[Math.floor(Math.random()*wordList.length)];
+
+    // random imposter, just never the same person twice in a row
+    const lastImposterId = history.length>0 ? history[history.length-1].imposterId : null;
+    const eligible = ids.length>1 ? ids.filter(id => id!==lastImposterId) : ids;
+    const imposterId = eligible[Math.floor(Math.random()*eligible.length)];
+
+    // reset flags
+    tallyDone=false;
+    readyAdvanceDone=false;
+
+    const u={};
+    ids.forEach(id=>{
+      u[`rooms/${roomCode}/players/${id}/word`]  = id===imposterId ? '__imposter__' : word;
+      u[`rooms/${roomCode}/players/${id}/ready`] = false;
+      u[`rooms/${roomCode}/players/${id}/vote`]  = null;
+    });
+    u[`rooms/${roomCode}/word`]         = word;
+    u[`rooms/${roomCode}/imposter`]     = imposterId;
+    u[`rooms/${roomCode}/currentRound`] = roundNum;
+    u[`rooms/${roomCode}/totalRounds`]  = total;
+    u[`rooms/${roomCode}/phase`]        = 'reveal';
+    await db.ref('/').update(u);
+  }
+
+  // ── Reveal ───────────────────────────────────
+  function enterReveal(room){
+    hasMarkedReady=false;
+    readyAdvanceDone=false;
+    myWord = room.players[myId]?.word || '';
+    const round=room.currentRound, total=room.totalRounds;
+
+    document.getElementById('reveal-phase-label').textContent=`round ${round}/${total} // your word`;
+    const isImposter=myWord==='__imposter__';
+    document.getElementById('word-reveal-content').innerHTML=`
+      <div class="word-card ${isImposter?'imposter-card':''}">
+        <div class="word-label">${isImposter?'// you are':'// the word is'}</div>
+        <div class="word-text">${isImposter?'IMPOSTER':myWord}</div>
+      </div>
+      ${isImposter?'<p style="text-align:center;font-size:13px;color:var(--muted);margin-top:10px">Figure out the word. Don\'t get caught!</p>':''}
+    `;
+    document.getElementById('ready-btn').disabled=false;
+    document.getElementById('ready-status').textContent='Waiting for others...';
+    showScreen('screen-reveal');
+  }
+
+  function updateReadyStatus(room){
+    const players=room.players||{};
+    // only count players who are active in this round (have a word assigned)
+    const active=Object.values(players).filter(p=>p.word);
+    const readyCount=active.filter(p=>p.ready).length;
+    const el=document.getElementById('ready-status');
+    if(el) el.textContent=`${readyCount}/${active.length} ready`;
+
+    if(readyCount===active.length && active.length>0 && isLeader && !readyAdvanceDone){
+      readyAdvanceDone=true;
+      dbUpd(`rooms/${roomCode}`,{phase:'vote'});
+    }
+  }
+
+  window.markReady = async () => {
+    if(hasMarkedReady) return;
+    hasMarkedReady=true;
+    document.getElementById('ready-btn').disabled=true;
+    await dbUpd(`rooms/${roomCode}/players/${myId}`,{ready:true});
+  };
+
+  // ── Voting ───────────────────────────────────
+  function enterVote(room){
+    hasVoted=false; selectedVote=null; tallyDone=false;
+    anonymousVoting = room.anonymousVoting || false;
+    const mySecEl=document.getElementById('votes-on-me-section');
+    const myNmEl=document.getElementById('votes-on-me-names');
+    if(mySecEl) mySecEl.style.display='none';
+    if(myNmEl) myNmEl.innerHTML='';
+    const players=room.players, word=room.word;
+    const isImposter=myWord==='__imposter__';
+    const round=room.currentRound, total=room.totalRounds;
+
+    document.getElementById('vote-phase-label').textContent=`round ${round}/${total} // vote`;
+    document.getElementById('voting-word-display').innerHTML=`
+      <div class="rw-label">// the word was</div>
+      <div class="rw-word">${isImposter?'???':word}</div>
+    `;
+
+    const grid=document.getElementById('vote-grid');
+    grid.innerHTML='';
+    Object.entries(players).forEach(([id,p])=>{
+      if(id===myId) return;
+      const btn=document.createElement('button');
+      btn.className='vote-btn'; btn.dataset.id=id;
+      btn.innerHTML=`
+        <div style="flex:1;text-align:left">
+          <div>${p.name}</div>
+          <div class="vote-voters" id="vv-${id}"></div>
+        </div>
+        <span class="vote-count" id="vc-${id}" style="margin-left:10px;flex-shrink:0"></span>`;
+      btn.onclick=()=>{
+        document.querySelectorAll('.vote-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedVote=id;
+        document.getElementById('cast-vote-btn').disabled=false;
+      };
+      grid.appendChild(btn);
+    });
+    document.getElementById('cast-vote-btn').disabled=true;
+    document.getElementById('vote-status').textContent='';
+    showScreen('screen-vote');
+  }
+
+  function updateVoteCounts(room){
+    const players=room.players||{};
+    // build: targetId -> list of voter names
+    const voterMap={};
+    Object.entries(players).forEach(([voterId,p])=>{
+      if(p.vote){
+        if(!voterMap[p.vote]) voterMap[p.vote]=[];
+        voterMap[p.vote].push(p.name);
+      }
+    });
+
+    Object.keys(players).forEach(id=>{
+      const count = (voterMap[id]||[]).length;
+      const countEl=document.getElementById(`vc-${id}`);
+      const voterEl=document.getElementById(`vv-${id}`);
+      if(countEl){
+        if(anonymousVoting){
+          countEl.textContent=`${count} vote${count===1?'':'s'}`;
+        } else {
+          countEl.textContent='';
+        }
+      }
+      if(voterEl){
+        if(anonymousVoting || count===0){
+          voterEl.innerHTML='';
+        } else {
+          voterEl.innerHTML=(voterMap[id]||[])
+            .map(n=>`<span class="voter-chip">${n}</span>`)
+            .join('');
+        }
+      }
+    });
+
+    // show who voted for ME
+    const myVoters = voterMap[myId] || [];
+    const mySection = document.getElementById('votes-on-me-section');
+    const myNames   = document.getElementById('votes-on-me-names');
+    if(mySection && myNames){
+      if(myVoters.length === 0){
+        mySection.style.display='none';
+        myNames.innerHTML='';
+      } else {
+        mySection.style.display='block';
+        if(anonymousVoting){
+          myNames.textContent=`${myVoters.length} player${myVoters.length===1?'':'s'} voted for you`;
+        } else {
+          myNames.innerHTML = myVoters.map(n=>`<span class="voter-chip">${n}</span>`).join(' ');
+        }
+      }
+    }
+
+    const activePlayers=Object.values(players).filter(p=>p.word);
+    const voted=activePlayers.filter(p=>p.vote).length;
+    const total=activePlayers.length;
+    const statusEl=document.getElementById('vote-status');
+    if(statusEl) statusEl.textContent=`${voted}/${total} voted`;
+
+    if(voted===total && total>0 && isLeader && !tallyDone){
+      tallyDone=true;
+      tallyAndAdvance(players, room);
+    }
+  }
+
+  window.castVote = async () => {
+    if(!selectedVote||hasVoted) return;
+    hasVoted=true;
+    document.getElementById('cast-vote-btn').disabled=true;
+    await dbUpd(`rooms/${roomCode}/players/${myId}`,{vote:selectedVote});
+    toast('Vote cast!');
+  };
+
+  // ── Tally ────────────────────────────────────
+  async function tallyAndAdvance(players, room){
+    const imposterId=room.imposter, word=room.word;
+    const round=room.currentRound, total=room.totalRounds;
+
+    // individual scoring: each crewmate who voted FOR the imposter gets +3
+    // imposter gets +5 if nobody caught them, +0 if caught by anyone
+    const caughtBy = Object.entries(players)
+      .filter(([id, p]) => p.vote === imposterId)
+      .map(([id]) => id);
+    const caught = caughtBy.length > 0;
+
+    const u={};
+    Object.entries(players).forEach(([id,p])=>{
+      const cur=p.score||0;
+      if(id===imposterId){
+        // imposter: +5 if nobody voted them, +0 if at least one person got them
+        u[`rooms/${roomCode}/players/${id}/score`] = cur + (caught ? 0 : 5);
+      } else {
+        // crewmate: +3 if they personally voted for the imposter, else +0
+        u[`rooms/${roomCode}/players/${id}/score`] = cur + (p.vote===imposterId ? 3 : 0);
+      }
+    });
+
+    // for history display: who got the most votes (to show who was "voted out")
+    const counts={};
+    Object.values(players).forEach(p=>{ if(p.vote) counts[p.vote]=(counts[p.vote]||0)+1; });
+    let maxVotes=0, votedOutId=null;
+    Object.entries(counts).forEach(([id,c])=>{ if(c>maxVotes){ maxVotes=c; votedOutId=id; } });
+
+    const histSnap=await dbGet(`rooms/${roomCode}/history`);
+    const history=histSnap.val()||[];
+    history.push({
+      round, word, imposterId,
+      imposterName: players[imposterId]?.name||'?',
+      votedOutId,
+      votedOutName: players[votedOutId]?.name||'?',
+      caught,
+      caughtBy
+    });
+
+    u[`rooms/${roomCode}/history`]=history;
+    u[`rooms/${roomCode}/phase`]='result';
+    await db.ref('/').update(u);
+  }
+
+  // ── Result ───────────────────────────────────
+  function enterResult(room){
+    const players=room.players, history=room.history||[];
+    const last=history[history.length-1];
+    const round=room.currentRound, total=room.totalRounds;
+
+    const caughtBy = last.caughtBy || [];
+    const caughtNames = caughtBy.map(id => room.players[id]?.name).filter(Boolean);
+    document.getElementById('result-content').innerHTML=last.caught?`
+      <div class="result-big win">CAUGHT!</div>
+      <p class="center small-muted">${last.imposterName} was the imposter.<br/>
+      Caught by: <strong style="color:var(--green)">${caughtNames.join(', ')}</strong><br/>
+      The word was <strong style="color:var(--accent2)">${last.word}</strong></p>
+    `:`
+      <div class="result-big lose">ESCAPED!</div>
+      <p class="center small-muted">
+        ${last.imposterName} was the imposter & got away with <strong style="color:var(--yellow)">+5 pts!</strong><br/>
+        The word was <strong style="color:var(--accent2)">${last.word}</strong>
+      </p>
+    `;
+
+    const pct=Math.round((round/total)*100);
+    document.getElementById('pb-label').textContent=`round ${round} of ${total}`;
+    document.getElementById('pb-pct').textContent=`${pct}%`;
+    document.getElementById('pb-fill').style.width=`${pct}%`;
+    document.getElementById('lb-round-badge').textContent=`after round ${round}`;
+
+    renderLeaderboard(players,'lb-rows');
+    renderHistory(history,'rh-list');
+
+    const area=document.getElementById('result-action-area');
+    if(isLeader){
+      area.innerHTML=round>=total
+        ?`<button class="btn btn-green" onclick="endGame()">SEE FINAL RESULTS </button>`
+        :`<button class="btn btn-primary" onclick="nextRound()">NEXT ROUND →</button>`;
+    } else {
+      area.innerHTML=`<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p>`;
+    }
+
+    showScreen('screen-result');
+  }
+
+  // ── Winner ───────────────────────────────────
+  function enterWinner(room){
+    const players=room.players, history=room.history||[];
+    const sorted=Object.entries(players)
+      .map(([id,p])=>({id,name:p.name,score:p.score||0}))
+      .sort((a,b)=>b.score-a.score);
+
+    const podium=document.getElementById('winner-podium');
+    podium.innerHTML='';
+    const podiumOrder=[1,0,2], blockClasses=['p2','p1','p3'];
+    podiumOrder.forEach((rank,col)=>{
+      const p=sorted[rank]; if(!p) return;
+      const el=document.createElement('div');
+      el.className='podium-place';
+      el.innerHTML=`
+        <div class="podium-name">${p.name}</div>
+        <div class="podium-score">${p.score} pts</div>
+        <div class="podium-block ${blockClasses[col]}">${rank+1}</div>
+      `;
+      podium.appendChild(el);
+    });
+
+    renderLeaderboard(players,'final-lb-rows');
+    renderHistory(history,'final-rh-list');
+
+    const area=document.getElementById('winner-action-area');
+    area.innerHTML=isLeader
+      ?`<button class="btn btn-green" onclick="playAgain()">PLAY AGAIN</button>
+        <button class="btn btn-ghost" onclick="leaveRoom()">LEAVE ROOM</button>`
+      :`<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p>
+        <button class="btn btn-ghost mt" onclick="leaveRoom()">LEAVE ROOM</button>`;
+
+    showScreen('screen-winner');
+  }
+
+  // ── Leaderboard & History renderers ──────────
+  function renderLeaderboard(players, containerId){
+    const sorted=Object.entries(players)
+      .map(([id,p])=>({id,name:p.name,score:p.score||0}))
+      .sort((a,b)=>b.score-a.score);
+    const medals=['🥇','🥈','🥉'];
+    const el=document.getElementById(containerId); el.innerHTML='';
+    sorted.forEach((p,i)=>{
+      const row=document.createElement('div');
+      row.className='lb-row'+(p.id===myId?' me':'')+(i===0?' top':'');
+      row.innerHTML=`
+        <div class="lb-rank">${i<3?medals[i]:i+1}</div>
+        <div class="lb-name">${p.name}${p.id===myId?'<span class="lb-you">YOU</span>':''}</div>
+        <div class="lb-score-block">
+          <div class="lb-score">${p.score}</div>
+          <div class="lb-score-label">pts</div>
+        </div>`;
+      el.appendChild(row);
+    });
+  }
+
+  function renderHistory(history, containerId){
+    const el=document.getElementById(containerId); el.innerHTML='';
+    [...history].reverse().forEach(h=>{
+      const row=document.createElement('div');
+      row.className='rh-item';
+      row.innerHTML=`
+        <div class="rh-num">#${h.round}</div>
+        <div class="rh-word">${h.word}</div>
+        <div class="rh-imposter">impostor: ${h.imposterName}</div>
+        <div class="rh-caught ${h.caught?'yes':'no'}">${h.caught?'CAUGHT':'ESCAPED'}</div>`;
+      el.appendChild(row);
+    });
+  }
+
+  // ── Next round / End / Play again / Leave ────
+  window.nextRound = async () => {
+    if(!isLeader) return;
+    const snap=await dbGet(`rooms/${roomCode}`);
+    const room=snap.val();
+    const ids=Object.keys(room.players);
+    tallyDone=false; readyAdvanceDone=false;
+    await launchRound(ids, room.currentRound+1);
+  };
+
+  window.endGame = async () => {
+    if(!isLeader) return;
+    await dbUpd(`rooms/${roomCode}`,{phase:'winner'});
+  };
+
+  window.playAgain = async () => {
+    if(!isLeader) return;
+    const snap=await dbGet(`rooms/${roomCode}/players`);
+    const players=snap.val();
+    const u={};
+    Object.keys(players).forEach(id=>{
+      u[`rooms/${roomCode}/players/${id}/ready`]=false;
+      u[`rooms/${roomCode}/players/${id}/vote`]=null;
+      u[`rooms/${roomCode}/players/${id}/word`]=null;
+      u[`rooms/${roomCode}/players/${id}/score`]=0;
+      u[`rooms/${roomCode}/players/${id}/wayWord`]=null;
+      u[`rooms/${roomCode}/players/${id}/wayReady`]=false;
+    });
+    u[`rooms/${roomCode}/phase`]='waiting';
+    u[`rooms/${roomCode}/currentRound`]=0;
+    u[`rooms/${roomCode}/history`]=null;
+    tallyDone=false; readyAdvanceDone=false;
+    await db.ref('/').update(u);
+  };
+
+  // kick a player (leader only)
+  window.kickPlayer = async (targetId) => {
+    if(!isLeader) return;
+    const snap = await dbGet(`rooms/${roomCode}/players/${targetId}`);
+    const name = snap.exists() ? snap.val().name : 'Player';
+    await dbDel(`rooms/${roomCode}/players/${targetId}`);
+    await dbSet(`rooms/${roomCode}/notifications`, { msg: `${name} was kicked`, ts: Date.now() });
+    toast('Player kicked!');
+  };
+
+  // detect if WE got kicked (our entry disappeared mid-game)
+  function watchNotifications(){
+    db.ref(`rooms/${roomCode}/notifications`).on('value', snap=>{
+      if(!snap.exists()) return;
+      const n = snap.val();
+      if(!n || !n.ts || !n.msg) return;
+      if(n.ts <= lastNotifTs) return; // already shown
+      lastNotifTs = n.ts;
+      // show as a styled broadcast toast (different from normal toast)
+      showBroadcast(n.msg);
+    });
+  }
+
+  function showBroadcast(msg){
+    const el = document.getElementById('broadcast');
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  let leavingIntentionally = false; // flag so watchForKick ignores voluntary leave
+
+  function watchForKick(){
+    const savedRoom = roomCode;
+    db.ref(`rooms/${savedRoom}/players/${myId}`).on('value', async snap=>{
+      // ignore if: entry still exists, we're leaving voluntarily, or room is already cleared
+      if(snap.exists() || leavingIntentionally || !roomCode) return;
+
+      // double-check the room itself still exists — if not, it was just cleaned up normally
+      const roomSnap = await dbGet(`rooms/${savedRoom}`);
+      if(!roomSnap.exists()) return; // room deleted, not a kick
+
+      // room exists but our player entry is gone → we were kicked
+      if(roomListener){ roomListener.off(); roomListener=null; }
+      db.ref(`rooms/${savedRoom}/players`).off();
+      db.ref(`rooms/${savedRoom}/players/${myId}`).off();
+      db.ref(`rooms/${savedRoom}/notifications`).off();
+      roomCode=''; myId=''; isLeader=false;
+      toast('You were removed from the room.');
+      showScreen('screen-landing');
+    });
+  }
+
+  window.leaveRoom = async () => {
+    leavingIntentionally = true; // tell watchForKick to ignore the deletion
+
+    // detach all listeners before deleting so they don't react to our own removal
+    if(roomListener){ roomListener.off(); roomListener=null; }
+    db.ref(`rooms/${roomCode}/players`).off();
+    db.ref(`rooms/${roomCode}/players/${myId}`).off();
+    db.ref(`rooms/${roomCode}/notifications`).off();
+
+    const savedRoom = roomCode;
+    const savedId   = myId;
+    roomCode=''; myId=''; isLeader=false; // clear state immediately
+
+    await dbDel(`rooms/${savedRoom}/players/${savedId}`);
+
+    // only delete the whole room if it's now empty
+    const snap = await dbGet(`rooms/${savedRoom}/players`);
+    if(!snap.exists() || Object.keys(snap.val()).length===0){
+      await dbDel(`rooms/${savedRoom}`);
+    }
+
+    leavingIntentionally = false;
+    showScreen('screen-landing');
+  };
+
+  // ════════════════════════════════════════
+  //   TIER LIST GAME
+  // ════════════════════════════════════════
+  const TIER_LEVELS = ['S','A','B','C','D'];
+  const TIER_COUNTS = [8, 10, 12, 15];
+
+  function renderTierCategories(){
+    const el=document.getElementById('tier-category-tags'); el.innerHTML='';
+    categories.forEach(cat=>{
+      const t=document.createElement('div');
+      t.className='tag'+(cat===selectedCategory?' selected':'');
+      t.textContent=cat;
+      t.onclick=()=>{selectedCategory=cat;dbUpd(`rooms/${roomCode}`,{category:cat});renderTierCategories();};
+      el.appendChild(t);
+    });
+  }
+
+  function renderTierCountOptions(){
+    const el=document.getElementById('tier-count-selector'); el.innerHTML='';
+    TIER_COUNTS.forEach(n=>{
+      const b=document.createElement('div');
+      b.className='rounds-btn'+(n===selectedTierCount?' selected':'');
+      b.textContent=n;
+      b.onclick=()=>{selectedTierCount=n;renderTierCountOptions();};
+      el.appendChild(b);
+    });
+  }
+
+  window.startTierGame = async () => {
+    if(!isLeader) return;
+    const snap=await dbGet(`rooms/${roomCode}/players`);
+    const players=snap.val();
+    if(Object.keys(players).length<2){ toast('Need at least 2 players!'); return; }
+
+    const catSnap=await dbGet(`rooms/${roomCode}/category`);
+    const cat=catSnap.val()||'mixed';
+    const fullList=cat==='mixed'?Object.values(WORDS).flat():WORDS[cat];
+    // pick random items
+    const shuffled=[...fullList].sort(()=>Math.random()-.5);
+    const items=shuffled.slice(0,selectedTierCount).map(w=>({id:w.replace(/[^a-z0-9]/gi,'_'),label:w,tier:null}));
+
+    await dbUpd(`rooms/${roomCode}`,{
+      phase:'tier-build',
+      tierItems: items,
+      tierCount: selectedTierCount,
+      tierCollaborators: null,
+      tierCollabRequests: null,
+      tierDoneBy: null,
+    });
+  };
+
+  // drag state
+  let dragItem=null;
+
+  function enterTierBuild(room){
+    showScreen('screen-tier-build');
+    buildChatWidget(document.getElementById('tier-build-chat'), `rooms/${roomCode}/chat`);
+    updateTierBuild(room);
+  }
+
+  function updateTierBuild(room){
+    const items=room.tierItems||[];
+    const cat=room.category||'mixed';
+    const collaborators=room.tierCollaborators||{};  // {id: true}
+    const doneBy=room.tierDoneBy||{};                // {id: true}
+    const isCollaborator=collaborators[myId]===true;
+    const canRank=isLeader||isCollaborator;
+
+    document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER LIST`;
+
+    // phase label & leader label
+    if(isLeader){
+      document.getElementById('tier-phase-label').textContent='// drag items into tiers';
+      const collabNames=Object.keys(collaborators).map(id=>room.players[id]?.name).filter(Boolean);
+      document.getElementById('tier-leader-label').textContent=
+        collabNames.length>0?`collaborating with: ${collabNames.join(', ')}`:'you are ranking — drag items below';
+    } else if(isCollaborator){
+      document.getElementById('tier-phase-label').textContent='// collaborating on tier list';
+      document.getElementById('tier-leader-label').textContent='you can now drag items!';
+    } else {
+      document.getElementById('tier-phase-label').textContent='// watching the leader rank';
+      document.getElementById('tier-leader-label').textContent='';
+    }
+
+    // show/hide collab button — check rejection cooldown
+    const myRequest = (room.tierCollabRequests||{})[myId] || '';
+    const isRejected = myRequest.startsWith('rejected:');
+    if(isRejected && collabRejectedAt === 0){
+      collabRejectedAt = parseInt(myRequest.split(':')[1]) || Date.now();
+      startCollabCooldownTick();
+    }
+    const elapsed = Date.now() - collabRejectedAt;
+    const cooldown = 60000;
+    const onCooldown = isRejected && elapsed < cooldown;
+
+    const collabBtn = document.getElementById('tier-collab-btn');
+    if(!canRank && myRequest !== 'approved'){
+      collabBtn.style.display = 'block';
+      if(myRequest === 'pending'){
+        collabBtn.disabled = true;
+        collabBtn.textContent = '⏳ waiting...';
+      } else if(onCooldown){
+        collabBtn.disabled = true;
+        const secsLeft = Math.ceil((cooldown - elapsed) / 1000);
+        collabBtn.textContent = `🚫 wait ${secsLeft}s`;
+      } else {
+        collabBtn.disabled = false;
+        collabBtn.textContent = '🤝 COLLABORATE';
+      }
+    } else {
+      collabBtn.style.display = 'none';
+    }
+    document.getElementById('tier-done-btn-wrap').style.display=canRank&&!doneBy[myId]?'block':'none';
+
+    // done status: show how many rankers have clicked done
+    const rankerIds=[room.leader,...Object.keys(collaborators)];
+    const doneCount=rankerIds.filter(id=>doneBy[id]).length;
+    const doneStatus=document.getElementById('tier-done-status');
+    if(rankerIds.length>1){
+      doneStatus.style.display='block';
+      doneStatus.textContent=`${doneCount}/${rankerIds.length} done ranking`;
+    } else {
+      doneStatus.style.display='none';
+    }
+
+    // build tier rows
+    const tierRowsEl=document.getElementById('tier-rows');
+    tierRowsEl.innerHTML='';
+    TIER_LEVELS.forEach(tier=>{
+      const tierItems=items.filter(it=>it.tier===tier);
+      const row=document.createElement('div');
+      row.className=`tier-row tier-${tier.toLowerCase()}`;
+      row.innerHTML=`<div class="tier-label">${tier}</div><div class="tier-slots" id="slots-${tier}" data-tier="${tier}"></div>`;
+      tierRowsEl.appendChild(row);
+      const slots=row.querySelector('.tier-slots');
+      tierItems.forEach(it=>slots.appendChild(makeChip(it.id,it.label,canRank)));
+      if(canRank) setupDropZone(slots,tier);
+    });
+
+    // unranked pool
+    const pool=document.getElementById('unranked-pool');
+    pool.innerHTML='';
+    const unranked=items.filter(it=>!it.tier);
+    unranked.forEach(it=>pool.appendChild(makeChip(it.id,it.label,canRank)));
+    if(canRank) setupDropZone(pool,null);
+
+    // viewer message
+    document.getElementById('tier-viewer-msg').style.display=canRank?'none':'block';
+    if(!canRank){
+      const ranked=items.filter(it=>it.tier).length;
+      document.getElementById('tier-viewer-msg').textContent=`${ranked}/${items.length} items ranked — discuss!`;
+    }
+
+    // leader: watch for pending collab requests and show popup
+    if(isLeader){
+      const requests=room.tierCollabRequests||{};
+      const pending=Object.entries(requests).find(([id,v])=>v==='pending'&&id!==myId);
+      if(pending){
+        const [reqId]=pending;
+        const reqName=room.players[reqId]?.name||'Someone';
+        pendingCollabId=reqId;
+        document.getElementById('collab-popup-msg').textContent=`${reqName} wants to help rank the tier list`;
+        document.getElementById('collab-popup').style.display='flex';
+      } else {
+        document.getElementById('collab-popup').style.display='none';
+        pendingCollabId=null;
+      }
+    }
+  }
+
+  let pendingCollabId=null;
+
+  let collabRejectedAt = 0;
+  let _collabCooldownTimer = null;
+
+  function startCollabCooldownTick(){
+    if(_collabCooldownTimer) clearInterval(_collabCooldownTimer);
+    _collabCooldownTimer = setInterval(()=>{
+      const btn = document.getElementById('tier-collab-btn');
+      if(!btn || btn.style.display === 'none') return;
+      const elapsed = Date.now() - collabRejectedAt;
+      const cooldown = 60000;
+      if(elapsed >= cooldown){
+        clearInterval(_collabCooldownTimer);
+        _collabCooldownTimer = null;
+        btn.disabled = false;
+        btn.textContent = '🤝 COLLABORATE';
+      } else {
+        const secsLeft = Math.ceil((cooldown - elapsed) / 1000);
+        btn.textContent = `🚫 wait ${secsLeft}s`;
+      }
+    }, 1000);
+  }
+
+  window.requestCollaborate=async()=>{
+    // cooldown check
+    const elapsed = Date.now() - collabRejectedAt;
+    const cooldown = 60000; // 60 seconds
+    if(elapsed < cooldown){
+      const secs = Math.ceil((cooldown - elapsed) / 1000);
+      toast(`Wait ${secs}s before requesting again`);
+      return;
+    }
+    const btn=document.getElementById('tier-collab-btn');
+    btn.disabled=true;
+    btn.textContent='⏳ waiting...';
+    await dbSet(`rooms/${roomCode}/tierCollabRequests/${myId}`,'pending');
+    await db.ref(`rooms/${roomCode}/chat`).push({uid:'__system__',name:'🤝 system',text:`${myName} wants to collaborate!`,ts:Date.now()});
+  };
+
+  window.respondCollab=async(approved)=>{
+    if(!pendingCollabId) return;
+    const id=pendingCollabId;
+    const snap=await dbGet(`rooms/${roomCode}/players/${id}`);
+    const name=snap.exists()?snap.val().name:'Someone';
+    const u={};
+    u[`rooms/${roomCode}/tierCollabRequests/${id}`]=approved?'approved':`rejected:${Date.now()}`;
+    if(approved) u[`rooms/${roomCode}/tierCollaborators/${id}`]=true;
+    await db.ref('/').update(u);
+    document.getElementById('collab-popup').style.display='none';
+    pendingCollabId=null;
+    const msg=approved?`✅ ${name} is now collaborating!`:`❌ ${name}'s collaborate request was rejected`;
+    await db.ref(`rooms/${roomCode}/chat`).push({uid:'__system__',name:'🤝 system',text:msg,ts:Date.now()});
+  };
+
+  window.tierDone=async()=>{
+    // mark this player as done
+    await dbSet(`rooms/${roomCode}/tierDoneBy/${myId}`,true);
+    // check if all rankers are done
+    const roomSnap=await dbGet(`rooms/${roomCode}`);
+    const room=roomSnap.val();
+    const collaborators=room.tierCollaborators||{};
+    const doneBy=room.tierDoneBy||{};
+    doneBy[myId]=true;
+    const rankerIds=[room.leader,...Object.keys(collaborators)];
+    const allDone=rankerIds.every(id=>doneBy[id]);
+    if(allDone){
+      await dbUpd(`rooms/${roomCode}`,{phase:'tier-vote'});
+    }
+  };
+
+  function makeChip(id,label,draggable){
+    const el=document.createElement('div');
+    el.className='tier-chip';
+    el.textContent=label;
+    el.dataset.id=id;
+    if(draggable){
+      el.draggable=true;
+      el.addEventListener('dragstart',e=>{
+        dragItem=id;
+        setTimeout(()=>el.classList.add('dragging'),0);
+        e.dataTransfer.effectAllowed='move';
+      });
+      el.addEventListener('dragend',()=>{
+        el.classList.remove('dragging');
+        dragItem=null;
+      });
+      // touch support
+      el.addEventListener('touchstart',onTouchStart,{passive:true});
+      el.addEventListener('touchmove',onTouchMove,{passive:false});
+      el.addEventListener('touchend',onTouchEnd,{passive:true});
+    } else {
+      el.style.cursor='default';
+      el.className='tier-viewer-chip';
+    }
+    return el;
+  }
+
+  function setupDropZone(el,tier){
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',async e=>{
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if(!dragItem) return;
+      await moveTierItem(dragItem,tier);
+    });
+  }
+
+  async function moveTierItem(itemId,tier){
+    const snap=await dbGet(`rooms/${roomCode}/tierItems`);
+    const items=snap.val()||[];
+    const idx=items.findIndex(it=>it.id===itemId);
+    if(idx===-1) return;
+    items[idx].tier=tier;
+    await dbSet(`rooms/${roomCode}/tierItems`,items);
+  }
+
+  // ── Touch drag support ──
+  let _touchDragId=null, _touchClone=null;
+
+  function onTouchStart(e){
+    const chip=e.currentTarget;
+    _touchDragId=chip.dataset.id;
+    _touchClone=chip.cloneNode(true);
+    _touchClone.style.cssText=`position:fixed;opacity:.8;pointer-events:none;z-index:9999;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--text)`;
+    document.body.appendChild(_touchClone);
+  }
+
+  function onTouchMove(e){
+    if(!_touchClone) return;
+    e.preventDefault();
+    const t=e.touches[0];
+    _touchClone.style.left=(t.clientX-40)+'px';
+    _touchClone.style.top=(t.clientY-20)+'px';
+  }
+
+  function onTouchEnd(e){
+    if(!_touchClone||!_touchDragId) return;
+    const t=e.changedTouches[0];
+    _touchClone.remove(); _touchClone=null;
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const zone=el?.closest('[data-tier],[id="unranked-pool"]');
+    if(!zone) { _touchDragId=null; return; }
+    const tier=zone.dataset.tier||null;
+    moveTierItem(_touchDragId,tier);
+    _touchDragId=null;
+  }
+
+  // ── Vote screen ──
+  function enterTierVote(room){
+    // always reset buttons fresh — critical for play again
+    document.getElementById('btn-approve').disabled=false;
+    document.getElementById('btn-disapprove').disabled=false;
+    showScreen('screen-tier-vote');
+    renderReadonlyTiers(room.tierItems||[],'tier-vote-rows');
+    buildChatWidget(document.getElementById('tier-vote-chat'), `rooms/${roomCode}/chat`);
+    updateTierVote(room);
+  }
+
+  function updateTierVote(room){
+    const players=room.players||{};
+    const votes=room.tierVotes||{};
+    const total=Object.keys(players).length;
+    const voteCount=Object.keys(votes).length;
+    // update button state
+    if(votes[myId]){
+      document.getElementById('btn-approve').disabled=true;
+      document.getElementById('btn-disapprove').disabled=true;
+    }
+    document.getElementById('tier-vote-tally').textContent=`${voteCount}/${total} voted`;
+    // if all voted and leader → advance
+    if(voteCount>=total&&isLeader){
+      dbUpd(`rooms/${roomCode}`,{phase:'tier-result'});
+    }
+  }
+
+  window.castTierVote=async(v)=>{
+    await dbSet(`rooms/${roomCode}/tierVotes/${myId}`,v);
+    document.getElementById('btn-approve').disabled=true;
+    document.getElementById('btn-disapprove').disabled=true;
+    toast(v==='approve'?'👍 Approved!':'👎 Disapproved!');
+  };
+
+  // ── Result screen ──
+  function enterTierResult(room){
+    const items=room.tierItems||[];
+    const players=room.players||{};
+    const votes=room.tierVotes||{};
+
+    const approves=Object.values(votes).filter(v=>v==='approve').length;
+    const disapproves=Object.values(votes).filter(v=>v==='disapprove').length;
+    const total=approves+disapproves;
+    const approved=approves>disapproves;
+
+    const banner=document.getElementById('tier-verdict-banner');
+    banner.textContent=approved?'APPROVED!':'RATIO\'D!';
+    banner.style.color=approved?'var(--green)':'var(--accent)';
+
+    renderReadonlyTiers(items,'tier-result-rows');
+
+    // player votes
+    const votesEl=document.getElementById('tier-result-votes');
+    votesEl.innerHTML='';
+    const pctBar=document.createElement('div');
+    pctBar.className='vote-result-bar';
+    pctBar.style.marginBottom='14px';
+    const pct=total>0?Math.round((approves/total)*100):0;
+    pctBar.innerHTML=`<div class="vote-result-yes" style="width:${pct}%"></div><div class="vote-result-no" style="width:${100-pct}%"></div>`;
+    votesEl.appendChild(pctBar);
+    Object.entries(votes).forEach(([pid,v])=>{
+      const name=players[pid]?.name||'?';
+      const chip=document.createElement('div');
+      chip.className=`player-vote-chip ${v==='approve'?'pvc-approve':'pvc-disapprove'}`;
+      chip.innerHTML=`<span>${v==='approve'?'👍':'👎'}</span><span>${name}</span>`;
+      votesEl.appendChild(chip);
+    });
+
+    const area=document.getElementById('tier-result-actions');
+    area.innerHTML=isLeader
+      ?`<button class="btn btn-green" onclick="tierPlayAgain()">PLAY AGAIN</button>
+         <button class="btn btn-ghost" onclick="leaveRoom()">LEAVE ROOM</button>`
+      :`<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p>
+        <button class="btn btn-ghost mt" onclick="leaveRoom()">LEAVE ROOM</button>`;
+
+    showScreen('screen-tier-result');
+  }
+
+  function renderReadonlyTiers(items,containerId){
+    const el=document.getElementById(containerId); el.innerHTML='';
+    TIER_LEVELS.forEach(tier=>{
+      const tierItems=items.filter(it=>it.tier===tier);
+      if(tierItems.length===0) return;
+      const row=document.createElement('div');
+      row.className=`tier-row tier-${tier.toLowerCase()}`;
+      row.style.marginBottom='6px';
+      const slots=document.createElement('div');
+      slots.className='tier-slots';
+      slots.style.pointerEvents='none';
+      tierItems.forEach(it=>slots.appendChild(makeChip(it.id,it.label,false)));
+      row.innerHTML=`<div class="tier-label">${tier}</div>`;
+      row.appendChild(slots);
+      el.appendChild(row);
+    });
+    // show unranked if any
+    const unranked=items.filter(it=>!it.tier);
+    if(unranked.length>0){
+      const row=document.createElement('div');
+      row.style.cssText='margin-top:8px';
+      const lbl=document.createElement('div');
+      lbl.style.cssText='font-family:"DM Mono",monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;text-transform:uppercase';
+      lbl.textContent='// unranked';
+      row.appendChild(lbl);
+      const pool=document.createElement('div');
+      pool.className='unranked-pool';
+      pool.style.pointerEvents='none';
+      unranked.forEach(it=>pool.appendChild(makeChip(it.id,it.label,false)));
+      row.appendChild(pool);
+      el.appendChild(row);
+    }
+  }
+
+  window.tierPlayAgain=async()=>{
+    if(!isLeader) return;
+    chatListeners = {};
+    collabRejectedAt = 0;
+    if(_collabCooldownTimer){ clearInterval(_collabCooldownTimer); _collabCooldownTimer=null; }
+    db.ref(`rooms/${roomCode}/chat`).off();
+    const snap=await dbGet(`rooms/${roomCode}/players`);
+    const u={};
+    Object.keys(snap.val()).forEach(id=>{
+      u[`rooms/${roomCode}/players/${id}/ready`]=false;
+    });
+    u[`rooms/${roomCode}/phase`]='waiting';
+    u[`rooms/${roomCode}/tierItems`]=null;
+    u[`rooms/${roomCode}/tierVotes`]=null;
+    u[`rooms/${roomCode}/tierCollaborators`]=null;
+    u[`rooms/${roomCode}/tierCollabRequests`]=null;
+    u[`rooms/${roomCode}/tierDoneBy`]=null;
+    u[`rooms/${roomCode}/chat`]=null;
+    await db.ref('/').update(u);
+  };
+
+  // ════════════════════════════════════════
+  //   CHAT SYSTEM
+  // ════════════════════════════════════════
+  const CHAT_PRESETS = {
+    placement: [
+      { emoji:'🔥', text:'Idhi next level' },
+      { emoji:'📈', text:'Konchem respect ivvu bro' },
+      { emoji:'📉', text:'kinda pettali bro' },
+      { emoji:'😤', text:'Idhi insult laga undi' },
+      { emoji:'🫡', text:'sarele kani' },
+      { emoji:'🤦', text:'Idhi too much ra rey' },
+      { emoji:'🧨', text:'controversial' },
+      { emoji:'🔥', text:'Absolutely S tier' },
+      { emoji:'💀', text:"No way that's S" },
+      { emoji:'📈', text:'Too low, move it up' },
+      { emoji:'📉', text:'Too high, move it down' },
+      { emoji:'✅', text:'I agree with this' },
+      { emoji:'❌', text:'Hard disagree' },
+    ],
+    debate: [
+      { emoji:'✅', text:'Naa doubt confirm ayyindi' },
+      { emoji:'❓', text:'endhuku brooo' },
+      { emoji:'😶', text:'Nenu convince avvaled' },
+      { emoji:'😑', text:'Idhi safe play' },
+      { emoji:'🫠', text:'thappu idhi thappu' },
+      { emoji:'😏', text:'nuetral ga undali' },
+      { emoji:'😭', text:'edisinattu undhi' },
+      { emoji:'🤔', text:'Let\'s discuss this' },
+      { emoji:'👀', text:'Controversial pick' },
+      { emoji:'😭', text:'This is criminal' },
+      { emoji:'💯', text:'Perfect placement' },
+      { emoji:'🗑️', text:'That belongs in D' },
+    ],
+    energy: [
+      { emoji:'🔊', text:'CHAT IS THIS REAL' },
+      { emoji:'😂', text:"I can't defend this" },
+      { emoji:'🤝', text:'We move' },
+      { emoji:'⚡', text:'Bold choice' },
+    ]
+  };
+
+  let chatListeners = {}; // keyed by roomCode+screen to avoid dupes
+
+  function buildChatWidget(containerEl, chatPath){
+    const makeButtons = (presets) => presets.map(p =>
+      `<button class="chat-preset-btn" onclick="sendChat('${chatPath}','${p.emoji} ${p.text.replace(/'/g,"&#39;")}')">${p.emoji} ${p.text}</button>`
+    ).join('');
+
+    containerEl.innerHTML = `
+      <div class="chat-feed" id="chat-feed-${chatPath.replace(/\//g,'_')}"></div>
+      <div class="chat-presets">
+        <div class="chat-section-label">// placement</div>
+        ${makeButtons(CHAT_PRESETS.placement)}
+        <div class="chat-section-label">// debate</div>
+        ${makeButtons(CHAT_PRESETS.debate)}
+        <div class="chat-section-label">// energy</div>
+        ${makeButtons(CHAT_PRESETS.energy)}
+      </div>
+    `;
+    // attach listener once
+    if(chatListeners[chatPath]) return;
+    chatListeners[chatPath] = true;
+    db.ref(chatPath).limitToLast(40).on('child_added', snap=>{
+      const msg = snap.val();
+      const feedId = `chat-feed-${chatPath.replace(/\//g,'_')}`;
+      const feed = document.getElementById(feedId);
+      if(!feed) return;
+      const el = document.createElement('div');
+      el.className = 'chat-msg' + (msg.uid === myId ? ' mine' : '');
+      if(msg.uid === '__system__'){
+        el.style.cssText='font-family:"DM Mono",monospace;font-size:11px;color:var(--blue);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.15);border-radius:6px;padding:4px 8px;text-align:center';
+        el.textContent=msg.text;
+      } else {
+        el.innerHTML = `<span class="chat-name">${msg.name}</span><span>${msg.text}</span>`;
+      }
+      feed.appendChild(el);
+      feed.scrollTop = feed.scrollHeight;
+    });
+  }
+
+  window.sendChat = async (chatPath, text) => {
+    await db.ref(chatPath).push({ uid: myId, name: myName, text, ts: Date.now() });
+  };
+
+  // ════════════════════════════════════════
+  //   HEADS UP (single device)
+  // ════════════════════════════════════════
+  const HU_TIMES = [1, 2, 3]; // minutes
+  let huCategory = 'mixed';
+  let huTimeLimit = 1; // minutes
+  let huWords = [];
+  let huIndex = 0;
+  let huCorrectList = [];
+  let huSkippedList = [];
+  let huTimerInterval = null;
+  let huSecsLeft = 60;
+  let huActive = false;
+
+  window.goToHeadsUp = () => {
+    showScreen('screen-hu-setup');
+    renderHuCategories();
+    renderHuTimes();
+  };
+
+  function renderHuCategories(){
+    const el = document.getElementById('hu-category-tags');
+    el.innerHTML = '';
+    categories.forEach(cat => {
+      const t = document.createElement('div');
+      t.className = 'tag' + (cat === huCategory ? ' selected' : '');
+      t.textContent = cat;
+      t.onclick = () => { huCategory = cat; renderHuCategories(); };
+      el.appendChild(t);
+    });
+  }
+
+  function renderHuTimes(){
+    const el = document.getElementById('hu-time-selector');
+    el.innerHTML = '';
+    HU_TIMES.forEach(n => {
+      const b = document.createElement('div');
+      b.className = 'rounds-btn' + (n === huTimeLimit ? ' selected' : '');
+      b.textContent = n + 'm';
+      b.onclick = () => { huTimeLimit = n; renderHuTimes(); };
+      el.appendChild(b);
+    });
+  }
+
+  window.startHeadsUp = () => {
+    // build shuffled word list
+    const pool = huCategory === 'mixed'
+      ? Object.values(WORDS).flat()
+      : WORDS[huCategory];
+    huWords = [...pool].sort(() => Math.random() - .5);
+    huIndex = 0;
+    huCorrectList = [];
+    huSkippedList = [];
+    huSecsLeft = huTimeLimit * 60;
+    huActive = false;
+
+    showScreen('screen-hu-play');
+    document.getElementById('hu-correct-count').textContent = '0';
+    document.getElementById('hu-skip-count').textContent = '0';
+    updateHuTimer();
+    showHuWord();
+
+    // small countdown before starting so player can get ready
+    let countdown = 3;
+    document.getElementById('hu-word').textContent = 'GET READY';
+    document.getElementById('hu-timer').textContent = countdown + '...';
+    document.getElementById('hu-timer').className = 'hu-timer';
+    // disable zones during countdown
+    document.getElementById('hu-top-zone').style.pointerEvents = 'none';
+    document.getElementById('hu-bottom-zone').style.pointerEvents = 'none';
+
+    const cdInterval = setInterval(() => {
+      countdown--;
+      if(countdown <= 0){
+        clearInterval(cdInterval);
+        document.getElementById('hu-top-zone').style.pointerEvents = '';
+        document.getElementById('hu-bottom-zone').style.pointerEvents = '';
+        huActive = true;
+        showHuWord();
+        startHuTimer();
+      } else {
+        document.getElementById('hu-timer').textContent = countdown + '...';
+      }
+    }, 1000);
+  };
+
+  function showHuWord(){
+    const el = document.getElementById('hu-word');
+    if(huIndex < huWords.length){
+      el.textContent = huWords[huIndex];
+    } else {
+      // ran out of words — end game
+      huEndGame();
+    }
+  }
+
+  function startHuTimer(){
+    if(huTimerInterval) clearInterval(huTimerInterval);
+    huTimerInterval = setInterval(() => {
+      huSecsLeft--;
+      updateHuTimer();
+      if(huSecsLeft <= 0){
+        clearInterval(huTimerInterval);
+        huEndGame();
+      }
+    }, 1000);
+  }
+
+  function updateHuTimer(){
+    const el = document.getElementById('hu-timer');
+    const m = Math.floor(huSecsLeft / 60);
+    const s = huSecsLeft % 60;
+    el.textContent = m + ':' + String(s).padStart(2,'0');
+    el.className = 'hu-timer' + (huSecsLeft <= 10 ? ' urgent' : '');
+  }
+
+  window.huCorrect = () => {
+    if(!huActive) return;
+    huCorrectList.push(huWords[huIndex]);
+    huIndex++;
+    document.getElementById('hu-correct-count').textContent = huCorrectList.length;
+    flashHu('green');
+    if(huIndex >= huWords.length) { huEndGame(); return; }
+    showHuWord();
+  };
+
+  window.huSkip = () => {
+    if(!huActive) return;
+    huSkippedList.push(huWords[huIndex]);
+    huIndex++;
+    document.getElementById('hu-skip-count').textContent = huSkippedList.length;
+    flashHu('red');
+    if(huIndex >= huWords.length) { huEndGame(); return; }
+    showHuWord();
+  };
+
+  function flashHu(color){
+    const el = document.getElementById(color === 'green' ? 'hu-flash-green' : 'hu-flash-red');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 150);
+  }
+
+  function huEndGame(){
+    if(!huActive) return;
+    huActive = false;
+    clearInterval(huTimerInterval);
+    huTimerInterval = null;
+
+    document.getElementById('hu-final-correct').textContent = huCorrectList.length;
+    document.getElementById('hu-final-skipped').textContent = huSkippedList.length;
+
+    const list = document.getElementById('hu-result-list');
+    list.innerHTML = '';
+    huCorrectList.forEach(w => {
+      const el = document.createElement('div');
+      el.className = 'hu-result-item correct';
+      el.innerHTML = `<div class="hu-result-icon">✓</div><div class="hu-result-word">${w}</div>`;
+      list.appendChild(el);
+    });
+    huSkippedList.forEach(w => {
+      const el = document.createElement('div');
+      el.className = 'hu-result-item skipped';
+      el.innerHTML = `<div class="hu-result-icon">↓</div><div class="hu-result-word">${w}</div>`;
+      list.appendChild(el);
+    });
+
+    showScreen('screen-hu-result');
+  }
+
+  window.huPlayAgain = () => {
+    showScreen('screen-hu-setup');
+  };
+
+  // ════════════════════════════════════════
+  //   WHO ARE YOU
+  // ════════════════════════════════════════
+  let waySelectedCategory = 'mixed';
+
+  function renderWayCategories(){
+    const el=document.getElementById('way-category-tags'); el.innerHTML='';
+    categories.forEach(cat=>{
+      const t=document.createElement('div');
+      t.className='tag'+(cat===waySelectedCategory?' selected':'');
+      t.textContent=cat;
+      t.onclick=()=>{waySelectedCategory=cat;dbUpd(`rooms/${roomCode}`,{category:cat});renderWayCategories();};
+      el.appendChild(t);
+    });
+  }
+
+  window.startWayGame=async()=>{
+    if(!isLeader) return;
+    const snap=await dbGet(`rooms/${roomCode}/players`);
+    const players=snap.val();
+    if(Object.keys(players).length<2){toast('Need at least 2 players!');return;}
+    await launchWayRound(players, 1);
+  };
+
+  async function launchWayRound(players, roundNum){
+    const catSnap=await dbGet(`rooms/${roomCode}/category`);
+    const cat=catSnap.val()||'mixed';
+    const pool=cat==='mixed'?Object.values(WORDS).flat():WORDS[cat];
+    const shuffled=[...pool].sort(()=>Math.random()-.5);
+    const ids=Object.keys(players);
+
+    const u={};
+    ids.forEach((id,i)=>{
+      u[`rooms/${roomCode}/players/${id}/wayWord`]=shuffled[i%shuffled.length];
+      u[`rooms/${roomCode}/players/${id}/wayReady`]=false;
+    });
+    u[`rooms/${roomCode}/phase`]='way-play';
+    u[`rooms/${roomCode}/wayRound`]=roundNum;
+    await db.ref('/').update(u);
+  }
+
+  function enterWayPlay(room){
+    showScreen('screen-way-play');
+    updateWayPlay(room);
+  }
+
+  function updateWayPlay(room){
+    const players=room.players||{};
+    const cat=room.category||'mixed';
+    const round=room.wayRound||1;
+
+    document.getElementById('way-round-num').textContent=round;
+    document.getElementById('way-cat-display').textContent=cat.toUpperCase();
+
+    // others grid
+    const grid=document.getElementById('way-others-grid');
+    grid.innerHTML='';
+    Object.entries(players).forEach(([id,p])=>{
+      if(id===myId) return;
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px';
+      row.innerHTML=`
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent2);flex:1">${p.wayWord||'...'}</div>
+        ${p.wayReady?'<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--green)">✓ ready</div>':''}
+      `;
+      grid.appendChild(row);
+    });
+
+    // ready status
+    const allPlayers=Object.values(players);
+    const readyCount=allPlayers.filter(p=>p.wayReady).length;
+    const total=allPlayers.length;
+    document.getElementById('way-ready-status').textContent=`${readyCount}/${total} ready for next round`;
+
+    // hide ready btn if already clicked
+    const btn=document.getElementById('way-next-btn');
+    if(players[myId]?.wayReady){
+      btn.disabled=true;
+      btn.textContent='✓ waiting for others...';
+    } else {
+      btn.disabled=false;
+      btn.textContent='✓ READY FOR NEXT ROUND';
+    }
+
+    // if all ready and leader → next round
+    if(readyCount>=total && total>0 && isLeader){
+      launchWayRound(players, round+1);
+    }
+  }
+
+  window.wayMarkReady=async()=>{
+    document.getElementById('way-next-btn').disabled=true;
+    document.getElementById('way-next-btn').textContent='✓ waiting for others...';
+    await dbSet(`rooms/${roomCode}/players/${myId}/wayReady`,true);
+  };
+
+  // ── Init ─────────────────────────────────────
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase();
+</script>
+</body>
+</html>
