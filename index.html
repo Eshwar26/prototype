@@ -687,6 +687,9 @@
 
     // lobby choice → landing
     if(current === 'screen-lobby-choice'){
+      joiningRoom = false;
+      const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
+      if(joinBtn) joinBtn.disabled = false;
       showScreen('screen-landing');
       return;
     }
@@ -785,6 +788,10 @@
     myName = document.getElementById('player-name-input').value.trim();
     if(!myName){ toast('Enter your name first!'); return; }
     currentGame = game;
+    // always reset join state when entering lobby choice
+    joiningRoom = false;
+    const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
+    if(joinBtn) joinBtn.disabled = false;
     showScreen('screen-lobby-choice');
   };
   // keep old name working just in case
