@@ -656,10 +656,63 @@
   const roundOptions = [3, 5, 7, 10];
 
   // ── Helpers ──────────────────────────────────
+  // Screens that are mid-game — back should trigger leaveRoom or just go to landing
+  const MID_GAME_SCREENS = new Set([
+    'screen-waiting','screen-reveal','screen-vote','screen-result','screen-winner',
+    'screen-tier-build','screen-tier-vote','screen-tier-result','screen-way-play'
+  ]);
+
   window.showScreen = id => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    // push a history entry so the browser back button has something to pop
+    history.pushState({ screen: id }, '', '');
   };
+
+  // intercept browser/mobile back button
+  window.addEventListener('popstate', () => {
+    const current = document.querySelector('.screen.active')?.id;
+    if(!current) return;
+
+    // during active room — leave properly
+    if(MID_GAME_SCREENS.has(current)){
+      history.pushState({ screen: current }, '', ''); // re-push so we stay
+      const leave = confirm('Leave the game?');
+      if(leave){
+        if(roomCode) leaveRoom();
+        else showScreen('screen-landing');
+      }
+      return;
+    }
+
+    // lobby choice → landing
+    if(current === 'screen-lobby-choice'){
+      showScreen('screen-landing');
+      return;
+    }
+
+    // heads up setup/result → landing
+    if(current === 'screen-hu-setup' || current === 'screen-hu-result'){
+      showScreen('screen-landing');
+      return;
+    }
+
+    // heads up play → confirm quit
+    if(current === 'screen-hu-play'){
+      history.pushState({ screen: current }, '', '');
+      const quit = confirm('Quit the game?');
+      if(quit){
+        huActive = false;
+        clearInterval(huTimerInterval);
+        huTimerInterval = null;
+        showScreen('screen-landing');
+      }
+      return;
+    }
+
+    // fallback — go home
+    showScreen('screen-landing');
+  });
   function toast(msg, dur=2500){
     const t=document.getElementById('toast');
     t.textContent=msg; t.classList.add('show');
@@ -2151,6 +2204,8 @@
   // ── Init ─────────────────────────────────────
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase();
+  // seed initial history entry so the first popstate has something to catch
+  history.replaceState({ screen: 'screen-landing' }, '', '');
 </script>
 </body>
 </html>
