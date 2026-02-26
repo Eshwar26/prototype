@@ -254,6 +254,7 @@
     <div class="card-title">// players <span id="player-count">0</span>/8</div>
     <div class="player-list" id="waiting-player-list"></div>
     <div class="waiting-text" id="waiting-msg">Waiting for players<span class="loading-dots"></span></div>
+    <div id="waiting-for-leader-msg" style="display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:1px">waiting for leader to start<span class="loading-dots"></span></div>
     <div id="leader-controls" style="display:none">
       <hr class="divider" />
       <div class="card-title">// word category</div>
@@ -890,6 +891,8 @@
       if(wsb) wsb.disabled=count<2;
       document.getElementById('waiting-msg').textContent=
         count<2?'Need at least 2 players':`${count} player${count>1?'s':''} in lobby`;
+      const wflMsg = document.getElementById('waiting-for-leader-msg');
+      if(wflMsg) wflMsg.style.display = (!isLeader && count>=2) ? 'block' : 'none';
     });
   }
 
