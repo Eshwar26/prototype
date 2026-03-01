@@ -582,6 +582,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 <script>
   // ── Firebase shims ───────────────────────────
   const initializeApp = cfg => firebase.initializeApp(cfg);
@@ -593,13 +594,14 @@
   const dbDel  = (path)     => db.ref(path).remove();
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBP-rCJhSzUOsqx9gY46BDZiVJC_xpMKy4",
-    authDomain: "imposter-game-b01ef.firebaseapp.com",
-    databaseURL: "https://imposter-game-b01ef-default-rtdb.firebaseio.com",
-    projectId: "imposter-game-b01ef",
-    storageBucket: "imposter-game-b01ef.firebasestorage.app",
-    messagingSenderId: "5466723581",
-    appId: "1:5466723581:web:9362edc935fbb3affd1a94"
+    apiKey: "AIzaSyAOtPWgKV-J12jorj4Zmfgdxe8MaF-xR8M",
+    authDomain: "cinefied-4d389.firebaseapp.com",
+    databaseURL: "https://cinefied-4d389-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "cinefied-4d389",
+    storageBucket: "cinefied-4d389.firebasestorage.app",
+    messagingSenderId: "37019525498",
+    appId: "1:37019525498:web:016b0e372aa54c434876c3",
+    measurementId: "G-8H2T3MSJME"
   };
 
   // ── State ────────────────────────────────────
@@ -623,28 +625,51 @@
       'Pawan Kalyan','Mahesh Babu','NTR','Ram Charan','Allu Arjun','Prabhas','Nani',
       'Chiranjeevi','Balakrishna','Nagarjuna','Venkatesh','Ravi Teja','Allu Sirish',
       'Bellamkonda Srinivas','Sai Dharam Tej','Varun Tej','Adivi Sesh','Sharwanand',
-      'Nikhil Siddhartha','Navdeep','Vishwak Sen','Raj Tarun','Kalyan Ram'
+      'Nikhil Siddhartha','Navdeep','Vishwak Sen','Raj Tarun','Kalyan Ram',
+      'Vijay Deverakonda','Ram Pothineni','Naga Chaitanya','Akhil Akkineni',
+      'Sudheer Babu','Allari Naresh','Sunil','Manchu Manoj','Manchu Vishnu',
+      'Mohan Babu','Gopichand','Srikanth','Jagapathi Babu','Sree Vishnu','Teja Sajja',
+      'Kiran Abbavaram','Santosh Shoban','Anand Deverakonda','Siddhu Jonnalagadda',
+      'Nara Rohit','Satyadev','Priyadarshi Pulikonda','Abhinav Gomatam','Rana Daggubati',
+      'Aadi Pinisetty','Varun Sandesh','Nithiin'
     ],
     movies: [
-      'Baahubali 2: The Conclusion','Pushpa 2: The Rule','RRR','Kalki 2898 AD',
-      'Salaar: Part 1 – Ceasefire','Baahubali: The Beginning','Saaho','Adipurush',
-      'Devara: Part 1','Pushpa: The Rise','Hanu-Man','They Call Him OG',
-      'Mana Shankara Vara Prasad Garu','Ala Vaikunthapurramuloo','Sarileru Neekevvaru',
-      'Sankranthiki Vasthunam','Sye Raa Narasimha Reddy','Waltair Veerayya',
-      'Bharat Ane Nenu','Rangasthalam','The RajaSaab','Srimanthudu','Game Changer',
-      'Aravinda Sametha Veera Raghava','Attarintiki Daredi','Guntur Kaaram',
-      'Sarkaru Vaari Paata','Maharshi','Khaidi No. 150','Bheemla Nayak','Magadheera',
-      'Jai Lava Kusa','Gabbar Singh','Janatha Garage','DJ: Duvvada Jagannadham',
-      'Spyder','Akhanda','Mirai','Radhe Shyam','Bhagavanth Kesari','Vakeel Saab',
-      'Tillu Square','Veera Simha Reddy','Geetha Govindam','Daaku Maharaaj',
-      'Akhanda 2: Thaandavam','Sarrainodu','F2: Fun and Frustration',
-      'Race Gurram','Eega'
+      'Gangotri','Arya','Bunny','Happy','Desamuduru','Shankar Dada Zindabad','Parugu',
+      'Arya 2','Varudu','Vedam','Badrinath','Julayi','Iddarammayilatho','Yevadu',
+      'Race Gurram','S/O Satyamurthy','Rudhramadevi','Sarrainodu',
+      'DJ: Duvvada Jagannadham','Naa Peru Surya Naa Illu India','Ala Vaikunthapurramuloo',
+      'Akkada Ammayi Ikkada Abbayi','Gokulamlo Seeta','Suswagatham','Tholi Prema',
+      'Thammudu','Badri','Kushi','Johnny','Gudumba Shankar','Shankar Dada M.B.B.S.',
+      'Balu','Bangaram','Annavaram','Jalsa','Teen Maar','Panjaa','Gabbar Singh',
+      'Cameraman Gangatho Rambabu','Attarintiki Daredi','Gopala Gopala',
+      'Sardaar Gabbar Singh','Katamarayudu','Agnyaathavaasi','Vakeel Saab',
+      'Bheemla Nayak','Bro','Hari Hara Veera Mallu','They Call Him OG',
+      'Ustaad Bhagat Singh','Chirutha','Magadheera','Orange','Racha','Naayak',
+      'Zanjeer','Thoofan','Govindudu Andarivadele','Bruce Lee: The Fighter','Dhruva',
+      'Khaidi No. 150','Rangasthalam','Vinaya Vidheya Rama','RRR','Acharya',
+      'Game Changer','Peddi','Murari','Okkadu','Arjun','Athadu','Pokiri','Sainikudu',
+      'Athidhi','Khaleja','Dookudu','Businessman','Seethamma Vakitlo Sirimalle Chettu',
+      '1: Nenokkadine','Aagadu','Srimanthudu','Brahmotsavam','Spyder','Bharat Ane Nenu',
+      'Maharshi','Sarileru Neekevvaru','Sarkaru Vaari Paata','Guntur Kaaram','Varanasi',
+      'Aadi','Simhadri','Ashok','Rakhi','Yamadonga','Kantri','Chintakayala Ravi',
+      'Adhurs','Rama Rama Krishna Krishna','Brindavanam','Shakthi','Oosaravelli',
+      'Dammu','Baadshah','Ramayya Vasthavayya','Rabhasa','Temper','Nannaku Prematho',
+      'Janatha Garage','Jai Lava Kusa','Aravinda Sametha Veera Raghava','Devara: Part 1',
+      'War 2','Eeswar','Varsham','Chatrapathi','Yogi','Munna','Bujjigadu','Billa',
+      'Ek Niranjan','Darling','Mr. Perfect','Rebel','Mirchi','Baahubali: The Beginning',
+      'Baahubali 2: The Conclusion','Saaho','Radhe Shyam','Adipurush',
+      'Salaar: Part 1 – Ceasefire','Kalki 2898 AD','Kannappa','Mirai',
+      'Baahubali: The Epic','The RajaSaab','Fauzi','Spirit'
     ],
     directors: [
       'Rajamouli','Trivikram','Puri Jagannadh','Sreenu Vaitla','Sukumar',
       'Boyapati Srinu','Harish Shankar','Vamshi Paidipally','Ram Gopal Varma',
       'Krishna Vamsi','Surender Reddy','Maruthi','Srikanth Addala','Koratala Siva',
-      'Sandeep Vanga','Krish Jagarlamudi','Anil Ravipudi','Gopichand Malineni'
+      'Sandeep Vanga','Krish Jagarlamudi','Anil Ravipudi','Gopichand Malineni',
+      'Nag Ashwin','Sekhar Kammula','Chandoo Mondeti','Gowtam Tinnanuri',
+      'Vivek Athreya','Tharun Bhascker','Sailesh Kolanu','Prashanth Varma',
+      'Hanu Raghavapudi','Venky Atluri','Parasuram','Bobby Kolli',
+      'Buchi Babu Sana','V. V. Vinayak'
     ],
     politics: [
       'Chandrababu Naidu','YS Jagan','Narendra Modi','KCR','YS Rajasekhara Reddy',
@@ -2214,6 +2239,63 @@
   // ── Init ─────────────────────────────────────
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase();
+  const analytics = firebase.analytics();
+
+  // ── Analytics helpers ─────────────────────────
+  // Call these throughout the game to track key actions in GA4
+  function logEvent(name, params={}) {
+    try { analytics.logEvent(name, params); } catch(e) {}
+  }
+
+  // Track: which game mode was selected
+  const _origGoToLobby = window.goToLobby;
+  window.goToLobby = (game) => {
+    logEvent('select_game_mode', { game_mode: game });
+    _origGoToLobby(game);
+  };
+
+  // Track: room created
+  const _origCreateRoom = window.createRoom;
+  window.createRoom = async () => {
+    logEvent('room_created', { game_mode: currentGame });
+    await _origCreateRoom();
+  };
+
+  // Track: room joined
+  const _origJoinRoom = window.joinRoom;
+  window.joinRoom = async () => {
+    logEvent('room_joined', { game_mode: currentGame });
+    await _origJoinRoom();
+  };
+
+  // Track: game started
+  const _origStartGame = window.startGame;
+  window.startGame = async () => {
+    logEvent('game_started', { game_mode: 'imposter' });
+    await _origStartGame();
+  };
+
+  // Track: vote cast
+  const _origCastVote = window.castVote;
+  window.castVote = async () => {
+    logEvent('vote_cast');
+    await _origCastVote();
+  };
+
+  // Track: heads up started
+  const _origStartHeadsUp = window.startHeadsUp;
+  window.startHeadsUp = () => {
+    logEvent('game_started', { game_mode: 'headsup', category: huCategory, time_limit: huTimeLimit });
+    _origStartHeadsUp();
+  };
+
+  // Track: tier list started
+  const _origStartTierGame = window.startTierGame;
+  window.startTierGame = async () => {
+    logEvent('game_started', { game_mode: 'tierlist', category: selectedCategory, item_count: selectedTierCount });
+    await _origStartTierGame();
+  };
+
   // seed initial history entry so the first popstate has something to catch
   history.replaceState({ screen: 'screen-landing' }, '', '');
 </script>
