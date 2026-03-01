@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cinefied — The Telugu Film Party Game</title>
+  <meta name="description" content="Cinefied is the ultimate party game for Telugu movie lovers. Imposter, Tier List, Heads Up, Who Are You — play with friends, no app needed." />
+  <meta property="og:title" content="Cinefied — The Telugu Film Party Game" />
+  <meta property="og:description" content="4 game modes. Your favorite heroes, movies & directors. Play instantly in your browser." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c28;
+      --border: #2a2a3d;
+      --accent: #ff3f3f;
+      --accent2: #ff8c42;
+      --text: #e8e8f0;
+      --muted: #7070a0;
+      --green: #3fffa0;
+      --yellow: #ffd93d;
+      --blue: #5b8fff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ── AMBIENT GLOWS ── */
+    .glow-red {
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,63,63,0.12) 0%, transparent 70%);
+      top: -200px; left: -200px;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatGlow 8s ease-in-out infinite alternate;
+    }
+    .glow-blue {
+      position: fixed;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,143,255,0.09) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatGlow 10s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes floatGlow {
+      0% { transform: translate(0,0); }
+      100% { transform: translate(40px, 30px); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 3px;
+      color: var(--text);
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px; letter-spacing: 2px;
+      color: var(--muted); text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #fff !important;
+      padding: 9px 20px; border-radius: 8px;
+      font-weight: 600 !important;
+      transition: box-shadow 0.2s, transform 0.15s !important;
+    }
+    .nav-cta:hover {
+      box-shadow: 0 0 24px rgba(255,63,63,0.5) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 24px 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0; animation: slideUp 0.6s 0.1s ease forwards;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 14vw, 160px);
+      letter-spacing: 6px; line-height: 0.92;
+      color: var(--text);
+      opacity: 0; animation: slideUp 0.7s 0.2s ease forwards;
+    }
+    .hero-title .red { color: var(--accent); }
+    .hero-title .outline {
+      -webkit-text-stroke: 2px var(--text);
+      color: transparent;
+    }
+    .hero-sub {
+      max-width: 520px;
+      font-size: 17px; line-height: 1.7;
+      color: var(--muted); margin: 28px auto 0;
+      opacity: 0; animation: slideUp 0.7s 0.35s ease forwards;
+    }
+    .hero-sub strong { color: var(--text); }
+    .hero-btns {
+      display: flex; gap: 14px; justify-content: center;
+      margin-top: 42px; flex-wrap: wrap;
+      opacity: 0; animation: slideUp 0.7s 0.5s ease forwards;
+    }
+    .btn-hero-primary {
+      padding: 16px 36px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: box-shadow 0.2s, transform 0.15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-primary:hover {
+      box-shadow: 0 0 40px rgba(255,63,63,0.5);
+      transform: translateY(-2px);
+    }
+    .btn-hero-secondary {
+      padding: 16px 36px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-secondary:hover {
+      border-color: var(--muted);
+      background: rgba(255,255,255,0.03);
+    }
+    .hero-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 1px; margin-top: 18px;
+      opacity: 0; animation: slideUp 0.7s 0.65s ease forwards;
+    }
+
+    /* floating game preview card */
+    .hero-preview {
+      margin-top: 70px; width: 100%; max-width: 480px;
+      opacity: 0; animation: slideUp 0.8s 0.7s ease forwards;
+    }
+    .preview-window {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    }
+    .preview-titlebar {
+      background: var(--surface2);
+      padding: 12px 18px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #28c840; }
+    .preview-body { padding: 28px 24px; text-align: center; }
+    .preview-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 3px;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .preview-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px; letter-spacing: 6px;
+      color: var(--accent); line-height: 1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .preview-tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 2px;
+      color: var(--accent); background: rgba(255,63,63,0.12);
+      border: 1px solid rgba(255,63,63,0.3);
+      padding: 4px 12px; border-radius: 20px;
+      margin-top: 14px;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SCROLL TICKER ── */
+    .ticker-wrap {
+      position: relative; z-index: 1;
+      overflow: hidden;
+      background: var(--accent);
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .ticker-inner {
+      display: flex; gap: 48px;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap; width: max-content;
+    }
+    .ticker-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 3px;
+      color: rgba(255,255,255,0.9);
+    }
+    .ticker-sep { color: rgba(255,255,255,0.4); }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION SHARED ── */
+    section {
+      position: relative; z-index: 1;
+      padding: 100px 24px;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 6vw, 72px);
+      letter-spacing: 4px; line-height: 1;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--muted); line-height: 1.7;
+      max-width: 520px;
+    }
+
+    /* ── GAMES GRID ── */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-top: 52px;
+    }
+    .game-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px 24px;
+      cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      display: block; position: relative; overflow: hidden;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--card-glow);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .game-card:hover { transform: translateY(-4px); }
+    .game-card:hover::before { opacity: 1; }
+    .game-card.c-red { --card-glow: radial-gradient(ellipse at top left, rgba(255,63,63,0.1), transparent 60%); }
+    .game-card.c-red:hover { border-color: rgba(255,63,63,0.5); box-shadow: 0 20px 60px rgba(255,63,63,0.12); }
+    .game-card.c-orange { --card-glow: radial-gradient(ellipse at top left, rgba(255,140,66,0.1), transparent 60%); }
+    .game-card.c-orange:hover { border-color: rgba(255,140,66,0.5); box-shadow: 0 20px 60px rgba(255,140,66,0.12); }
+    .game-card.c-green { --card-glow: radial-gradient(ellipse at top left, rgba(63,255,160,0.1), transparent 60%); }
+    .game-card.c-green:hover { border-color: rgba(63,255,160,0.5); box-shadow: 0 20px 60px rgba(63,255,160,0.12); }
+    .game-card.c-blue { --card-glow: radial-gradient(ellipse at top left, rgba(91,143,255,0.1), transparent 60%); }
+    .game-card.c-blue:hover { border-color: rgba(91,143,255,0.5); box-shadow: 0 20px 60px rgba(91,143,255,0.12); }
+
+    .game-icon { font-size: 36px; margin-bottom: 16px; position: relative; }
+    .game-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px; letter-spacing: 3px;
+      color: var(--text); position: relative;
+    }
+    .game-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px;
+      display: inline-block; margin-top: 8px; position: relative;
+    }
+    .tag-red { background: rgba(255,63,63,0.12); color: var(--accent); border: 1px solid rgba(255,63,63,0.25); }
+    .tag-orange { background: rgba(255,140,66,0.12); color: var(--accent2); border: 1px solid rgba(255,140,66,0.25); }
+    .tag-green { background: rgba(63,255,160,0.12); color: var(--green); border: 1px solid rgba(63,255,160,0.25); }
+    .tag-blue { background: rgba(91,143,255,0.12); color: var(--blue); border: 1px solid rgba(91,143,255,0.25); }
+    .game-desc {
+      font-size: 14px; color: var(--muted);
+      margin-top: 12px; line-height: 1.6;
+      position: relative;
+    }
+    .game-players {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      margin-top: 16px; letter-spacing: 1px;
+      position: relative;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; position: relative; z-index: 1; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px; margin-top: 52px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+    }
+    .step {
+      background: var(--surface);
+      padding: 32px 28px;
+      position: relative;
+    }
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px; letter-spacing: 2px;
+      color: rgba(255,255,255,0.04);
+      position: absolute; top: 12px; right: 20px;
+      line-height: 1;
+    }
+    .step-icon { font-size: 28px; margin-bottom: 16px; }
+    .step-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px; letter-spacing: 2px;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── CATEGORIES ── */
+    .cats-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; position: relative; z-index: 1; }
+    .cat-pills { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+    .cat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cat-pill:hover { border-color: var(--muted); background: var(--surface2); }
+    .cat-pill-icon { font-size: 20px; }
+    .cat-pill-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 2px; color: var(--text);
+    }
+    .cat-pill-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; color: var(--muted); letter-spacing: 1px;
+    }
+    .cat-sample {
+      margin-top: 28px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .sample-chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; padding: 5px 12px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .sample-chip:hover { color: var(--accent2); border-color: rgba(255,140,66,0.4); }
+
+    /* ── SOCIAL PROOF / STATS ── */
+    .stats-wrap {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 60px 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2px;
+    }
+    .stat-box {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-box:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px; letter-spacing: 2px;
+      line-height: 1; color: var(--text);
+    }
+    .stat-num span { color: var(--accent); }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .quotes-wrap { max-width: 1100px; margin: 0 auto; padding: 100px 24px; position: relative; z-index: 1; }
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px; margin-top: 52px;
+    }
+    .quote-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .quote-card:hover { border-color: var(--muted); }
+    .quote-stars { font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+    .quote-text { font-size: 15px; line-height: 1.7; color: var(--text); font-style: italic; }
+    .quote-author {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 2px; margin-top: 16px;
+    }
+
+    /* ── FINAL CTA ── */
+    .cta-section {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 100px 24px 120px;
+    }
+    .cta-inner {
+      max-width: 700px; margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px; padding: 64px 40px;
+      position: relative; overflow: hidden;
+    }
+    .cta-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(255,63,63,0.08), transparent 70%);
+    }
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 8vw, 80px);
+      letter-spacing: 4px; line-height: 0.95;
+      color: var(--text); margin-bottom: 16px;
+      position: relative;
+    }
+    .cta-title span { color: var(--accent); }
+    .cta-sub {
+      font-size: 16px; color: var(--muted);
+      margin-bottom: 36px; position: relative;
+    }
+
+    /* ── TODO BADGE (fixed corner) ── */
+    .todo-badge {
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 200;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      min-width: 220px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      font-family: 'DM Mono', monospace;
+      transition: transform 0.3s ease;
+    }
+    .todo-badge:hover { transform: scale(1.02); }
+    .todo-badge-title {
+      font-size: 10px; letter-spacing: 3px;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .todo-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 11px; letter-spacing: 0.5px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-check {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px;
+    }
+    .todo-check.done { background: rgba(63,255,160,0.2); color: var(--green); border: 1px solid var(--green); }
+    .todo-check.active { background: rgba(255,140,66,0.2); color: var(--accent2); border: 1px solid var(--accent2); animation: todoGlow 1s ease-in-out infinite alternate; }
+    .todo-check.pending { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .todo-text-done { color: var(--muted); text-decoration: line-through; }
+    .todo-text-active { color: var(--accent2); }
+    .todo-text-pending { color: var(--muted); opacity: 0.5; }
+    @keyframes todoGlow { 0% { box-shadow: none; } 100% { box-shadow: 0 0 8px rgba(255,140,66,0.6); } }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 36px 24px;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; letter-spacing: 4px; color: var(--text);
+      margin-bottom: 12px;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted); letter-spacing: 2px;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 16px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .todo-badge { display: none; }
+      .stat-box { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-box:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="glow-red"></div>
+<div class="glow-blue"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CINE<span>FIED</span></div>
+  <div class="nav-links">
+    <a href="#games">Games</a>
+    <a href="#how">How It Works</a>
+    <a href="#categories">Categories</a>
+    <a href="index.html" class="nav-cta">PLAY NOW →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">// the telugu film party game</div>
+  <div class="hero-title">
+    CINE<span class="red">FIED</span>
+  </div>
+  <p class="hero-sub">
+    4 game modes. Your favorite <strong>heroes, movies & directors</strong>. Play instantly with friends — no download, no signup, just a room code.
+  </p>
+  <div class="hero-btns">
+    <a href="index.html" class="btn-hero-primary">▶ PLAY NOW — FREE</a>
+    <a href="#games" class="btn-hero-secondary">↓ SEE GAME MODES</a>
+  </div>
+  <div class="hero-note">// no account needed &nbsp;·&nbsp; works on any phone &nbsp;·&nbsp; 2–8 players</div>
+
+  <div class="hero-preview">
+    <div class="preview-window">
+      <div class="preview-titlebar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-left:8px;letter-spacing:1px">cinefied.app</span>
+      </div>
+      <div class="preview-body">
+        <div class="preview-badge">// you are the imposter</div>
+        <div class="preview-word">IMPOSTER</div>
+        <div class="preview-tag">figure out the word. don't get caught.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker"></div>
+</div>
+
+<!-- GAMES SECTION -->
+<section id="games">
+  <div class="section-label">// 04 game modes</div>
+  <div class="section-title">PICK YOUR<br/>BATTLE</div>
+  <p class="section-sub">Each mode is a different kind of chaos. Mix and match throughout the night.</p>
+  <div class="games-grid">
+    <a href="index.html" class="game-card c-red">
+      <div class="game-icon">🕵️</div>
+      <div class="game-name">IMPOSTER</div>
+      <div class="game-tag tag-red">MULTIPLAYER · 2–8</div>
+      <div class="game-desc">Everyone gets the same secret word — except the imposter. Discuss. Deceive. Vote out the spy before they blend in.</div>
+      <div class="game-players">🏆 scored · up to 10 rounds</div>
+    </a>
+    <a href="index.html" class="game-card c-orange">
+      <div class="game-icon">📊</div>
+      <div class="game-name">TIER LIST</div>
+      <div class="game-tag tag-orange">MULTIPLAYER · 2–8</div>
+      <div class="game-desc">Drag heroes, movies, or directors into S/A/B/C/D tiers. Defend your choices. Get ratio'd by the room or earn their approval.</div>
+      <div class="game-players">🗳️ vote to approve or disapprove</div>
+    </a>
+    <a href="index.html" class="game-card c-green">
+      <div class="game-icon">🎯</div>
+      <div class="game-name">HEADS UP</div>
+      <div class="game-tag tag-green">SOLO · 1 DEVICE</div>
+      <div class="game-desc">Hold your phone to your forehead. Tilt to guess what's on screen. One player, one timer, maximum energy.</div>
+      <div class="game-players">⏱️ 1–3 min timer modes</div>
+    </a>
+    <a href="index.html" class="game-card c-blue">
+      <div class="game-icon">❓</div>
+      <div class="game-name">WHO ARE YOU</div>
+      <div class="game-tag tag-blue">MULTIPLAYER · 2–8</div>
+      <div class="game-desc">A secret word is stuck to your head — you can see everyone else's but not your own. Ask yes/no questions to figure out who you are.</div>
+      <div class="game-players">🔄 endless rounds</div>
+    </a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-wrap" id="how">
+  <div class="section-label">// stupidly simple</div>
+  <div class="section-title">HOW IT<br/>WORKS</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">✏️</div>
+      <div class="step-title">ENTER NAME</div>
+      <div class="step-desc">Type your name and pick a game mode from the home screen. No account, no friction.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🚪</div>
+      <div class="step-title">CREATE ROOM</div>
+      <div class="step-desc">Get a 6-letter code instantly. Share it in your group chat. Friends join from any device.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">⚙️</div>
+      <div class="step-title">CONFIGURE</div>
+      <div class="step-desc">Pick category, number of rounds, and voting style. The room leader controls the settings.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">🔥</div>
+      <div class="step-title">PLAY & ARGUE</div>
+      <div class="step-desc">Words are assigned, timers run, votes are cast. Scores update live. Start the next round instantly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-wrap">
+  <div class="stats-inner">
+    <div class="stat-box">
+      <div class="stat-num">4<span>+</span></div>
+      <div class="stat-label">Game Modes</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">200<span>+</span></div>
+      <div class="stat-label">Telugu Heroes, Movies & Directors</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Players per Room</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Downloads Required</div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="cats-wrap" id="categories">
+  <div class="section-label">// what you're ranking & guessing</div>
+  <div class="section-title">THE<br/>CATEGORIES</div>
+  <p class="section-sub">All content is Telugu film focused. Switch categories between rounds for maximum chaos.</p>
+  <div class="cat-pills">
+    <div class="cat-pill"><div class="cat-pill-icon">🦁</div><div><div class="cat-pill-name">HEROES</div><div class="cat-pill-count">50+ stars</div></div></div>
+    <div class="cat-pill"><div class="cat-pill-icon">🎬</div><div><div class="cat-pill-name">MOVIES</div><div class="cat-pill-count">100+ films</div></div></div>
+    <div class="cat-pill"><div class="cat-pill-icon">🎥</div><div><div class="cat-pill-name">DIRECTORS</div><div class="cat-pill-count">30+ directors</div></div></div>
+    <div class="cat-pill"><div class="cat-pill-icon">🗳️</div><div><div class="cat-pill-name">POLITICS</div><div class="cat-pill-count">10 figures</div></div></div>
+    <div class="cat-pill"><div class="cat-pill-icon">🔀</div><div><div class="cat-pill-name">MIXED</div><div class="cat-pill-count">Everything</div></div></div>
+  </div>
+  <div class="cat-sample" id="sample-chips"></div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="quotes-wrap">
+  <div class="section-label">// from the group chat</div>
+  <div class="section-title">REAL<br/>REACTIONS</div>
+  <div class="quotes-grid">
+    <div class="quote-card">
+      <div class="quote-stars">★★★★★</div>
+      <div class="quote-text">"bro we played this for 3 hours straight at the hostel. tier list mode hit different ngl"</div>
+      <div class="quote-author">— engineering student, vizag</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-stars">★★★★★</div>
+      <div class="quote-text">"idhi insult laga undi that they put Rajamouli in B tier. absolute criminal activity."</div>
+      <div class="quote-author">— film student, hyderabad</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-stars">★★★★★</div>
+      <div class="quote-text">"imposter mode is literally too addictive. my friend bluffed his way through 4 rounds without getting caught lol"</div>
+      <div class="quote-author">— office gang, bangalore</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-title">READY TO<br/><span>PLAY?</span></div>
+    <p class="cta-sub">Share the link. Create a room. Start arguing in 30 seconds.</p>
+    <a href="index.html" class="btn-hero-primary" style="display:inline-flex;font-size:16px;padding:18px 48px">
+      ▶ &nbsp;PLAY CINEFIED — FREE
+    </a>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:20px;letter-spacing:1px;position:relative">
+      no download &nbsp;·&nbsp; no account &nbsp;·&nbsp; just a link
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CINE<span>FIED</span></div>
+  <div class="footer-sub">// the telugu film party game &nbsp;·&nbsp; built for group chats</div>
+</footer>
+
+<!-- TODO BADGE (fixed corner) -->
+<div class="todo-badge">
+  <div class="todo-badge-title">// launch checklist</div>
+  <div class="todo-item">
+    <div class="todo-check done">✓</div>
+    <div class="todo-text-done">Landing page</div>
+  </div>
+  <div class="todo-item">
+    <div class="todo-check active">◉</div>
+    <div class="todo-text-active">Marketing page</div>
+  </div>
+  <div class="todo-item">
+    <div class="todo-check pending">○</div>
+    <div class="todo-text-pending">GA4 + Clarity analytics</div>
+  </div>
+  <div class="todo-item">
+    <div class="todo-check pending">○</div>
+    <div class="todo-text-pending">Firebase Hosting setup</div>
+  </div>
+  <div class="todo-item">
+    <div class="todo-check pending">○</div>
+    <div class="todo-text-pending">PWA (installable)</div>
+  </div>
+</div>
+
+<script>
+  // ── TICKER ──
+  const tickerWords = [
+    'Allu Arjun','Prabhas','Mahesh Babu','RRR','Rajamouli','Baahubali','Pushpa',
+    'NTR','Ram Charan','Trivikram','Kalki 2898','Pawan Kalyan','Pokiri','Magadheera',
+    'Nani','Vijay Deverakonda','Sukumar','Boyapati','Rangasthalam','Akhil'
+  ];
+  const ticker = document.getElementById('ticker');
+  // duplicate for seamless loop
+  const fullList = [...tickerWords, ...tickerWords];
+  fullList.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.className = 'ticker-item';
+    span.innerHTML = w + (i % 2 === 0 ? '' : ' <span class="ticker-sep">·</span>');
+    ticker.appendChild(span);
+  });
+
+  // ── SAMPLE CHIPS ──
+  const samples = [
+    'Mahesh Babu','Pokiri','Rajamouli','Allu Arjun','Baahubali','Ram Charan',
+    'Trivikram','RRR','Prabhas','Nani','Sukumar','Kalki 2898','Boyapati',
+    'Rangasthalam','Pushpa','Desamuduru','Jalsa','Magadheera'
+  ];
+  const sampleEl = document.getElementById('sample-chips');
+  samples.sort(() => Math.random() - 0.5).forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'sample-chip';
+    chip.textContent = s;
+    sampleEl.appendChild(chip);
+  });
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.game-card, .step, .quote-card, .cat-pill, .stat-box').forEach(el => {
+    el.style.cssText += 'opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
