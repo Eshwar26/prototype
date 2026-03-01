@@ -16,7 +16,8 @@
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
     body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,63,63,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 90%,rgba(63,100,255,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
     .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:24px 16px;animation:fadeIn .35s ease}
-    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px}
+    #screen-landing{justify-content:flex-start;padding:40px 16px 48px}
     @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,12vw,96px);letter-spacing:4px;line-height:1;color:var(--text);text-align:center}
     .logo span{color:var(--accent)}
@@ -205,26 +206,101 @@
     .btn-collab-approve{flex:1;padding:12px;border-radius:10px;border:none;background:var(--green);color:#050f0a;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer;font-weight:700}
     .btn-collab-reject{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer}
     .collaborator-badge{display:inline-block;background:rgba(91,143,255,.12);border:1px solid rgba(91,143,255,.3);color:var(--blue);font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:6px;margin-left:6px}
+
+    /* ── LANDING GAME CARDS ── */
+    .landing-game-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+    .landing-game-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,var(--card-glow),transparent 65%);opacity:0;transition:opacity .25s}
+    .landing-game-card:hover{transform:translateY(-2px);border-color:var(--card-accent);box-shadow:0 8px 32px var(--card-glow)}
+    .landing-game-card:hover::before{opacity:1}
+    .landing-game-card:active{transform:scale(.98)}
+    .lgc-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+    .lgc-icon{font-size:28px;flex-shrink:0}
+    .lgc-info{flex:1}
+    .lgc-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--text);line-height:1}
+    .lgc-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid;display:inline-block;margin-top:5px}
+    .lgc-arrow{font-size:18px;color:var(--card-accent);opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px)}
+    .landing-game-card:hover .lgc-arrow{opacity:1;transform:translateX(0)}
+    .lgc-desc{font-size:13px;color:var(--muted);line-height:1.6;position:relative}
+    .lgc-footer{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;letter-spacing:1px;position:relative}
   </style>
 </head>
 <body>
 
 <!-- LANDING -->
 <div class="screen active" id="screen-landing">
-  <div class="logo">CINE<span>FIED</span></div>
-  <div class="tagline">// pick your game</div>
-  <div class="spacer"></div>
-  <div class="card">
-    <div class="card-title">// enter your name</div>
+
+  <!-- hero -->
+  <div style="text-align:center;margin-bottom:40px">
+    <div class="logo">CINE<span>FIED</span></div>
+    <div class="tagline">// the telugu film party game</div>
+  </div>
+
+  <!-- name input -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title">// enter your name to play</div>
     <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn btn-primary" style="flex:1" onclick="goToLobby('imposter')">IMPOSTER</button>
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')">TIER LIST</button>
+    <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:4px;letter-spacing:1px">pick a game below to get started</p>
+  </div>
+
+  <!-- game cards -->
+  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px">
+
+    <!-- imposter -->
+    <div class="landing-game-card" onclick="goToLobby('imposter')" style="--card-accent:#ff3f3f;--card-glow:rgba(255,63,63,0.08)">
+      <div class="lgc-top">
+        <div class="lgc-icon"></div>
+        <div class="lgc-info">
+          <div class="lgc-name">IMPOSTER</div>
+          <div class="lgc-tag" style="background:rgba(255,63,63,0.12);color:#ff3f3f;border-color:rgba(255,63,63,0.25)">MULTIPLAYER · 2–8</div>
+        </div>
+        <div class="lgc-arrow">→</div>
+      </div>
+      <div class="lgc-desc">Everyone gets the same secret word — except the imposter. Discuss. Deceive. Vote out the spy before they blend in.</div>
+      <div class="lgc-footer">scored · up to 10 rounds</div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()">HEADS UP</button>
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')">WHO ARE YOU</button>
+
+    <!-- tier list -->
+    <div class="landing-game-card" onclick="goToLobby('tierlist')" style="--card-accent:#ff8c42;--card-glow:rgba(255,140,66,0.08)">
+      <div class="lgc-top">
+        <div class="lgc-icon"></div>
+        <div class="lgc-info">
+          <div class="lgc-name">TIER LIST</div>
+          <div class="lgc-tag" style="background:rgba(255,140,66,0.12);color:#ff8c42;border-color:rgba(255,140,66,0.25)">MULTIPLAYER · 2–8</div>
+        </div>
+        <div class="lgc-arrow">→</div>
+      </div>
+      <div class="lgc-desc">Drag heroes, movies, or directors into S/A/B/C/D tiers. Defend your choices. Get ratio'd by the room or earn their approval.</div>
+      <div class="lgc-footer">vote to approve or disapprove</div>
     </div>
+
+    <!-- heads up -->
+    <div class="landing-game-card" onclick="goToHeadsUp()" style="--card-accent:#3fffa0;--card-glow:rgba(63,255,160,0.08)">
+      <div class="lgc-top">
+        <div class="lgc-icon"></div>
+        <div class="lgc-info">
+          <div class="lgc-name">HEADS UP</div>
+          <div class="lgc-tag" style="background:rgba(63,255,160,0.12);color:#3fffa0;border-color:rgba(63,255,160,0.25)">SOLO · 1 DEVICE</div>
+        </div>
+        <div class="lgc-arrow">→</div>
+      </div>
+      <div class="lgc-desc">Hold your phone to your forehead. Tap to guess what's on screen. One player, one timer, maximum energy.</div>
+      <div class="lgc-footer">1–3 min timer modes</div>
+    </div>
+
+    <!-- who are you -->
+    <div class="landing-game-card" onclick="goToLobby('whoareyou')" style="--card-accent:#5b8fff;--card-glow:rgba(91,143,255,0.08)">
+      <div class="lgc-top">
+        <div class="lgc-icon"></div>
+        <div class="lgc-info">
+          <div class="lgc-name">WHO ARE YOU</div>
+          <div class="lgc-tag" style="background:rgba(91,143,255,0.12);color:#5b8fff;border-color:rgba(91,143,255,0.25)">MULTIPLAYER · 2–8</div>
+        </div>
+        <div class="lgc-arrow">→</div>
+      </div>
+      <div class="lgc-desc">A secret word is stuck to your head — you can see everyone else's but not your own. Ask yes/no questions to figure out who you are.</div>
+      <div class="lgc-footer">endless rounds</div>
+    </div>
+
   </div>
 </div>
 
@@ -1905,7 +1981,7 @@
     ],
     debate: [
       { emoji:'✅', text:'Naa doubt confirm ayyindi' },
-      { emoji:'❓', text:'endhuku brooo' },
+      { emoji:'', text:'endhuku brooo' },
       { emoji:'😶', text:'Nenu convince avvaled' },
       { emoji:'😑', text:'Idhi safe play' },
       { emoji:'🫠', text:'thappu idhi thappu' },
