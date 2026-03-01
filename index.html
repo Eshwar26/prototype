@@ -874,6 +874,12 @@
   // ── Waiting room ─────────────────────────────
   function enterWaitingRoom(){
     document.getElementById('display-room-code').textContent = roomCode;
+
+    // always hide all three panels first — prevents stacking when switching games
+    document.getElementById('leader-controls').style.display      = 'none';
+    document.getElementById('tier-leader-controls').style.display = 'none';
+    document.getElementById('way-leader-controls').style.display  = 'none';
+
     if(isLeader){
       if(currentGame==='tierlist'){
         document.getElementById('tier-leader-controls').style.display='block';
