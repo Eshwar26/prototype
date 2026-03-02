@@ -208,7 +208,11 @@
     .dot-r { background: #ff5f57; }
     .dot-y { background: #ffbd2e; }
     .dot-g { background: #28c840; }
-    .preview-body { padding: 28px 24px; text-align: center; }
+    .preview-body { padding: 28px 24px; text-align: center; position: relative; overflow: hidden; }
+    .preview-slide { display: none; animation: slideIn 0.3s ease; }
+    .preview-slide.active { display: block; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     .preview-badge {
       font-family: 'DM Mono', monospace;
       font-size: 10px; letter-spacing: 3px;
@@ -218,22 +222,36 @@
     .preview-word {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 64px; letter-spacing: 6px;
-      color: var(--accent); line-height: 1;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      line-height: 1;
     }
     .preview-tag {
       display: inline-block;
       font-family: 'DM Mono', monospace;
       font-size: 10px; letter-spacing: 2px;
-      color: var(--accent); background: rgba(255,63,63,0.12);
-      border: 1px solid rgba(255,63,63,0.3);
       padding: 4px 12px; border-radius: 20px;
-      margin-top: 14px;
+      margin-top: 14px; border: 1px solid;
     }
+    .preview-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .preview-arrow {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); width: 32px; height: 32px;
+      border-radius: 8px; cursor: pointer;
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .preview-arrow:hover { border-color: var(--muted); background: var(--surface); }
+    .preview-dots { display: flex; gap: 6px; }
+    .preview-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border); transition: background 0.2s;
+      cursor: pointer;
+    }
+    .preview-dot.active { background: var(--text); }
 
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -256,7 +274,7 @@
     }
     .ticker-item {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: 3px;
+      font-size: 32px; letter-spacing: 4px;
       color: rgba(255,255,255,0.9);
     }
     .ticker-sep { color: rgba(255,255,255,0.4); }
@@ -591,13 +609,14 @@
     CINE<span class="red">FIED</span>
   </div>
   <p class="hero-sub">
-    Argue about <strong>heroes, movies & directors</strong> with your friends. Pick a game, share the room code, start playing.
+    Lights. Camera. Drama.
   </p>
   <div class="hero-btns">
     <a href="index.html" class="btn-hero-primary">▶ PLAY NOW</a>
     <a href="#games" class="btn-hero-secondary">↓ SEE GAME MODES</a>
   </div>
-  <div class="hero-note">// 2–8 players &nbsp;·&nbsp; no account needed</div>
+
+  <div class="hero-note">// built for group chats</div>
 
   <div class="hero-preview">
     <div class="preview-window">
@@ -608,9 +627,41 @@
         <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-left:8px;letter-spacing:1px">cinefied.app</span>
       </div>
       <div class="preview-body">
-        <div class="preview-badge">// you are the imposter</div>
-        <div class="preview-word">IMPOSTER</div>
-        <div class="preview-tag">figure out the word. don't get caught.</div>
+
+        <div class="preview-slide active" data-index="0">
+          <div class="preview-badge">// you are the imposter</div>
+          <div class="preview-word" style="color:#ff3f3f;animation:pulse 2s ease-in-out infinite">IMPOSTER</div>
+          <div class="preview-tag" style="color:#ff3f3f;background:rgba(255,63,63,0.12);border-color:rgba(255,63,63,0.3)">figure out the word. don't get caught.</div>
+        </div>
+
+        <div class="preview-slide" data-index="1">
+          <div class="preview-badge">// place them in tiers</div>
+          <div class="preview-word" style="color:#ff8c42">TIER'D</div>
+          <div class="preview-tag" style="color:#ff8c42;background:rgba(255,140,66,0.12);border-color:rgba(255,140,66,0.3)">s, a, b, c or d — defend your pick.</div>
+        </div>
+
+        <div class="preview-slide" data-index="2">
+          <div class="preview-badge">// hold it to your forehead</div>
+          <div class="preview-word" style="color:#3fffa0">HEADS UP</div>
+          <div class="preview-tag" style="color:#3fffa0;background:rgba(63,255,160,0.12);border-color:rgba(63,255,160,0.3)">tap top to pass. tap bottom to skip.</div>
+        </div>
+
+        <div class="preview-slide" data-index="3">
+          <div class="preview-badge">// who are you?</div>
+          <div class="preview-word" style="color:#5b8fff">BLINDSPOT</div>
+          <div class="preview-tag" style="color:#5b8fff;background:rgba(91,143,255,0.12);border-color:rgba(91,143,255,0.3)">you can't see your own word.</div>
+        </div>
+
+      </div>
+      <div class="preview-nav">
+        <button class="preview-arrow" onclick="previewNav(-1)">←</button>
+        <div class="preview-dots">
+          <div class="preview-dot active" data-dot="0" onclick="previewGo(0)"></div>
+          <div class="preview-dot" data-dot="1" onclick="previewGo(1)"></div>
+          <div class="preview-dot" data-dot="2" onclick="previewGo(2)"></div>
+          <div class="preview-dot" data-dot="3" onclick="previewGo(3)"></div>
+        </div>
+        <button class="preview-arrow" onclick="previewNav(1)">→</button>
       </div>
     </div>
   </div>
@@ -628,32 +679,32 @@
   <p class="section-sub">Each mode is a different kind of chaos. Mix and match throughout the night.</p>
   <div class="games-grid">
     <a href="index.html" class="game-card c-red">
-      <div class="game-icon">🕵️</div>
+      
       <div class="game-name">IMPOSTER</div>
       <div class="game-tag tag-red">MULTIPLAYER · 2–8</div>
       <div class="game-desc">Everyone gets the same secret word — except the imposter. Discuss. Deceive. Vote out the spy before they blend in.</div>
-      <div class="game-players">🏆 scored · up to 10 rounds</div>
+      <div class="game-players">scored · up to 10 rounds</div>
     </a>
     <a href="index.html" class="game-card c-orange">
-      <div class="game-icon">📊</div>
+      
       <div class="game-name">TIER'D</div>
       <div class="game-tag tag-orange">MULTIPLAYER · 2–8</div>
       <div class="game-desc">Drag heroes, movies, or directors into S/A/B/C/D tiers. Defend your choices. Get ratio'd by the room or earn their approval.</div>
-      <div class="game-players">🗳️ vote to approve or disapprove</div>
+      <div class="game-players">vote to approve or disapprove</div>
     </a>
     <a href="index.html" class="game-card c-green">
-      <div class="game-icon">🎯</div>
+      
       <div class="game-name">HEADS UP</div>
       <div class="game-tag tag-green">SOLO · 1 DEVICE</div>
       <div class="game-desc">Hold your phone to your forehead. Tilt to guess what's on screen. One player, one timer, maximum energy.</div>
-      <div class="game-players">⏱️ 1–3 min timer modes</div>
+      <div class="game-players">1–3 min timer modes</div>
     </a>
     <a href="index.html" class="game-card c-blue">
-      <div class="game-icon">❓</div>
+      
       <div class="game-name">BLINDSPOT</div>
       <div class="game-tag tag-blue">MULTIPLAYER · 2–8</div>
       <div class="game-desc">A secret word is stuck to your head — you can see everyone else's but not your own. Ask yes/no questions to figure out who you are.</div>
-      <div class="game-players">🔄 endless rounds</div>
+      <div class="game-players">endless rounds</div>
     </a>
   </div>
 </section>
@@ -684,7 +735,7 @@
     <div class="step">
       <div class="step-num">04</div>
       <div class="step-icon">🔥</div>
-      <div class="step-title">PLAY & ARGUE</div>
+      <div class="step-title">BEGIN THE SHOW</div>
       <div class="step-desc">Words are assigned, timers run, votes are cast. Scores update live. Start the next round instantly.</div>
     </div>
   </div>
@@ -699,16 +750,13 @@
     </div>
     <div class="stat-box">
       <div class="stat-num">200<span>+</span></div>
-      <div class="stat-label">Telugu Heroes, Movies & Directors</div>
+      <div class="stat-label">Actors, Movies & Directors</div>
     </div>
     <div class="stat-box">
       <div class="stat-num">8</div>
       <div class="stat-label">Players per Room</div>
     </div>
-    <div class="stat-box">
-      <div class="stat-num">0</div>
-      <div class="stat-label">Downloads Required</div>
-    </div>
+
   </div>
 </div>
 
@@ -718,12 +766,11 @@
   <div class="section-title">THE<br/>CATEGORIES</div>
   <p class="section-sub">All content is Telugu film focused. Switch categories between rounds for maximum chaos.</p>
   <div class="cat-pills">
-    <div class="cat-pill"><div class="cat-pill-icon">🦁</div><div><div class="cat-pill-name">HEROES</div><div class="cat-pill-count">50+ stars</div></div></div>
-    <div class="cat-pill"><div class="cat-pill-icon">🎬</div><div><div class="cat-pill-name">MOVIES</div><div class="cat-pill-count">100+ films</div></div></div>
-    <div class="cat-pill"><div class="cat-pill-icon">🎥</div><div><div class="cat-pill-name">DIRECTORS</div><div class="cat-pill-count">30+ directors</div></div></div>
-    <div class="cat-pill"><div class="cat-pill-icon">🔀</div><div><div class="cat-pill-name">MIXED</div><div class="cat-pill-count">Everything</div></div></div>
+    <div class="cat-pill"><div class="cat-pill-name">HEROES</div></div>
+    <div class="cat-pill"><div class="cat-pill-name">MOVIES</div></div>
+    <div class="cat-pill"><div class="cat-pill-name">DIRECTORS</div></div>
+    <div class="cat-pill"><div class="cat-pill-name">MIXED</div></div>
   </div>
-  <div class="cat-sample" id="sample-chips"></div>
 </div>
 
 
@@ -733,64 +780,36 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">CINE<span>FIED</span></div>
-  <div class="footer-sub">// the telugu film party game &nbsp;·&nbsp; built for group chats</div>
+  <div class="footer-sub">// built out of boredom &nbsp;·&nbsp; for the group chats</div>
 </footer>
 
-<!-- TODO BADGE (fixed corner) -->
-<div class="todo-badge">
-  <div class="todo-badge-title">// launch checklist</div>
-  <div class="todo-item">
-    <div class="todo-check done">✓</div>
-    <div class="todo-text-done">Landing page</div>
-  </div>
-  <div class="todo-item">
-    <div class="todo-check active">◉</div>
-    <div class="todo-text-active">Marketing page</div>
-  </div>
-  <div class="todo-item">
-    <div class="todo-check pending">○</div>
-    <div class="todo-text-pending">GA4 + Clarity analytics</div>
-  </div>
-  <div class="todo-item">
-    <div class="todo-check pending">○</div>
-    <div class="todo-text-pending">Firebase Hosting setup</div>
-  </div>
-  <div class="todo-item">
-    <div class="todo-check pending">○</div>
-    <div class="todo-text-pending">PWA (installable)</div>
-  </div>
-</div>
+
 
 <script>
   // ── TICKER ──
-  const tickerWords = [
-    'Allu Arjun','Prabhas','Mahesh Babu','RRR','Rajamouli','Baahubali','Pushpa',
-    'NTR','Ram Charan','Trivikram','Kalki 2898','Pawan Kalyan','Pokiri','Magadheera',
-    'Nani','Vijay Deverakonda','Sukumar','Boyapati','Rangasthalam','Akhil'
-  ];
   const ticker = document.getElementById('ticker');
-  // duplicate for seamless loop
-  const fullList = [...tickerWords, ...tickerWords];
-  fullList.forEach((w, i) => {
-    const span = document.createElement('span');
-    span.className = 'ticker-item';
-    span.innerHTML = w + (i % 2 === 0 ? '' : ' <span class="ticker-sep">·</span>');
-    ticker.appendChild(span);
-  });
+  const tickerText = Array(20).fill('CINEMA').join('          ·          ') + '          ·          ';
+  ticker.innerHTML = `<span class="ticker-item">${tickerText}${tickerText}</span>`;
 
-  // ── SAMPLE CHIPS ──
-  const samples = [
-    'Mahesh Babu','Pokiri','Rajamouli','Allu Arjun','Baahubali','Ram Charan',
-    'Trivikram','RRR','Prabhas','Nani','Sukumar','Kalki 2898','Boyapati',
-    'Rangasthalam','Pushpa','Desamuduru','Jalsa','Magadheera'
-  ];
-  const sampleEl = document.getElementById('sample-chips');
-  samples.sort(() => Math.random() - 0.5).forEach(s => {
-    const chip = document.createElement('div');
-    chip.className = 'sample-chip';
-    chip.textContent = s;
-    sampleEl.appendChild(chip);
-  });
+
+
+  // ── PREVIEW CAROUSEL ──
+  let previewIndex = 0;
+  const previewTotal = 4;
+
+  function previewGo(idx) {
+    document.querySelectorAll('.preview-slide').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.preview-dot').forEach(d => d.classList.remove('active'));
+    previewIndex = (idx + previewTotal) % previewTotal;
+    document.querySelector(`.preview-slide[data-index="${previewIndex}"]`).classList.add('active');
+    document.querySelector(`.preview-dot[data-dot="${previewIndex}"]`).classList.add('active');
+  }
+
+  window.previewNav = (dir) => previewGo(previewIndex + dir);
+  window.previewGo = previewGo;
+
+  // auto-advance every 3s
+  setInterval(() => previewNav(1), 3000);
 
   // ── SCROLL REVEAL ──
   const observer = new IntersectionObserver((entries) => {
