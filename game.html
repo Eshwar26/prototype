@@ -222,80 +222,37 @@
 </head>
 <body>
 
-<!-- LANDING -->
-<div class="screen" id="screen-landing">
-
-  <!-- logo -->
-  <div style="text-align:center;margin-bottom:32px">
-    <div class="logo">CINE<span>FIED</span></div>
-  </div>
-
-  <!-- game select -->
+<!-- LANDING (now the actual game home) -->
+<div class="screen active" id="screen-landing">
+  <div class="logo">CINE<span>FIED</span></div>
+  <div class="tagline">// pick your game</div>
+  <div class="spacer"></div>
   <div class="card">
-    <div class="card-title">// pick your battle</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-
-      <div class="landing-game-card" onclick="goToLobby('imposter')" style="--card-accent:#ff3f3f;--card-glow:rgba(255,63,63,0.08)">
-        <div class="lgc-row">
-          <div class="lgc-name">IMPOSTER</div>
-          <div class="lgc-meta">
-            <span class="lgc-tag" style="background:rgba(255,63,63,0.12);color:#ff3f3f;border-color:rgba(255,63,63,0.25)">MULTIPLAYER</span>
-            <span class="lgc-desc">Find the spy before they blend in</span>
-          </div>
-          <div class="lgc-arrow" style="color:#ff3f3f">→</div>
-        </div>
-      </div>
-
-      <div class="landing-game-card" onclick="goToLobby('tierlist')" style="--card-accent:#ff8c42;--card-glow:rgba(255,140,66,0.08)">
-        <div class="lgc-row">
-          <div class="lgc-name">TIER'D</div>
-          <div class="lgc-meta">
-            <span class="lgc-tag" style="background:rgba(255,140,66,0.12);color:#ff8c42;border-color:rgba(255,140,66,0.25)">MULTIPLAYER</span>
-            <span class="lgc-desc">Rank & defend your choices</span>
-          </div>
-          <div class="lgc-arrow" style="color:#ff8c42">→</div>
-        </div>
-      </div>
-
-      <div class="landing-game-card" onclick="goToHeadsUp()" style="--card-accent:#3fffa0;--card-glow:rgba(63,255,160,0.08)">
-        <div class="lgc-row">
-          <div class="lgc-name">HEADS UP</div>
-          <div class="lgc-meta">
-            <span class="lgc-tag" style="background:rgba(63,255,160,0.12);color:#3fffa0;border-color:rgba(63,255,160,0.25)">SOLO</span>
-            <span class="lgc-desc">Guess what's on your forehead</span>
-          </div>
-          <div class="lgc-arrow" style="color:#3fffa0">→</div>
-        </div>
-      </div>
-
-      <div class="landing-game-card" onclick="goToLobby('whoareyou')" style="--card-accent:#5b8fff;--card-glow:rgba(91,143,255,0.08)">
-        <div class="lgc-row">
-          <div class="lgc-name">BLINDSPOT</div>
-          <div class="lgc-meta">
-            <span class="lgc-tag" style="background:rgba(91,143,255,0.12);color:#5b8fff;border-color:rgba(91,143,255,0.25)">MULTIPLAYER</span>
-            <span class="lgc-desc">Figure out your secret word</span>
-          </div>
-          <div class="lgc-arrow" style="color:#5b8fff">→</div>
-        </div>
-      </div>
-
+    <div class="card-title">// enter your name</div>
+    <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" style="flex:1" onclick="goToLobby('imposter')">IMPOSTER</button>
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')">TIER'D</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()">HEADS UP</button>
+      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')">BLINDSPOT</button>
     </div>
   </div>
 </div>
 
 <!-- LOBBY CHOICE -->
-<div class="screen active" id="screen-lobby-choice">
-  <div class="logo" style="font-size:48px">CINE<span>FIED</span></div>
+<div class="screen" id="screen-lobby-choice">
+  <div class="logo" style="font-size:48px">LOBBY</div>
   <div class="spacer"></div>
   <div class="card">
-    <div class="card-title">// your name</div>
-    <input type="text" id="player-name-input" placeholder="enter your name" maxlength="20" />
     <button class="btn btn-primary" onclick="createRoom()">＋ CREATE ROOM</button>
     <hr class="divider" />
     <div class="card-title">// join existing room</div>
     <input type="text" id="join-code-input" placeholder="ENTER CODE" maxlength="6"
       style="text-transform:uppercase;text-align:center;font-size:22px;letter-spacing:6px;" />
     <button class="btn btn-secondary" onclick="joinRoom()">JOIN ROOM →</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
   </div>
 </div>
 
@@ -863,6 +820,8 @@
 
   // ── Landing ──────────────────────────────────
   window.goToLobby = (game) => {
+    myName = document.getElementById('player-name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); return; }
     currentGame = game;
     joiningRoom = false;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
@@ -874,8 +833,6 @@
 
   // ── Create room ──────────────────────────────
   window.createRoom = async () => {
-    myName = document.getElementById('player-name-input').value.trim();
-    if(!myName){ toast('Enter your name first!'); return; }
     roomCode=genCode(); myId=genId(); isLeader=true;
     await dbSet(`rooms/${roomCode}`, {
       leader:myId, phase:'waiting', game:currentGame,
@@ -891,8 +848,6 @@
   // ── Join room ────────────────────────────────
   let joiningRoom = false; // prevent double-tap
   window.joinRoom = async () => {
-    myName = document.getElementById('player-name-input').value.trim();
-    if(!myName){ toast('Enter your name first!'); return; }
     if(joiningRoom) return;
     joiningRoom = true;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
@@ -2358,7 +2313,7 @@
   };
 
   // seed initial history entry so the first popstate has something to catch
-  history.replaceState({ screen: 'screen-lobby-choice' }, '', '');
+  history.replaceState({ screen: 'screen-landing' }, '', '');
 
   // ── URL param auto-launch ─────────────────────
   // e.g. game.html?game=imposter → skip home, go straight to lobby
@@ -2387,11 +2342,8 @@
       return;
     }
 
-    if(game === 'headsup'){
-      goToHeadsUp();
-    } else if(['imposter','tierlist','whoareyou'].includes(game)){
-      goToLobby(game);
-    }
+    // pre-select game — user still needs to enter name then click the game button
+    // just show landing, nothing more needed
   })();
 </script>
 </body>
