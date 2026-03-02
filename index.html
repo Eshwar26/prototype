@@ -609,7 +609,7 @@
     <a href="#games">Games</a>
     <a href="#how">How It Works</a>
     <a href="#categories">Categories</a>
-    <a href="game.html" class="nav-cta">PLAY NOW →</a>
+    <a href="#games" class="nav-cta" onclick="playNowClick(event)">PLAY NOW →</a>
   </div>
 </nav>
 
@@ -821,6 +821,10 @@
 
   // auto-advance every 3s
   setInterval(() => previewNav(1), 3000);
+
+  // ── Force scroll to top on load ──
+  window.addEventListener('load', () => window.scrollTo(0, 0));
+  if(window.location.hash) history.replaceState(null, '', window.location.pathname);
 
   // ── PLAY NOW scroll & shake ──
   window.playNowClick = function(e) {
