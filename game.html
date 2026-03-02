@@ -16,8 +16,8 @@
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
     body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,63,63,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 90%,rgba(63,100,255,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
     .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:24px 16px;animation:fadeIn .35s ease}
-    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px}
-    #screen-landing{justify-content:flex-start;padding:40px 16px 48px}
+    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+
     @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,12vw,96px);letter-spacing:4px;line-height:1;color:var(--text);text-align:center}
     .logo span{color:var(--accent)}
@@ -208,114 +208,94 @@
     .collaborator-badge{display:inline-block;background:rgba(91,143,255,.12);border:1px solid rgba(91,143,255,.3);color:var(--blue);font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:6px;margin-left:6px}
 
     /* ── LANDING GAME CARDS ── */
-    .landing-game-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
-    .landing-game-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,var(--card-glow),transparent 65%);opacity:0;transition:opacity .25s}
-    .landing-game-card:hover{transform:translateY(-2px);border-color:var(--card-accent);box-shadow:0 8px 32px var(--card-glow)}
-    .landing-game-card:hover::before{opacity:1}
+    .landing-game-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+    .landing-game-card:hover{border-color:var(--card-accent);background:rgba(255,255,255,0.02)}
     .landing-game-card:active{transform:scale(.98)}
-    .lgc-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-    .lgc-icon{font-size:28px;flex-shrink:0}
-    .lgc-info{flex:1}
-    .lgc-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--text);line-height:1}
-    .lgc-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid;display:inline-block;margin-top:5px}
-    .lgc-arrow{font-size:18px;color:var(--card-accent);opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px)}
-    .landing-game-card:hover .lgc-arrow{opacity:1;transform:translateX(0)}
-    .lgc-desc{font-size:13px;color:var(--muted);line-height:1.6;position:relative}
-    .lgc-footer{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;letter-spacing:1px;position:relative}
+    .lgc-row{display:flex;align-items:center;gap:12px}
+    .lgc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--text);line-height:1;width:100px;flex-shrink:0}
+    .lgc-meta{flex:1;display:flex;flex-direction:column;gap:4px}
+    .lgc-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;border:1px solid;display:inline-block;width:fit-content}
+    .lgc-desc{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.3px}
+    .lgc-arrow{font-size:16px;flex-shrink:0;opacity:0.4}
+    .landing-game-card:hover .lgc-arrow{opacity:1}
   </style>
 </head>
 <body>
 
 <!-- LANDING -->
-<div class="screen active" id="screen-landing">
+<div class="screen" id="screen-landing">
 
-  <!-- hero -->
-  <div style="text-align:center;margin-bottom:40px">
+  <!-- logo -->
+  <div style="text-align:center;margin-bottom:32px">
     <div class="logo">CINE<span>FIED</span></div>
-    
   </div>
 
-  <!-- name input -->
-  <div class="card" style="margin-bottom:24px">
-    <div class="card-title">// enter your name to play</div>
-    <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
-    <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:4px;letter-spacing:1px">pick your battle</p>
-  </div>
+  <!-- game select -->
+  <div class="card">
+    <div class="card-title">// pick your battle</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
 
-  <!-- game cards -->
-  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px">
-
-    <!-- imposter -->
-    <div class="landing-game-card" onclick="goToLobby('imposter')" style="--card-accent:#ff3f3f;--card-glow:rgba(255,63,63,0.08)">
-      <div class="lgc-top">
-        <div class="lgc-icon"></div>
-        <div class="lgc-info">
+      <div class="landing-game-card" onclick="goToLobby('imposter')" style="--card-accent:#ff3f3f;--card-glow:rgba(255,63,63,0.08)">
+        <div class="lgc-row">
           <div class="lgc-name">IMPOSTER</div>
-          <div class="lgc-tag" style="background:rgba(255,63,63,0.12);color:#ff3f3f;border-color:rgba(255,63,63,0.25)">MULTIPLAYER · 2–8</div>
+          <div class="lgc-meta">
+            <span class="lgc-tag" style="background:rgba(255,63,63,0.12);color:#ff3f3f;border-color:rgba(255,63,63,0.25)">MULTIPLAYER</span>
+            <span class="lgc-desc">Find the spy before they blend in</span>
+          </div>
+          <div class="lgc-arrow" style="color:#ff3f3f">→</div>
         </div>
-        <div class="lgc-arrow">→</div>
       </div>
-      <div class="lgc-desc">Everyone gets the same secret word — except the imposter. Discuss. Deceive. Vote out the spy before they blend in.</div>
-      <div class="lgc-footer">scored · up to 10 rounds</div>
-    </div>
 
-    <!-- tier'd -->
-    <div class="landing-game-card" onclick="goToLobby('tierlist')" style="--card-accent:#ff8c42;--card-glow:rgba(255,140,66,0.08)">
-      <div class="lgc-top">
-        <div class="lgc-icon"></div>
-        <div class="lgc-info">
+      <div class="landing-game-card" onclick="goToLobby('tierlist')" style="--card-accent:#ff8c42;--card-glow:rgba(255,140,66,0.08)">
+        <div class="lgc-row">
           <div class="lgc-name">TIER'D</div>
-          <div class="lgc-tag" style="background:rgba(255,140,66,0.12);color:#ff8c42;border-color:rgba(255,140,66,0.25)">MULTIPLAYER · 2–8</div>
+          <div class="lgc-meta">
+            <span class="lgc-tag" style="background:rgba(255,140,66,0.12);color:#ff8c42;border-color:rgba(255,140,66,0.25)">MULTIPLAYER</span>
+            <span class="lgc-desc">Rank & defend your choices</span>
+          </div>
+          <div class="lgc-arrow" style="color:#ff8c42">→</div>
         </div>
-        <div class="lgc-arrow">→</div>
       </div>
-      <div class="lgc-desc">Drag heroes, movies, or directors into S/A/B/C/D tiers. Defend your choices. Get ratio'd by the room or earn their approval.</div>
-      <div class="lgc-footer">vote to approve or disapprove</div>
-    </div>
 
-    <!-- heads up -->
-    <div class="landing-game-card" onclick="goToHeadsUp()" style="--card-accent:#3fffa0;--card-glow:rgba(63,255,160,0.08)">
-      <div class="lgc-top">
-        <div class="lgc-icon"></div>
-        <div class="lgc-info">
+      <div class="landing-game-card" onclick="goToHeadsUp()" style="--card-accent:#3fffa0;--card-glow:rgba(63,255,160,0.08)">
+        <div class="lgc-row">
           <div class="lgc-name">HEADS UP</div>
-          <div class="lgc-tag" style="background:rgba(63,255,160,0.12);color:#3fffa0;border-color:rgba(63,255,160,0.25)">SOLO · 1 DEVICE</div>
+          <div class="lgc-meta">
+            <span class="lgc-tag" style="background:rgba(63,255,160,0.12);color:#3fffa0;border-color:rgba(63,255,160,0.25)">SOLO</span>
+            <span class="lgc-desc">Guess what's on your forehead</span>
+          </div>
+          <div class="lgc-arrow" style="color:#3fffa0">→</div>
         </div>
-        <div class="lgc-arrow">→</div>
       </div>
-      <div class="lgc-desc">Hold your phone to your forehead. Tap to guess what's on screen. One player, one timer, maximum energy.</div>
-      <div class="lgc-footer">1–3 min timer modes</div>
-    </div>
 
-    <!-- blindspot -->
-    <div class="landing-game-card" onclick="goToLobby('whoareyou')" style="--card-accent:#5b8fff;--card-glow:rgba(91,143,255,0.08)">
-      <div class="lgc-top">
-        <div class="lgc-icon"></div>
-        <div class="lgc-info">
+      <div class="landing-game-card" onclick="goToLobby('whoareyou')" style="--card-accent:#5b8fff;--card-glow:rgba(91,143,255,0.08)">
+        <div class="lgc-row">
           <div class="lgc-name">BLINDSPOT</div>
-          <div class="lgc-tag" style="background:rgba(91,143,255,0.12);color:#5b8fff;border-color:rgba(91,143,255,0.25)">MULTIPLAYER · 2–8</div>
+          <div class="lgc-meta">
+            <span class="lgc-tag" style="background:rgba(91,143,255,0.12);color:#5b8fff;border-color:rgba(91,143,255,0.25)">MULTIPLAYER</span>
+            <span class="lgc-desc">Figure out your secret word</span>
+          </div>
+          <div class="lgc-arrow" style="color:#5b8fff">→</div>
         </div>
-        <div class="lgc-arrow">→</div>
       </div>
-      <div class="lgc-desc">A secret word is stuck to your head — you can see everyone else's but not your own. Ask yes/no questions to figure out who you are.</div>
-      <div class="lgc-footer">endless rounds</div>
-    </div>
 
+    </div>
   </div>
 </div>
 
 <!-- LOBBY CHOICE -->
-<div class="screen" id="screen-lobby-choice">
-  <div class="logo" style="font-size:48px">LOBBY</div>
+<div class="screen active" id="screen-lobby-choice">
+  <div class="logo" style="font-size:48px">CINE<span>FIED</span></div>
   <div class="spacer"></div>
   <div class="card">
+    <div class="card-title">// your name</div>
+    <input type="text" id="player-name-input" placeholder="enter your name" maxlength="20" />
     <button class="btn btn-primary" onclick="createRoom()">＋ CREATE ROOM</button>
     <hr class="divider" />
     <div class="card-title">// join existing room</div>
     <input type="text" id="join-code-input" placeholder="ENTER CODE" maxlength="6"
       style="text-transform:uppercase;text-align:center;font-size:22px;letter-spacing:6px;" />
     <button class="btn btn-secondary" onclick="joinRoom()">JOIN ROOM →</button>
-    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
   </div>
 </div>
 
@@ -778,7 +758,7 @@
       const leave = confirm('Leave the game?');
       if(leave){
         if(roomCode) leaveRoom();
-        else showScreen('screen-landing');
+        else showScreen('screen-lobby-choice');
       }
       return;
     }
@@ -788,13 +768,13 @@
       joiningRoom = false;
       const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
       if(joinBtn) joinBtn.disabled = false;
-      showScreen('screen-landing');
+      showScreen('screen-lobby-choice');
       return;
     }
 
     // heads up setup/result → landing
     if(current === 'screen-hu-setup' || current === 'screen-hu-result'){
-      showScreen('screen-landing');
+      showScreen('screen-lobby-choice');
       return;
     }
 
@@ -806,13 +786,13 @@
         huActive = false;
         clearInterval(huTimerInterval);
         huTimerInterval = null;
-        showScreen('screen-landing');
+        showScreen('screen-lobby-choice');
       }
       return;
     }
 
     // fallback — go home
-    showScreen('screen-landing');
+    showScreen('screen-lobby-choice');
   });
   function toast(msg, dur=2500){
     const t=document.getElementById('toast');
@@ -1478,7 +1458,7 @@
       db.ref(`rooms/${savedRoom}/notifications`).off();
       roomCode=''; myId=''; isLeader=false;
       toast('You were removed from the room.');
-      showScreen('screen-landing');
+      showScreen('screen-lobby-choice');
     });
   }
 
@@ -1504,7 +1484,7 @@
     }
 
     leavingIntentionally = false;
-    showScreen('screen-landing');
+    showScreen('screen-lobby-choice');
   };
 
   // ════════════════════════════════════════
@@ -1575,7 +1555,7 @@
     const isCollaborator=collaborators[myId]===true;
     const canRank=isLeader||isCollaborator;
 
-    document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER'D`;
+    document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER\'D`;
 
     // phase label & leader label
     if(isLeader){
@@ -1584,7 +1564,7 @@
       document.getElementById('tier-leader-label').textContent=
         collabNames.length>0?`collaborating with: ${collabNames.join(', ')}`:'you are ranking — drag items below';
     } else if(isCollaborator){
-      document.getElementById('tier-phase-label').textContent='// collaborating on tier'd';
+      document.getElementById('tier-phase-label').textContent='// collaborating on tier\'d';
       document.getElementById('tier-leader-label').textContent='you can now drag items!';
     } else {
       document.getElementById('tier-phase-label').textContent='// watching the leader rank';
@@ -1668,7 +1648,7 @@
         const [reqId]=pending;
         const reqName=room.players[reqId]?.name||'Someone';
         pendingCollabId=reqId;
-        document.getElementById('collab-popup-msg').textContent=`${reqName} wants to help rank the tier'd`;
+        document.getElementById('collab-popup-msg').textContent=`${reqName} wants to help rank the tier list`;
         document.getElementById('collab-popup').style.display='flex';
       } else {
         document.getElementById('collab-popup').style.display='none';
@@ -2059,6 +2039,8 @@
   let huActive = false;
 
   window.goToHeadsUp = () => {
+    myName = document.getElementById('player-name-input')?.value.trim() || myName;
+    if(!myName){ toast('Enter your name first!'); return; }
     showScreen('screen-hu-setup');
     renderHuCategories();
     renderHuTimes();
@@ -2375,7 +2357,41 @@
   };
 
   // seed initial history entry so the first popstate has something to catch
-  history.replaceState({ screen: 'screen-landing' }, '', '');
+  history.replaceState({ screen: 'screen-lobby-choice' }, '', '');
+
+  // ── URL param auto-launch ─────────────────────
+  // e.g. game.html?game=imposter → skip home, go straight to lobby
+  (function(){
+    const params = new URLSearchParams(window.location.search);
+    const game   = params.get('game');
+    const name   = params.get('name') || '';
+    if(!game) return;
+
+    // pre-fill name if passed
+    if(name){
+      const nameInput = document.getElementById('player-name-input');
+      if(nameInput) nameInput.value = name;
+      myName = name;
+    }
+
+    // if no name yet, show landing screen with the game pre-selected
+    // user types name then clicks the game — but highlight the right one
+    const nameInput = document.getElementById('player-name-input');
+    if(!myName && nameInput){
+      // focus name input and store intended game so we can launch after name entered
+      showScreen('screen-lobby-choice');
+      nameInput.focus();
+      nameInput.placeholder = 'enter name to play ' + game.toUpperCase();
+      // override the specific card click to just work normally — goToLobby handles the toast
+      return;
+    }
+
+    if(game === 'headsup'){
+      goToHeadsUp();
+    } else if(['imposter','tierlist','whoareyou'].includes(game)){
+      goToLobby(game);
+    }
+  })();
 </script>
 </body>
 </html>
