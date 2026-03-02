@@ -863,10 +863,7 @@
 
   // ── Landing ──────────────────────────────────
   window.goToLobby = (game) => {
-    myName = document.getElementById('player-name-input').value.trim();
-    if(!myName){ toast('Enter your name first!'); return; }
     currentGame = game;
-    // always reset join state when entering lobby choice
     joiningRoom = false;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
     if(joinBtn) joinBtn.disabled = false;
@@ -877,6 +874,8 @@
 
   // ── Create room ──────────────────────────────
   window.createRoom = async () => {
+    myName = document.getElementById('player-name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); return; }
     roomCode=genCode(); myId=genId(); isLeader=true;
     await dbSet(`rooms/${roomCode}`, {
       leader:myId, phase:'waiting', game:currentGame,
@@ -892,6 +891,8 @@
   // ── Join room ────────────────────────────────
   let joiningRoom = false; // prevent double-tap
   window.joinRoom = async () => {
+    myName = document.getElementById('player-name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); return; }
     if(joiningRoom) return;
     joiningRoom = true;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
