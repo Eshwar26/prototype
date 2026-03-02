@@ -126,7 +126,7 @@
     .revealed-word-small .rw-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
     .revealed-word-small .rw-word{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--accent2)}
 
-    /* ── TIER LIST ── */
+    /* ── TIER'D ── */
     .tier-row{display:flex;align-items:stretch;margin-bottom:6px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
     .tier-label{width:52px;min-width:52px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;flex-shrink:0}
     .tier-s .tier-label{background:#ff7070;color:#1a0000}
@@ -232,14 +232,14 @@
   <!-- hero -->
   <div style="text-align:center;margin-bottom:40px">
     <div class="logo">CINE<span>FIED</span></div>
-    <div class="tagline">// the telugu film party game</div>
+    
   </div>
 
   <!-- name input -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-title">// enter your name to play</div>
     <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
-    <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:4px;letter-spacing:1px">pick a game below to get started</p>
+    <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:4px;letter-spacing:1px">pick your battle</p>
   </div>
 
   <!-- game cards -->
@@ -259,12 +259,12 @@
       <div class="lgc-footer">scored · up to 10 rounds</div>
     </div>
 
-    <!-- tier list -->
+    <!-- tier'd -->
     <div class="landing-game-card" onclick="goToLobby('tierlist')" style="--card-accent:#ff8c42;--card-glow:rgba(255,140,66,0.08)">
       <div class="lgc-top">
         <div class="lgc-icon"></div>
         <div class="lgc-info">
-          <div class="lgc-name">TIER LIST</div>
+          <div class="lgc-name">TIER'D</div>
           <div class="lgc-tag" style="background:rgba(255,140,66,0.12);color:#ff8c42;border-color:rgba(255,140,66,0.25)">MULTIPLAYER · 2–8</div>
         </div>
         <div class="lgc-arrow">→</div>
@@ -287,12 +287,12 @@
       <div class="lgc-footer">1–3 min timer modes</div>
     </div>
 
-    <!-- who are you -->
+    <!-- blindspot -->
     <div class="landing-game-card" onclick="goToLobby('whoareyou')" style="--card-accent:#5b8fff;--card-glow:rgba(91,143,255,0.08)">
       <div class="lgc-top">
         <div class="lgc-icon"></div>
         <div class="lgc-info">
-          <div class="lgc-name">WHO ARE YOU</div>
+          <div class="lgc-name">BLINDSPOT</div>
           <div class="lgc-tag" style="background:rgba(91,143,255,0.12);color:#5b8fff;border-color:rgba(91,143,255,0.25)">MULTIPLAYER · 2–8</div>
         </div>
         <div class="lgc-arrow">→</div>
@@ -355,7 +355,7 @@
       <button class="btn btn-green" id="start-btn" onclick="startGame()">START GAME</button>
     </div>
 
-    <!-- TIER LIST leader controls -->
+    <!-- TIER'D leader controls -->
     <div id="tier-leader-controls" style="display:none">
       <hr class="divider" />
       <div class="card-title">// word category</div>
@@ -364,10 +364,10 @@
       <div class="card-title">// how many items to rank</div>
       <div class="rounds-selector" id="tier-count-selector"></div>
       <hr class="divider" />
-      <button class="btn btn-green" id="tier-start-btn" onclick="startTierGame()" disabled>START TIER LIST</button>
+      <button class="btn btn-green" id="tier-start-btn" onclick="startTierGame()" disabled>START TIER'D</button>
     </div>
 
-    <!-- WHO ARE YOU leader controls -->
+    <!-- BLINDSPOT leader controls -->
     <div id="way-leader-controls" style="display:none">
       <hr class="divider" />
       <div class="card-title">// word category</div>
@@ -449,14 +449,14 @@
   </div>
 </div>
 
-<!-- TIER LIST — BUILD SCREEN (leader drags, others watch) -->
+<!-- TIER'D — BUILD SCREEN (leader drags, others watch) -->
 <div class="screen" id="screen-tier-build">
-  <div class="phase-indicator" id="tier-phase-label">// tier list</div>
+  <div class="phase-indicator" id="tier-phase-label">// tier'd</div>
   <div style="width:100%;max-width:500px">
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px" id="tier-cat-title">TIER LIST</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px" id="tier-cat-title">TIER'D</div>
         <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)" id="tier-leader-label"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -487,12 +487,12 @@
   </div>
 </div>
 
-<!-- TIER LIST — VOTE SCREEN -->
+<!-- TIER'D — VOTE SCREEN -->
 <div class="screen" id="screen-tier-vote">
   <div class="phase-indicator">// vote on the ranking</div>
   <div style="width:100%;max-width:500px">
 
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:14px">THE FINAL TIER LIST</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:14px">THE FINAL TIER'D</div>
 
     <!-- readonly tier display -->
     <div id="tier-vote-rows"></div>
@@ -512,7 +512,7 @@
   </div>
 </div>
 
-<!-- TIER LIST — RESULT SCREEN -->
+<!-- TIER'D — RESULT SCREEN -->
 <div class="screen" id="screen-tier-result">
   <div class="phase-indicator">// verdict</div>
   <div style="width:100%;max-width:500px">
@@ -599,7 +599,7 @@
   </div>
 </div>
 
-<!-- WHO ARE YOU — PLAY SCREEN -->
+<!-- BLINDSPOT — PLAY SCREEN -->
 <div class="screen" id="screen-way-play">
   <div style="width:100%;max-width:460px">
 
@@ -1508,7 +1508,7 @@
   };
 
   // ════════════════════════════════════════
-  //   TIER LIST GAME
+  //   TIER'D GAME
   // ════════════════════════════════════════
   const TIER_LEVELS = ['S','A','B','C','D'];
   const TIER_COUNTS = [8, 10, 12, 15];
@@ -1575,7 +1575,7 @@
     const isCollaborator=collaborators[myId]===true;
     const canRank=isLeader||isCollaborator;
 
-    document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER LIST`;
+    document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER'D`;
 
     // phase label & leader label
     if(isLeader){
@@ -1584,7 +1584,7 @@
       document.getElementById('tier-leader-label').textContent=
         collabNames.length>0?`collaborating with: ${collabNames.join(', ')}`:'you are ranking — drag items below';
     } else if(isCollaborator){
-      document.getElementById('tier-phase-label').textContent='// collaborating on tier list';
+      document.getElementById('tier-phase-label').textContent='// collaborating on tier'd';
       document.getElementById('tier-leader-label').textContent='you can now drag items!';
     } else {
       document.getElementById('tier-phase-label').textContent='// watching the leader rank';
@@ -1668,7 +1668,7 @@
         const [reqId]=pending;
         const reqName=room.players[reqId]?.name||'Someone';
         pendingCollabId=reqId;
-        document.getElementById('collab-popup-msg').textContent=`${reqName} wants to help rank the tier list`;
+        document.getElementById('collab-popup-msg').textContent=`${reqName} wants to help rank the tier'd`;
         document.getElementById('collab-popup').style.display='flex';
       } else {
         document.getElementById('collab-popup').style.display='none';
@@ -2218,7 +2218,7 @@
   };
 
   // ════════════════════════════════════════
-  //   WHO ARE YOU
+  //   BLINDSPOT
   // ════════════════════════════════════════
   let waySelectedCategory = 'mixed';
 
@@ -2367,7 +2367,7 @@
     _origStartHeadsUp();
   };
 
-  // Track: tier list started
+  // Track: tier'd started
   const _origStartTierGame = window.startTierGame;
   window.startTierGame = async () => {
     logEvent('game_started', { game_mode: 'tierlist', category: selectedCategory, item_count: selectedTierCount });
