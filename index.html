@@ -253,6 +253,17 @@
     }
     .preview-dot.active { background: var(--text); }
 
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      15%      { transform: translateX(-6px); }
+      30%      { transform: translateX(6px); }
+      45%      { transform: translateX(-4px); }
+      60%      { transform: translateX(4px); }
+      75%      { transform: translateX(-2px); }
+      90%      { transform: translateX(2px); }
+    }
+    .shake { animation: shake 0.7s ease; }
+
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -612,7 +623,7 @@
     Lights. Camera. Drama.
   </p>
   <div class="hero-btns">
-    <a href="game.html" class="btn-hero-primary">▶ PLAY NOW</a>
+    <a href="#games" class="btn-hero-primary" onclick="playNowClick(event)">▶ PLAY NOW</a>
     <a href="#games" class="btn-hero-secondary">↓ SEE GAME MODES</a>
   </div>
 
@@ -675,7 +686,7 @@
 <!-- GAMES SECTION -->
 <section id="games">
   <div class="section-label">// 04 game modes</div>
-  <div class="section-title">PICK YOUR<br/>BATTLE</div>
+  <div class="section-title" id="pick-your-battle">PICK YOUR<br/>BATTLE</div>
   <p class="section-sub">Each mode is a different kind of chaos. Mix and match throughout the night.</p>
   <div class="games-grid">
     <a href="game.html?game=imposter" class="game-card c-red">
@@ -810,6 +821,22 @@
 
   // auto-advance every 3s
   setInterval(() => previewNav(1), 3000);
+
+  // ── PLAY NOW scroll & shake ──
+  window.playNowClick = function(e) {
+    e.preventDefault();
+    const target = document.getElementById('games');
+    if(!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      const title = document.getElementById('pick-your-battle');
+      if(!title) return;
+      title.classList.remove('shake');
+      void title.offsetWidth; // reflow to restart animation
+      title.classList.add('shake');
+      setTimeout(() => title.classList.remove('shake'), 800);
+    }, 600);
+  };
 
   // ── SCROLL REVEAL ──
   const observer = new IntersectionObserver((entries) => {
