@@ -218,6 +218,20 @@
     .lgc-desc{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.3px}
     .lgc-arrow{font-size:16px;flex-shrink:0;opacity:0.4}
     .landing-game-card:hover .lgc-arrow{opacity:1}
+
+    /* ── HOW TO PLAY ── */
+    .htp-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:14px;transition:border-color .2s,color .2s;-webkit-tap-highlight-color:transparent}
+    .htp-toggle:hover{border-color:var(--accent);color:var(--text)}
+    .htp-toggle.open{border-color:var(--accent);color:var(--text);border-radius:10px 10px 0 0;border-bottom-color:transparent}
+    .htp-arrow{font-size:10px;transition:transform .25s;display:inline-block}
+    .htp-toggle.open .htp-arrow{transform:rotate(180deg)}
+    .htp-body{display:none;border:1px solid var(--accent);border-top:none;border-radius:0 0 10px 10px;padding:14px 12px;background:var(--surface)}
+    .htp-body.open{display:block;animation:fadeIn .2s ease}
+    .htp-cards{display:flex;flex-direction:column;gap:8px}
+    .htp-card{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+    .htp-step-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1;flex-shrink:0;width:22px;text-align:center;margin-top:1px}
+    .htp-card-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent2);text-transform:uppercase;margin-bottom:4px}
+    .htp-card-text{font-size:13px;color:var(--muted);line-height:1.55}
   </style>
 </head>
 <body>
@@ -253,6 +267,16 @@
       style="text-transform:uppercase;text-align:center;font-size:22px;letter-spacing:6px;" />
     <button class="btn btn-secondary" onclick="joinRoom()">JOIN ROOM →</button>
     <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
+
+    <!-- HOW TO PLAY COLLAPSIBLE -->
+    <button class="htp-toggle" id="htp-toggle-lobby" onclick="toggleHtp('lobby')">
+      <span>// how to play</span>
+      <span class="htp-arrow">▼</span>
+    </button>
+    <div class="htp-body" id="htp-body-lobby">
+      <div class="htp-cards" id="htp-cards-lobby"></div>
+    </div>
+
   </div>
 </div>
 
@@ -268,6 +292,16 @@
     <div class="player-list" id="waiting-player-list"></div>
     <div class="waiting-text" id="waiting-msg">Waiting for players<span class="loading-dots"></span></div>
     <div id="waiting-for-leader-msg" style="display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:1px">waiting for leader to start<span class="loading-dots"></span></div>
+
+    <!-- HOW TO PLAY COLLAPSIBLE (waiting room) -->
+    <button class="htp-toggle" id="htp-toggle-waiting" onclick="toggleHtp('waiting')" style="margin-top:16px">
+      <span>// how to play</span>
+      <span class="htp-arrow">▼</span>
+    </button>
+    <div class="htp-body" id="htp-body-waiting">
+      <div class="htp-cards" id="htp-cards-waiting"></div>
+    </div>
+
     <div id="leader-controls" style="display:none">
       <hr class="divider" />
       <div class="card-title">// word category</div>
@@ -484,6 +518,16 @@
     <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7;text-align:center">
       tap <span style="color:var(--green)">top half</span> = ✓ got it &nbsp;|&nbsp; tap <span style="color:var(--accent)">bottom half</span> = ↓ skip
     </p>
+
+    <!-- HOW TO PLAY for Heads Up -->
+    <button class="htp-toggle" id="htp-toggle-hu" onclick="toggleHtp('hu')">
+      <span>// how to play</span>
+      <span class="htp-arrow">▼</span>
+    </button>
+    <div class="htp-body" id="htp-body-hu">
+      <div class="htp-cards" id="htp-cards-hu"></div>
+    </div>
+
     <button class="btn btn-green" style="margin-top:16px" onclick="startHeadsUp()">START →</button>
     <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
   </div>
@@ -632,6 +676,88 @@
   let tallyDone = false;
   let readyAdvanceDone = false;
 
+  // ── HOW TO PLAY DATA ────────────────────────
+  const HTP_CONTENT = {
+    imposter: [
+      { title: 'The Word',       text: 'Everyone gets the same secret word. One person gets "IMPOSTER" instead — they don\'t know the word at all.' },
+      { title: 'The Discussion', text: 'Take turns saying one thing about the word. Don\'t make it too obvious — the imposter is listening and trying to guess.' },
+      { title: 'The Bluff',      text: 'The imposter has to pretend they know the word. They\'ll say something vague and hope nobody notices.' },
+      { title: 'The Vote',       text: 'After everyone speaks, vote for who you think the imposter is.' },
+      { title: 'The Points',     text: 'If the imposter gets caught, the others get points. If nobody catches them, the imposter wins points.' },
+    ],
+    tierlist: [
+      { title: 'The Items',        text: 'A set of Telugu heroes, movies or directors appears on screen for everyone to see.' },
+      { title: 'The Ranker',       text: 'The room leader or a collaborator drags items into tiers — S, A, B, C or D.' },
+      { title: 'Collaborate',      text: 'Non-leaders can tap the collaborate button to request drag access and help rank together.' },
+      { title: 'Everyone Watches', text: 'Other players watch the ranking live and chat their reactions using the preset messages.' },
+      { title: 'The Vote',         text: 'Once ranking is done, everyone votes Approve or Disapprove. If the majority approves — the list gets APPROVED. If the majority disapproves — the list gets RATIO\'D.' },
+    ],
+    whoareyou: [
+      { title: 'Your Word',    text: 'You have a secret word. You don\'t know what it is. Everyone else does.' },
+      { title: 'Look Around',  text: 'Open the app and you can see what word everyone else got.' },
+      { title: 'Take Turns',   text: 'Each player asks one yes or no question at a time. Go one by one, don\'t all ask at once.' },
+      { title: 'Ask Questions',text: 'Ask the group things like "am I a hero?" or "am I from a 2000s movie?" — they can only say yes or no.' },
+      { title: 'Figure It Out',text: 'Keep asking until you figure out your own word. Once everyone knows, hit ready and the next round begins.' },
+    ],
+    headsup: [
+      { title: 'The Setup',   text: 'A word appears on screen. Your friends need to get you to say that word out loud without saying it themselves.' },
+      { title: 'Got It',      text: 'Tap the top half of the screen if they guessed the word correctly.' },
+      { title: 'Skip',        text: 'Tap the bottom half to skip a word if it\'s too hard.' },
+      { title: 'Beat the Clock', text: 'Score as many correct guesses as you can before the timer runs out.' },
+    ],
+  };
+
+  // ── Toggle How To Play ───────────────────────
+  window.toggleHtp = (context) => {
+    const toggle = document.getElementById(`htp-toggle-${context}`);
+    const body   = document.getElementById(`htp-body-${context}`);
+    const cards  = document.getElementById(`htp-cards-${context}`);
+    if(!toggle || !body || !cards) return;
+
+    const isOpen = body.classList.contains('open');
+    if(isOpen){
+      toggle.classList.remove('open');
+      body.classList.remove('open');
+    } else {
+      // populate cards if not done yet
+      if(!cards.dataset.populated){
+        const game = context === 'hu' ? 'headsup' : currentGame;
+        const steps = HTP_CONTENT[game] || HTP_CONTENT.imposter;
+        cards.innerHTML = '';
+        steps.forEach((step, i) => {
+          const card = document.createElement('div');
+          card.className = 'htp-card';
+          card.innerHTML = `
+            <div class="htp-step-num">${i + 1}</div>
+            <div>
+              <div class="htp-card-title">${step.title}</div>
+              <div class="htp-card-text">${step.text}</div>
+            </div>`;
+          cards.appendChild(card);
+        });
+        cards.dataset.populated = '1';
+      }
+      toggle.classList.add('open');
+      body.classList.add('open');
+    }
+  };
+
+  // reset HTP populated state when game changes so it re-renders for new game
+  function resetHtp(){
+    ['htp-cards-lobby','htp-cards-waiting'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) { el.innerHTML=''; delete el.dataset.populated; }
+    });
+    ['htp-toggle-lobby','htp-toggle-waiting'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.classList.remove('open');
+    });
+    ['htp-body-lobby','htp-body-waiting'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.classList.remove('open');
+    });
+  }
+
   // ── Word bank ────────────────────────────────
   const WORDS = {
     heroes: [
@@ -691,7 +817,6 @@
   const roundOptions = [3, 5, 7, 10];
 
   // ── Helpers ──────────────────────────────────
-  // Screens that are mid-game — back should trigger leaveRoom or just go to landing
   const MID_GAME_SCREENS = new Set([
     'screen-waiting','screen-reveal','screen-vote','screen-result','screen-winner',
     'screen-tier-build','screen-tier-vote','screen-tier-result','screen-way-play'
@@ -700,18 +825,15 @@
   window.showScreen = id => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    // push a history entry so the browser back button has something to pop
     history.pushState({ screen: id }, '', '');
   };
 
-  // intercept browser/mobile back button
   window.addEventListener('popstate', () => {
     const current = document.querySelector('.screen.active')?.id;
     if(!current) return;
 
-    // during active room — leave properly
     if(MID_GAME_SCREENS.has(current)){
-      history.pushState({ screen: current }, '', ''); // re-push so we stay
+      history.pushState({ screen: current }, '', '');
       const leave = confirm('Leave the game?');
       if(leave){
         if(roomCode) leaveRoom();
@@ -720,7 +842,6 @@
       return;
     }
 
-    // lobby choice → landing
     if(current === 'screen-lobby-choice'){
       joiningRoom = false;
       const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
@@ -729,13 +850,11 @@
       return;
     }
 
-    // heads up setup/result → landing
     if(current === 'screen-hu-setup' || current === 'screen-hu-result'){
       showScreen('screen-lobby-choice');
       return;
     }
 
-    // heads up play → confirm quit
     if(current === 'screen-hu-play'){
       history.pushState({ screen: current }, '', '');
       const quit = confirm('Quit the game?');
@@ -748,9 +867,9 @@
       return;
     }
 
-    // fallback — go home
     showScreen('screen-lobby-choice');
   });
+
   function toast(msg, dur=2500){
     const t=document.getElementById('toast');
     t.textContent=msg; t.classList.add('show');
@@ -760,8 +879,6 @@
   function genId(){   return Math.random().toString(36).substring(2,12); }
 
   // ── Single master listener ───────────────────
-  // We attach ONE listener to the whole room object.
-  // It fires whenever anything changes and routes to the right screen.
   function attachRoomListener(){
     if(roomListener) roomListener.off();
     roomListener = db.ref(`rooms/${roomCode}`);
@@ -799,7 +916,6 @@
         enterWayPlay(room);
       }
 
-      // live updates within current screen
       if(phase === 'reveal' && currentScreen === 'screen-reveal'){
         updateReadyStatus(room);
       }
@@ -823,12 +939,12 @@
     myName = document.getElementById('player-name-input').value.trim();
     if(!myName){ toast('Enter your name first!'); return; }
     currentGame = game;
+    resetHtp();
     joiningRoom = false;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
     if(joinBtn) joinBtn.disabled = false;
     showScreen('screen-lobby-choice');
   };
-  // keep old name working just in case
   window.goToLobbyChoice = () => goToLobby('imposter');
 
   // ── Create room ──────────────────────────────
@@ -846,7 +962,7 @@
   };
 
   // ── Join room ────────────────────────────────
-  let joiningRoom = false; // prevent double-tap
+  let joiningRoom = false;
   window.joinRoom = async () => {
     if(joiningRoom) return;
     joiningRoom = true;
@@ -860,7 +976,6 @@
     const room = snap.val();
     if(room.phase!=='waiting'){ toast('Game already started!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
 
-    // check if this name is already in the room (double join guard)
     const existingPlayers = room.players || {};
     const nameTaken = Object.values(existingPlayers).some(p => p.name.toLowerCase()===myName.toLowerCase());
     if(nameTaken){ toast('Your name is already in this room!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
@@ -869,7 +984,6 @@
     currentGame = room.game || 'imposter';
     await dbSet(`rooms/${roomCode}/players/${myId}`, {name:myName,ready:false,vote:null,score:0});
 
-    // auto-remove on disconnect
     db.ref(`rooms/${roomCode}/players/${myId}`).onDisconnect().remove();
     db.ref(`rooms/${roomCode}/notifications`).onDisconnect().set({
       msg: `${myName} disconnected`, ts: Date.now()
@@ -883,7 +997,6 @@
   function enterWaitingRoom(){
     document.getElementById('display-room-code').textContent = roomCode;
 
-    // always hide all three panels first — prevents stacking when switching games
     document.getElementById('leader-controls').style.display      = 'none';
     document.getElementById('tier-leader-controls').style.display = 'none';
     document.getElementById('way-leader-controls').style.display  = 'none';
@@ -905,7 +1018,6 @@
     watchForKick();
     watchNotifications();
 
-    // separate player list watcher for waiting room
     db.ref(`rooms/${roomCode}/players`).on('value', snap=>{
       const players=snap.val()||{};
       const count=Object.keys(players).length;
@@ -981,11 +1093,9 @@
     const cat   = catSnap.val()   || 'mixed';
     const total = totalSnap.val() || 5;
 
-    // avoid repeat words
     const histSnap  = await dbGet(`rooms/${roomCode}/history`);
     const history   = histSnap.val() || [];
     const usedWords = history.map(h=>h.word);
-    // mixed = all categories combined
     const fullList  = cat==='mixed'
       ? Object.values(WORDS).flat()
       : WORDS[cat];
@@ -993,12 +1103,10 @@
     const wordList  = pool.length>0 ? pool : fullList;
     const word      = wordList[Math.floor(Math.random()*wordList.length)];
 
-    // random imposter, just never the same person twice in a row
     const lastImposterId = history.length>0 ? history[history.length-1].imposterId : null;
     const eligible = ids.length>1 ? ids.filter(id => id!==lastImposterId) : ids;
     const imposterId = eligible[Math.floor(Math.random()*eligible.length)];
 
-    // reset flags
     tallyDone=false;
     readyAdvanceDone=false;
 
@@ -1039,7 +1147,6 @@
 
   function updateReadyStatus(room){
     const players=room.players||{};
-    // only count players who are active in this round (have a word assigned)
     const active=Object.values(players).filter(p=>p.word);
     const readyCount=active.filter(p=>p.ready).length;
     const el=document.getElementById('ready-status');
@@ -1103,7 +1210,6 @@
 
   function updateVoteCounts(room){
     const players=room.players||{};
-    // build: targetId -> list of voter names
     const voterMap={};
     Object.entries(players).forEach(([voterId,p])=>{
       if(p.vote){
@@ -1134,7 +1240,6 @@
       }
     });
 
-    // show who voted for ME
     const myVoters = voterMap[myId] || [];
     const mySection = document.getElementById('votes-on-me-section');
     const myNames   = document.getElementById('votes-on-me-names');
@@ -1177,8 +1282,6 @@
     const imposterId=room.imposter, word=room.word;
     const round=room.currentRound, total=room.totalRounds;
 
-    // individual scoring: each crewmate who voted FOR the imposter gets +3
-    // imposter gets +5 if nobody caught them, +0 if caught by anyone
     const caughtBy = Object.entries(players)
       .filter(([id, p]) => p.vote === imposterId)
       .map(([id]) => id);
@@ -1188,15 +1291,12 @@
     Object.entries(players).forEach(([id,p])=>{
       const cur=p.score||0;
       if(id===imposterId){
-        // imposter: +5 if nobody voted them, +0 if at least one person got them
         u[`rooms/${roomCode}/players/${id}/score`] = cur + (caught ? 0 : 5);
       } else {
-        // crewmate: +3 if they personally voted for the imposter, else +0
         u[`rooms/${roomCode}/players/${id}/score`] = cur + (p.vote===imposterId ? 3 : 0);
       }
     });
 
-    // for history display: who got the most votes (to show who was "voted out")
     const counts={};
     Object.values(players).forEach(p=>{ if(p.vote) counts[p.vote]=(counts[p.vote]||0)+1; });
     let maxVotes=0, votedOutId=null;
@@ -1365,7 +1465,6 @@
     await db.ref('/').update(u);
   };
 
-  // kick a player (leader only)
   window.kickPlayer = async (targetId) => {
     if(!isLeader) return;
     const snap = await dbGet(`rooms/${roomCode}/players/${targetId}`);
@@ -1375,15 +1474,13 @@
     toast('Player kicked!');
   };
 
-  // detect if WE got kicked (our entry disappeared mid-game)
   function watchNotifications(){
     db.ref(`rooms/${roomCode}/notifications`).on('value', snap=>{
       if(!snap.exists()) return;
       const n = snap.val();
       if(!n || !n.ts || !n.msg) return;
-      if(n.ts <= lastNotifTs) return; // already shown
+      if(n.ts <= lastNotifTs) return;
       lastNotifTs = n.ts;
-      // show as a styled broadcast toast (different from normal toast)
       showBroadcast(n.msg);
     });
   }
@@ -1395,19 +1492,14 @@
     setTimeout(() => el.classList.remove('show'), 3500);
   }
 
-  let leavingIntentionally = false; // flag so watchForKick ignores voluntary leave
+  let leavingIntentionally = false;
 
   function watchForKick(){
     const savedRoom = roomCode;
     db.ref(`rooms/${savedRoom}/players/${myId}`).on('value', async snap=>{
-      // ignore if: entry still exists, we're leaving voluntarily, or room is already cleared
       if(snap.exists() || leavingIntentionally || !roomCode) return;
-
-      // double-check the room itself still exists — if not, it was just cleaned up normally
       const roomSnap = await dbGet(`rooms/${savedRoom}`);
-      if(!roomSnap.exists()) return; // room deleted, not a kick
-
-      // room exists but our player entry is gone → we were kicked
+      if(!roomSnap.exists()) return;
       if(roomListener){ roomListener.off(); roomListener=null; }
       db.ref(`rooms/${savedRoom}/players`).off();
       db.ref(`rooms/${savedRoom}/players/${myId}`).off();
@@ -1419,9 +1511,7 @@
   }
 
   window.leaveRoom = async () => {
-    leavingIntentionally = true; // tell watchForKick to ignore the deletion
-
-    // detach all listeners before deleting so they don't react to our own removal
+    leavingIntentionally = true;
     if(roomListener){ roomListener.off(); roomListener=null; }
     db.ref(`rooms/${roomCode}/players`).off();
     db.ref(`rooms/${roomCode}/players/${myId}`).off();
@@ -1429,11 +1519,9 @@
 
     const savedRoom = roomCode;
     const savedId   = myId;
-    roomCode=''; myId=''; isLeader=false; // clear state immediately
+    roomCode=''; myId=''; isLeader=false;
 
     await dbDel(`rooms/${savedRoom}/players/${savedId}`);
-
-    // only delete the whole room if it's now empty
     const snap = await dbGet(`rooms/${savedRoom}/players`);
     if(!snap.exists() || Object.keys(snap.val()).length===0){
       await dbDel(`rooms/${savedRoom}`);
@@ -1480,7 +1568,6 @@
     const catSnap=await dbGet(`rooms/${roomCode}/category`);
     const cat=catSnap.val()||'mixed';
     const fullList=cat==='mixed'?Object.values(WORDS).flat():WORDS[cat];
-    // pick random items
     const shuffled=[...fullList].sort(()=>Math.random()-.5);
     const items=shuffled.slice(0,selectedTierCount).map(w=>({id:w.replace(/[^a-z0-9]/gi,'_'),label:w,tier:null}));
 
@@ -1494,7 +1581,6 @@
     });
   };
 
-  // drag state
   let dragItem=null;
 
   function enterTierBuild(room){
@@ -1506,14 +1592,13 @@
   function updateTierBuild(room){
     const items=room.tierItems||[];
     const cat=room.category||'mixed';
-    const collaborators=room.tierCollaborators||{};  // {id: true}
-    const doneBy=room.tierDoneBy||{};                // {id: true}
+    const collaborators=room.tierCollaborators||{};
+    const doneBy=room.tierDoneBy||{};
     const isCollaborator=collaborators[myId]===true;
     const canRank=isLeader||isCollaborator;
 
     document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER\'D`;
 
-    // phase label & leader label
     if(isLeader){
       document.getElementById('tier-phase-label').textContent='// drag items into tiers';
       const collabNames=Object.keys(collaborators).map(id=>room.players[id]?.name).filter(Boolean);
@@ -1527,7 +1612,6 @@
       document.getElementById('tier-leader-label').textContent='';
     }
 
-    // show/hide collab button — check rejection cooldown
     const myRequest = (room.tierCollabRequests||{})[myId] || '';
     const isRejected = myRequest.startsWith('rejected:');
     if(isRejected && collabRejectedAt === 0){
@@ -1557,7 +1641,6 @@
     }
     document.getElementById('tier-done-btn-wrap').style.display=canRank&&!doneBy[myId]?'block':'none';
 
-    // done status: show how many rankers have clicked done
     const rankerIds=[room.leader,...Object.keys(collaborators)];
     const doneCount=rankerIds.filter(id=>doneBy[id]).length;
     const doneStatus=document.getElementById('tier-done-status');
@@ -1568,7 +1651,6 @@
       doneStatus.style.display='none';
     }
 
-    // build tier rows
     const tierRowsEl=document.getElementById('tier-rows');
     tierRowsEl.innerHTML='';
     TIER_LEVELS.forEach(tier=>{
@@ -1582,21 +1664,18 @@
       if(canRank) setupDropZone(slots,tier);
     });
 
-    // unranked pool
     const pool=document.getElementById('unranked-pool');
     pool.innerHTML='';
     const unranked=items.filter(it=>!it.tier);
     unranked.forEach(it=>pool.appendChild(makeChip(it.id,it.label,canRank)));
     if(canRank) setupDropZone(pool,null);
 
-    // viewer message
     document.getElementById('tier-viewer-msg').style.display=canRank?'none':'block';
     if(!canRank){
       const ranked=items.filter(it=>it.tier).length;
       document.getElementById('tier-viewer-msg').textContent=`${ranked}/${items.length} items ranked — discuss!`;
     }
 
-    // leader: watch for pending collab requests and show popup
     if(isLeader){
       const requests=room.tierCollabRequests||{};
       const pending=Object.entries(requests).find(([id,v])=>v==='pending'&&id!==myId);
@@ -1614,7 +1693,6 @@
   }
 
   let pendingCollabId=null;
-
   let collabRejectedAt = 0;
   let _collabCooldownTimer = null;
 
@@ -1638,9 +1716,8 @@
   }
 
   window.requestCollaborate=async()=>{
-    // cooldown check
     const elapsed = Date.now() - collabRejectedAt;
-    const cooldown = 60000; // 60 seconds
+    const cooldown = 60000;
     if(elapsed < cooldown){
       const secs = Math.ceil((cooldown - elapsed) / 1000);
       toast(`Wait ${secs}s before requesting again`);
@@ -1669,9 +1746,7 @@
   };
 
   window.tierDone=async()=>{
-    // mark this player as done
     await dbSet(`rooms/${roomCode}/tierDoneBy/${myId}`,true);
-    // check if all rankers are done
     const roomSnap=await dbGet(`rooms/${roomCode}`);
     const room=roomSnap.val();
     const collaborators=room.tierCollaborators||{};
@@ -1700,7 +1775,6 @@
         el.classList.remove('dragging');
         dragItem=null;
       });
-      // touch support
       el.addEventListener('touchstart',onTouchStart,{passive:true});
       el.addEventListener('touchmove',onTouchMove,{passive:false});
       el.addEventListener('touchend',onTouchEnd,{passive:true});
@@ -1731,7 +1805,6 @@
     await dbSet(`rooms/${roomCode}/tierItems`,items);
   }
 
-  // ── Touch drag support ──
   let _touchDragId=null, _touchClone=null;
 
   function onTouchStart(e){
@@ -1762,9 +1835,7 @@
     _touchDragId=null;
   }
 
-  // ── Vote screen ──
   function enterTierVote(room){
-    // always reset buttons fresh — critical for play again
     document.getElementById('btn-approve').disabled=false;
     document.getElementById('btn-disapprove').disabled=false;
     showScreen('screen-tier-vote');
@@ -1778,13 +1849,11 @@
     const votes=room.tierVotes||{};
     const total=Object.keys(players).length;
     const voteCount=Object.keys(votes).length;
-    // update button state
     if(votes[myId]){
       document.getElementById('btn-approve').disabled=true;
       document.getElementById('btn-disapprove').disabled=true;
     }
     document.getElementById('tier-vote-tally').textContent=`${voteCount}/${total} voted`;
-    // if all voted and leader → advance
     if(voteCount>=total&&isLeader){
       dbUpd(`rooms/${roomCode}`,{phase:'tier-result'});
     }
@@ -1797,7 +1866,6 @@
     toast(v==='approve'?'👍 Approved!':'👎 Disapproved!');
   };
 
-  // ── Result screen ──
   function enterTierResult(room){
     const items=room.tierItems||[];
     const players=room.players||{};
@@ -1814,7 +1882,6 @@
 
     renderReadonlyTiers(items,'tier-result-rows');
 
-    // player votes
     const votesEl=document.getElementById('tier-result-votes');
     votesEl.innerHTML='';
     const pctBar=document.createElement('div');
@@ -1857,7 +1924,6 @@
       row.appendChild(slots);
       el.appendChild(row);
     });
-    // show unranked if any
     const unranked=items.filter(it=>!it.tier);
     if(unranked.length>0){
       const row=document.createElement('div');
@@ -1937,7 +2003,7 @@
     ]
   };
 
-  let chatListeners = {}; // keyed by roomCode+screen to avoid dupes
+  let chatListeners = {};
 
   function buildChatWidget(containerEl, chatPath){
     const makeButtons = (presets) => presets.map(p =>
@@ -1955,7 +2021,6 @@
         ${makeButtons(CHAT_PRESETS.energy)}
       </div>
     `;
-    // attach listener once
     if(chatListeners[chatPath]) return;
     chatListeners[chatPath] = true;
     db.ref(chatPath).limitToLast(40).on('child_added', snap=>{
@@ -1983,9 +2048,9 @@
   // ════════════════════════════════════════
   //   HEADS UP (single device)
   // ════════════════════════════════════════
-  const HU_TIMES = [1, 2, 3]; // minutes
+  const HU_TIMES = [1, 2, 3];
   let huCategory = 'mixed';
-  let huTimeLimit = 1; // minutes
+  let huTimeLimit = 1;
   let huWords = [];
   let huIndex = 0;
   let huCorrectList = [];
@@ -2027,7 +2092,6 @@
   }
 
   window.startHeadsUp = () => {
-    // build shuffled word list
     const pool = huCategory === 'mixed'
       ? Object.values(WORDS).flat()
       : WORDS[huCategory];
@@ -2044,12 +2108,10 @@
     updateHuTimer();
     showHuWord();
 
-    // small countdown before starting so player can get ready
     let countdown = 3;
     document.getElementById('hu-word').textContent = 'GET READY';
     document.getElementById('hu-timer').textContent = countdown + '...';
     document.getElementById('hu-timer').className = 'hu-timer';
-    // disable zones during countdown
     document.getElementById('hu-top-zone').style.pointerEvents = 'none';
     document.getElementById('hu-bottom-zone').style.pointerEvents = 'none';
 
@@ -2073,7 +2135,6 @@
     if(huIndex < huWords.length){
       el.textContent = huWords[huIndex];
     } else {
-      // ran out of words — end game
       huEndGame();
     }
   }
@@ -2209,7 +2270,6 @@
     document.getElementById('way-round-num').textContent=round;
     document.getElementById('way-cat-display').textContent=cat.toUpperCase();
 
-    // others grid
     const grid=document.getElementById('way-others-grid');
     grid.innerHTML='';
     Object.entries(players).forEach(([id,p])=>{
@@ -2224,13 +2284,11 @@
       grid.appendChild(row);
     });
 
-    // ready status
     const allPlayers=Object.values(players);
     const readyCount=allPlayers.filter(p=>p.wayReady).length;
     const total=allPlayers.length;
     document.getElementById('way-ready-status').textContent=`${readyCount}/${total} ready for next round`;
 
-    // hide ready btn if already clicked
     const btn=document.getElementById('way-next-btn');
     if(players[myId]?.wayReady){
       btn.disabled=true;
@@ -2240,7 +2298,6 @@
       btn.textContent='✓ READY FOR NEXT ROUND';
     }
 
-    // if all ready and leader → next round
     if(readyCount>=total && total>0 && isLeader){
       launchWayRound(players, round+1);
     }
@@ -2257,93 +2314,71 @@
   const db  = getDatabase();
   const analytics = firebase.analytics();
 
-  // ── Analytics helpers ─────────────────────────
-  // Call these throughout the game to track key actions in GA4
   function logEvent(name, params={}) {
     try { analytics.logEvent(name, params); } catch(e) {}
   }
 
-  // Track: which game mode was selected
   const _origGoToLobby = window.goToLobby;
   window.goToLobby = (game) => {
     logEvent('select_game_mode', { game_mode: game });
     _origGoToLobby(game);
   };
 
-  // Track: room created
   const _origCreateRoom = window.createRoom;
   window.createRoom = async () => {
     logEvent('room_created', { game_mode: currentGame });
     await _origCreateRoom();
   };
 
-  // Track: room joined
   const _origJoinRoom = window.joinRoom;
   window.joinRoom = async () => {
     logEvent('room_joined', { game_mode: currentGame });
     await _origJoinRoom();
   };
 
-  // Track: game started
   const _origStartGame = window.startGame;
   window.startGame = async () => {
     logEvent('game_started', { game_mode: 'imposter' });
     await _origStartGame();
   };
 
-  // Track: vote cast
   const _origCastVote = window.castVote;
   window.castVote = async () => {
     logEvent('vote_cast');
     await _origCastVote();
   };
 
-  // Track: heads up started
   const _origStartHeadsUp = window.startHeadsUp;
   window.startHeadsUp = () => {
     logEvent('game_started', { game_mode: 'headsup', category: huCategory, time_limit: huTimeLimit });
     _origStartHeadsUp();
   };
 
-  // Track: tier'd started
   const _origStartTierGame = window.startTierGame;
   window.startTierGame = async () => {
     logEvent('game_started', { game_mode: 'tierlist', category: selectedCategory, item_count: selectedTierCount });
     await _origStartTierGame();
   };
 
-  // seed initial history entry so the first popstate has something to catch
   history.replaceState({ screen: 'screen-landing' }, '', '');
 
-  // ── URL param auto-launch ─────────────────────
-  // e.g. game.html?game=imposter → skip home, go straight to lobby
   (function(){
     const params = new URLSearchParams(window.location.search);
     const game   = params.get('game');
     const name   = params.get('name') || '';
     if(!game) return;
-
-    // pre-fill name if passed
     if(name){
       const nameInput = document.getElementById('player-name-input');
       if(nameInput) nameInput.value = name;
       myName = name;
     }
-
-    // if no name yet, show landing screen with the game pre-selected
-    // user types name then clicks the game — but highlight the right one
     const nameInput = document.getElementById('player-name-input');
     if(!myName && nameInput){
-      // focus name input and store intended game so we can launch after name entered
       showScreen('screen-lobby-choice');
       nameInput.focus();
       nameInput.placeholder = 'enter name to play ' + game.toUpperCase();
-      // override the specific card click to just work normally — goToLobby handles the toast
       return;
     }
-
-    // pre-select game — user still needs to enter name then click the game button
-    // just show landing, nothing more needed
   })();
 </script>
 </body>
