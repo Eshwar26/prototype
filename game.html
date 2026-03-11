@@ -4,21 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cinefied</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vq69u8gvco");
-</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
       --accent:#ff3f3f;--accent2:#ff8c42;--text:#e8e8f0;--muted:#7070a0;
-      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;
+      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;--purple:#c084fc;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
@@ -228,18 +220,45 @@
     .landing-game-card:hover .lgc-arrow{opacity:1}
 
     /* ── HOW TO PLAY ── */
-    .htp-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:14px;transition:border-color .2s,color .2s;-webkit-tap-highlight-color:transparent}
+    .htp-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:14px;transition:border-color .2s,color .2s}
     .htp-toggle:hover{border-color:var(--accent);color:var(--text)}
-    .htp-toggle.open{border-color:var(--accent);color:var(--text);border-radius:10px 10px 0 0;border-bottom-color:transparent}
-    .htp-arrow{font-size:10px;transition:transform .25s;display:inline-block}
+    .htp-toggle.open{border-color:var(--accent);color:var(--text);border-radius:10px 10px 0 0;border-bottom:none;margin-bottom:0}
+    .htp-arrow{font-size:10px;transition:transform .25s}
     .htp-toggle.open .htp-arrow{transform:rotate(180deg)}
-    .htp-body{display:none;border:1px solid var(--accent);border-top:none;border-radius:0 0 10px 10px;padding:14px 12px;background:var(--surface)}
+    .htp-body{display:none;border:1px solid var(--accent);border-top:none;border-radius:0 0 10px 10px;padding:14px 12px;background:var(--surface);margin-bottom:2px}
     .htp-body.open{display:block;animation:fadeIn .2s ease}
     .htp-cards{display:flex;flex-direction:column;gap:8px}
     .htp-card{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-    .htp-step-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1;flex-shrink:0;width:22px;text-align:center;margin-top:1px}
+    .htp-step-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1;flex-shrink:0;width:24px;text-align:center;margin-top:1px}
+    .htp-card-content{}
     .htp-card-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent2);text-transform:uppercase;margin-bottom:4px}
     .htp-card-text{font-size:13px;color:var(--muted);line-height:1.55}
+
+    /* ── LIKELY game ── */
+    .q-card{background:var(--surface2);border:2px solid var(--purple);border-radius:20px;padding:28px 24px;text-align:center;margin:20px 0;width:100%;max-width:440px;position:relative;overflow:hidden}
+    .q-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(192,132,252,.08),transparent 70%)}
+    .q-card .q-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;position:relative}
+    .q-card .q-text{font-size:clamp(16px,4vw,24px);font-weight:600;color:var(--text);line-height:1.5;position:relative}
+    .q-card.imposter-q-card{border-color:var(--accent)}
+    .q-card.imposter-q-card::before{background:radial-gradient(ellipse at center,rgba(255,63,63,.08),transparent 70%)}
+    .q-card.imposter-q-card .q-text{color:var(--accent)}
+    .likely-result-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+    .likely-result-name{font-size:14px;font-weight:600;flex:1}
+    .likely-result-bar{flex:2;height:6px;background:var(--surface);border-radius:4px;overflow:hidden}
+    .likely-result-fill{height:100%;background:var(--purple);border-radius:4px;transition:width .6s ease}
+    .likely-result-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:40px;text-align:right}
+    .likely-result-row.top-pick{border-color:var(--purple)}
+    .likely-result-row.top-pick .likely-result-name{color:var(--purple)}
+    .discuss-banner{background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.25);border-radius:12px;padding:14px 18px;text-align:center;margin:12px 0}
+    .discuss-banner .db-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--purple);text-transform:uppercase;margin-bottom:6px}
+    .discuss-banner .db-text{font-size:13px;color:var(--muted);line-height:1.5}
+    .imposter-reveal{background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.3);border-radius:12px;padding:16px 18px;margin:12px 0;max-width:440px;width:100%}
+    .imposter-reveal .ir-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+    .voter-chip-purple{display:inline-block;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--purple);padding:1px 7px;border-radius:5px;margin:2px 2px 0 0;font-size:10px;letter-spacing:.5px}
+    .vote-btn.likely-vote:hover{border-color:var(--purple);background:rgba(192,132,252,.06)}
+    .vote-btn.likely-vote.selected{border-color:var(--purple);background:rgba(192,132,252,.12)}
+    .vote-btn.imposter-vote:hover{border-color:var(--accent);background:rgba(255,63,63,.06)}
+    .vote-btn.imposter-vote.selected{border-color:var(--accent);background:rgba(255,63,63,.12)}
   </style>
 </head>
 <body>
@@ -260,6 +279,9 @@
       <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()">HEADS UP</button>
       <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')">BLINDSPOT</button>
     </div>
+    <div style="margin-top:8px">
+      <button class="btn" style="width:100%;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.35);color:var(--purple);margin:0" onclick="goToLobby('likely')">LIKELY?</button>
+    </div>
   </div>
 </div>
 
@@ -275,16 +297,6 @@
       style="text-transform:uppercase;text-align:center;font-size:22px;letter-spacing:6px;" />
     <button class="btn btn-secondary" onclick="joinRoom()">JOIN ROOM →</button>
     <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
-
-    <!-- HOW TO PLAY COLLAPSIBLE -->
-    <button class="htp-toggle" id="htp-toggle-lobby" onclick="toggleHtp('lobby')">
-      <span>// how to play</span>
-      <span class="htp-arrow">▼</span>
-    </button>
-    <div class="htp-body" id="htp-body-lobby">
-      <div class="htp-cards" id="htp-cards-lobby"></div>
-    </div>
-
   </div>
 </div>
 
@@ -300,16 +312,6 @@
     <div class="player-list" id="waiting-player-list"></div>
     <div class="waiting-text" id="waiting-msg">Waiting for players<span class="loading-dots"></span></div>
     <div id="waiting-for-leader-msg" style="display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:1px">waiting for leader to start<span class="loading-dots"></span></div>
-
-    <!-- HOW TO PLAY COLLAPSIBLE (waiting room) -->
-    <button class="htp-toggle" id="htp-toggle-waiting" onclick="toggleHtp('waiting')" style="margin-top:16px">
-      <span>// how to play</span>
-      <span class="htp-arrow">▼</span>
-    </button>
-    <div class="htp-body" id="htp-body-waiting">
-      <div class="htp-cards" id="htp-cards-waiting"></div>
-    </div>
-
     <div id="leader-controls" style="display:none">
       <hr class="divider" />
       <div class="card-title">// word category</div>
@@ -344,6 +346,16 @@
       <div class="rounds-selector" id="tier-count-selector"></div>
       <hr class="divider" />
       <button class="btn btn-green" id="tier-start-btn" onclick="startTierGame()" disabled>START TIER'D</button>
+    </div>
+
+    <!-- LIKELY? leader controls -->
+    <div id="likely-leader-controls" style="display:none">
+      <hr class="divider" />
+      <div class="card-title">// number of rounds</div>
+      <div class="rounds-selector" id="likely-rounds-selector"></div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:8px;">catch the imposter → +1 pt &nbsp;|&nbsp; imposter escapes → +3 pts</div>
+      <hr class="divider" />
+      <button class="btn btn-green" id="likely-start-btn" onclick="startLikelyGame()" disabled>START LIKELY?</button>
     </div>
 
     <!-- BLINDSPOT leader controls -->
@@ -526,16 +538,6 @@
     <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7;text-align:center">
       tap <span style="color:var(--green)">top half</span> = ✓ got it &nbsp;|&nbsp; tap <span style="color:var(--accent)">bottom half</span> = ↓ skip
     </p>
-
-    <!-- HOW TO PLAY for Heads Up -->
-    <button class="htp-toggle" id="htp-toggle-hu" onclick="toggleHtp('hu')">
-      <span>// how to play</span>
-      <span class="htp-arrow">▼</span>
-    </button>
-    <div class="htp-body" id="htp-body-hu">
-      <div class="htp-cards" id="htp-cards-hu"></div>
-    </div>
-
     <button class="btn btn-green" style="margin-top:16px" onclick="startHeadsUp()">START →</button>
     <button class="btn btn-ghost" onclick="showScreen('screen-landing')">← BACK</button>
   </div>
@@ -630,6 +632,95 @@
   </div>
 </div>
 
+
+<!-- LIKELY? — REVEAL + VOTE (combined) -->
+<div class="screen" id="screen-likely-reveal">
+  <div class="phase-indicator" id="likely-reveal-phase-label">round 1 // who's most likely?</div>
+  <div id="likely-q-reveal-content"></div>
+  <div class="card" style="max-width:440px;width:100%;margin-top:16px">
+    <div class="card-title">// who is most likely to...</div>
+    <div id="likely-lv-question-display" style="font-size:16px;font-weight:600;color:var(--purple);margin-bottom:16px;line-height:1.4;text-align:center;padding:12px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:10px"></div>
+    <div class="vote-grid" id="likely-vote-grid"></div>
+    <button class="btn" id="likely-cast-btn" onclick="likelyCastVote()" disabled style="background:var(--purple);color:#fff;font-weight:600;margin-top:10px">CAST VOTE</button>
+    <div class="waiting-text" id="likely-lv-status"></div>
+  </div>
+</div>
+
+<!-- LIKELY? — RESULTS + DISCUSSION -->
+<div class="screen" id="screen-likely-results">
+  <div class="phase-indicator" id="likely-lr-phase-label">round 1 // the verdict</div>
+  <div class="card" style="max-width:440px;width:100%">
+    <div class="card-title">// who's most likely to...</div>
+    <div id="likely-lr-question-display" style="font-size:15px;font-weight:600;color:var(--purple);margin-bottom:16px;line-height:1.4;text-align:center;padding:10px 14px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:10px"></div>
+    <div id="likely-results-bars"></div>
+    <hr class="divider" />
+    <div class="card-title">// who voted whom</div>
+    <div id="likely-vote-breakdown"></div>
+    <div class="discuss-banner">
+      <div class="db-label">// discuss</div>
+      <div class="db-text">Talk it out. Defend your vote. Then decide who the imposter is.</div>
+    </div>
+    <button class="btn" id="likely-ready-imposter-btn" onclick="likelyMarkReadyImposter()" style="background:var(--purple);color:#fff;font-weight:600;margin-top:10px">READY TO VOTE IMPOSTER →</button>
+    <div class="waiting-text" id="likely-lr-ready-status"></div>
+  </div>
+</div>
+
+<!-- LIKELY? — IMPOSTER VOTE -->
+<div class="screen" id="screen-likely-imposter-vote">
+  <div class="phase-indicator" id="likely-iv-phase-label">round 1 // find the imposter</div>
+  <div class="card" style="max-width:440px;width:100%">
+    <div class="card-title">// who got a different question?</div>
+    <div class="vote-grid" id="likely-imposter-vote-grid"></div>
+    <div id="likely-iv-votes-on-me" style="display:none;margin-top:14px;padding:10px 14px;background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.2);border-radius:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;text-transform:uppercase">// votes on you</div>
+      <div id="likely-iv-vom-names"></div>
+    </div>
+    <button class="btn btn-primary mt" id="likely-cast-imposter-btn" onclick="likelyCastImposterVote()" disabled>CAST VOTE</button>
+    <div class="waiting-text" id="likely-iv-status"></div>
+  </div>
+</div>
+
+<!-- LIKELY? — ROUND RESULT -->
+<div class="screen" id="screen-likely-round-result">
+  <div id="likely-rr-content"></div>
+  <div class="card" style="max-width:440px;width:100%;margin-top:10px">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">
+        <span id="likely-pb-label">round 1 of 5</span>
+        <span id="likely-pb-pct">20%</span>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="likely-pb-fill" style="width:20%;background:var(--purple)"></div></div>
+    </div>
+    <hr class="divider" />
+    <div class="lb-header">
+      <div class="lb-title">SCORES</div>
+      <div class="lb-round-badge" id="likely-lb-round-badge" style="color:var(--purple);background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.25)">after round 1</div>
+    </div>
+    <div id="likely-rr-lb-rows"></div>
+    <hr class="divider" />
+    <div class="rh-label">// round history</div>
+    <div class="rh-list" id="likely-rr-rh-list"></div>
+    <hr class="divider" />
+    <div id="likely-rr-action-area"></div>
+  </div>
+</div>
+
+<!-- LIKELY? — FINAL WINNER -->
+<div class="screen" id="screen-likely-winner">
+  <div class="phase-indicator">// game over</div>
+  <div class="logo" style="font-size:52px;color:var(--yellow)">LEADERBOARD</div>
+  <div class="podium" id="likely-winner-podium"></div>
+  <div class="card" style="max-width:440px;width:100%;margin-top:10px">
+    <div class="lb-header"><div class="lb-title">FINAL SCORES</div></div>
+    <div id="likely-final-lb-rows"></div>
+    <hr class="divider" />
+    <div class="rh-label">// all rounds</div>
+    <div class="rh-list" id="likely-final-rh-list"></div>
+    <hr class="divider" />
+    <div id="likely-winner-action-area"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div class="broadcast" id="broadcast"></div>
 
@@ -673,7 +764,7 @@
   let myName='', myId='', roomCode='', isLeader=false, myWord='';
   let selectedVote=null, hasVoted=false, hasMarkedReady=false;
   let selectedCategory='mixed', selectedRounds=5, anonymousVoting=false;
-  let currentGame='imposter'; // 'imposter' | 'tierlist'
+  let currentGame='imposter'; // 'imposter' | 'tierlist' | 'whoareyou' | 'headsup' | 'likely'
   let selectedTierCount=10;
 
   // ONE master room listener — never duplicated
@@ -683,88 +774,6 @@
   // flags to prevent double-firing tally
   let tallyDone = false;
   let readyAdvanceDone = false;
-
-  // ── HOW TO PLAY DATA ────────────────────────
-  const HTP_CONTENT = {
-    imposter: [
-      { title: 'The Word',       text: 'Everyone gets the same secret word. One person gets "IMPOSTER" instead — they don\'t know the word at all.' },
-      { title: 'The Discussion', text: 'Take turns saying one thing about the word. Don\'t make it too obvious — the imposter is listening and trying to guess.' },
-      { title: 'The Bluff',      text: 'The imposter has to pretend they know the word. They\'ll say something vague and hope nobody notices.' },
-      { title: 'The Vote',       text: 'After everyone speaks, vote for who you think the imposter is.' },
-      { title: 'The Points',     text: 'If the imposter gets caught, the others get points. If nobody catches them, the imposter wins points.' },
-    ],
-    tierlist: [
-      { title: 'The Items',        text: 'A set of Telugu heroes, movies or directors appears on screen for everyone to see.' },
-      { title: 'The Ranker',       text: 'The room leader or a collaborator drags items into tiers — S, A, B, C or D.' },
-      { title: 'Collaborate',      text: 'Non-leaders can tap the collaborate button to request drag access and help rank together.' },
-      { title: 'Everyone Watches', text: 'Other players watch the ranking live and chat their reactions using the preset messages.' },
-      { title: 'The Vote',         text: 'Once ranking is done, everyone votes Approve or Disapprove. If the majority approves — the list gets APPROVED. If the majority disapproves — the list gets RATIO\'D.' },
-    ],
-    whoareyou: [
-      { title: 'Your Word',    text: 'You have a secret word. You don\'t know what it is. Everyone else does.' },
-      { title: 'Look Around',  text: 'Open the app and you can see what word everyone else got.' },
-      { title: 'Take Turns',   text: 'Each player asks one yes or no question at a time. Go one by one, don\'t all ask at once.' },
-      { title: 'Ask Questions',text: 'Ask the group things like "am I a hero?" or "am I from a 2000s movie?" — they can only say yes or no.' },
-      { title: 'Figure It Out',text: 'Keep asking until you figure out your own word. Once everyone knows, hit ready and the next round begins.' },
-    ],
-    headsup: [
-      { title: 'The Setup',   text: 'A word appears on screen. Your friends need to get you to say that word out loud without saying it themselves.' },
-      { title: 'Got It',      text: 'Tap the top half of the screen if they guessed the word correctly.' },
-      { title: 'Skip',        text: 'Tap the bottom half to skip a word if it\'s too hard.' },
-      { title: 'Beat the Clock', text: 'Score as many correct guesses as you can before the timer runs out.' },
-    ],
-  };
-
-  // ── Toggle How To Play ───────────────────────
-  window.toggleHtp = (context) => {
-    const toggle = document.getElementById(`htp-toggle-${context}`);
-    const body   = document.getElementById(`htp-body-${context}`);
-    const cards  = document.getElementById(`htp-cards-${context}`);
-    if(!toggle || !body || !cards) return;
-
-    const isOpen = body.classList.contains('open');
-    if(isOpen){
-      toggle.classList.remove('open');
-      body.classList.remove('open');
-    } else {
-      // populate cards if not done yet
-      if(!cards.dataset.populated){
-        const game = context === 'hu' ? 'headsup' : currentGame;
-        const steps = HTP_CONTENT[game] || HTP_CONTENT.imposter;
-        cards.innerHTML = '';
-        steps.forEach((step, i) => {
-          const card = document.createElement('div');
-          card.className = 'htp-card';
-          card.innerHTML = `
-            <div class="htp-step-num">${i + 1}</div>
-            <div>
-              <div class="htp-card-title">${step.title}</div>
-              <div class="htp-card-text">${step.text}</div>
-            </div>`;
-          cards.appendChild(card);
-        });
-        cards.dataset.populated = '1';
-      }
-      toggle.classList.add('open');
-      body.classList.add('open');
-    }
-  };
-
-  // reset HTP populated state when game changes so it re-renders for new game
-  function resetHtp(){
-    ['htp-cards-lobby','htp-cards-waiting'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) { el.innerHTML=''; delete el.dataset.populated; }
-    });
-    ['htp-toggle-lobby','htp-toggle-waiting'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.classList.remove('open');
-    });
-    ['htp-body-lobby','htp-body-waiting'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.classList.remove('open');
-    });
-  }
 
   // ── Word bank ────────────────────────────────
   const WORDS = {
@@ -825,23 +834,29 @@
   const roundOptions = [3, 5, 7, 10];
 
   // ── Helpers ──────────────────────────────────
+  // Screens that are mid-game — back should trigger leaveRoom or just go to landing
   const MID_GAME_SCREENS = new Set([
     'screen-waiting','screen-reveal','screen-vote','screen-result','screen-winner',
-    'screen-tier-build','screen-tier-vote','screen-tier-result','screen-way-play'
+    'screen-tier-build','screen-tier-vote','screen-tier-result','screen-way-play',
+    'screen-likely-reveal','screen-likely-results','screen-likely-imposter-vote',
+    'screen-likely-round-result','screen-likely-winner'
   ]);
 
   window.showScreen = id => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    // push a history entry so the browser back button has something to pop
     history.pushState({ screen: id }, '', '');
   };
 
+  // intercept browser/mobile back button
   window.addEventListener('popstate', () => {
     const current = document.querySelector('.screen.active')?.id;
     if(!current) return;
 
+    // during active room — leave properly
     if(MID_GAME_SCREENS.has(current)){
-      history.pushState({ screen: current }, '', '');
+      history.pushState({ screen: current }, '', ''); // re-push so we stay
       const leave = confirm('Leave the game?');
       if(leave){
         if(roomCode) leaveRoom();
@@ -850,6 +865,7 @@
       return;
     }
 
+    // lobby choice → landing
     if(current === 'screen-lobby-choice'){
       joiningRoom = false;
       const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
@@ -858,11 +874,13 @@
       return;
     }
 
+    // heads up setup/result → landing
     if(current === 'screen-hu-setup' || current === 'screen-hu-result'){
       showScreen('screen-lobby-choice');
       return;
     }
 
+    // heads up play → confirm quit
     if(current === 'screen-hu-play'){
       history.pushState({ screen: current }, '', '');
       const quit = confirm('Quit the game?');
@@ -875,9 +893,9 @@
       return;
     }
 
+    // fallback — go home
     showScreen('screen-lobby-choice');
   });
-
   function toast(msg, dur=2500){
     const t=document.getElementById('toast');
     t.textContent=msg; t.classList.add('show');
@@ -887,6 +905,8 @@
   function genId(){   return Math.random().toString(36).substring(2,12); }
 
   // ── Single master listener ───────────────────
+  // We attach ONE listener to the whole room object.
+  // It fires whenever anything changes and routes to the right screen.
   function attachRoomListener(){
     if(roomListener) roomListener.off();
     roomListener = db.ref(`rooms/${roomCode}`);
@@ -923,7 +943,23 @@
       if(phase === 'way-play' && currentScreen !== 'screen-way-play'){
         enterWayPlay(room);
       }
+      if(phase === 'likely-reveal' && currentScreen !== 'screen-likely-reveal'){
+        enterLikelyReveal(room);
+      }
+      if(phase === 'likely-results' && currentScreen !== 'screen-likely-results'){
+        enterLikelyResults(room);
+      }
+      if(phase === 'likely-imposter-vote' && currentScreen !== 'screen-likely-imposter-vote'){
+        enterLikelyImposterVote(room);
+      }
+      if(phase === 'likely-round-result' && currentScreen !== 'screen-likely-round-result'){
+        enterLikelyRoundResult(room);
+      }
+      if(phase === 'likely-winner' && currentScreen !== 'screen-likely-winner'){
+        enterLikelyWinner(room);
+      }
 
+      // live updates within current screen
       if(phase === 'reveal' && currentScreen === 'screen-reveal'){
         updateReadyStatus(room);
       }
@@ -939,6 +975,15 @@
       if(phase === 'way-play' && currentScreen === 'screen-way-play'){
         updateWayPlay(room);
       }
+      if(phase === 'likely-reveal' && currentScreen === 'screen-likely-reveal'){
+        updateLikelyVoteCounts(room);
+      }
+      if(phase === 'likely-results' && currentScreen === 'screen-likely-results'){
+        updateLikelyReadyImposter(room);
+      }
+      if(phase === 'likely-imposter-vote' && currentScreen === 'screen-likely-imposter-vote'){
+        updateLikelyImposterVoteCounts(room);
+      }
     });
   }
 
@@ -947,12 +992,12 @@
     myName = document.getElementById('player-name-input').value.trim();
     if(!myName){ toast('Enter your name first!'); return; }
     currentGame = game;
-    resetHtp();
     joiningRoom = false;
     const joinBtn = document.querySelector('#screen-lobby-choice .btn-secondary');
     if(joinBtn) joinBtn.disabled = false;
     showScreen('screen-lobby-choice');
   };
+  // keep old name working just in case
   window.goToLobbyChoice = () => goToLobby('imposter');
 
   // ── Create room ──────────────────────────────
@@ -970,7 +1015,7 @@
   };
 
   // ── Join room ────────────────────────────────
-  let joiningRoom = false;
+  let joiningRoom = false; // prevent double-tap
   window.joinRoom = async () => {
     if(joiningRoom) return;
     joiningRoom = true;
@@ -984,6 +1029,7 @@
     const room = snap.val();
     if(room.phase!=='waiting'){ toast('Game already started!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
 
+    // check if this name is already in the room (double join guard)
     const existingPlayers = room.players || {};
     const nameTaken = Object.values(existingPlayers).some(p => p.name.toLowerCase()===myName.toLowerCase());
     if(nameTaken){ toast('Your name is already in this room!'); joiningRoom=false; if(joinBtn) joinBtn.disabled=false; return; }
@@ -992,6 +1038,7 @@
     currentGame = room.game || 'imposter';
     await dbSet(`rooms/${roomCode}/players/${myId}`, {name:myName,ready:false,vote:null,score:0});
 
+    // auto-remove on disconnect
     db.ref(`rooms/${roomCode}/players/${myId}`).onDisconnect().remove();
     db.ref(`rooms/${roomCode}/notifications`).onDisconnect().set({
       msg: `${myName} disconnected`, ts: Date.now()
@@ -1005,9 +1052,11 @@
   function enterWaitingRoom(){
     document.getElementById('display-room-code').textContent = roomCode;
 
-    document.getElementById('leader-controls').style.display      = 'none';
-    document.getElementById('tier-leader-controls').style.display = 'none';
-    document.getElementById('way-leader-controls').style.display  = 'none';
+    // always hide all panels first — prevents stacking when switching games
+    document.getElementById('leader-controls').style.display        = 'none';
+    document.getElementById('tier-leader-controls').style.display   = 'none';
+    document.getElementById('way-leader-controls').style.display    = 'none';
+    document.getElementById('likely-leader-controls').style.display = 'none';
 
     if(isLeader){
       if(currentGame==='tierlist'){
@@ -1016,6 +1065,9 @@
       } else if(currentGame==='whoareyou'){
         document.getElementById('way-leader-controls').style.display='block';
         renderWayCategories();
+      } else if(currentGame==='likely'){
+        document.getElementById('likely-leader-controls').style.display='block';
+        renderLikelyRoundOptions();
       } else {
         document.getElementById('leader-controls').style.display='block';
         renderCategories(); renderRoundOptions();
@@ -1026,6 +1078,7 @@
     watchForKick();
     watchNotifications();
 
+    // separate player list watcher for waiting room
     db.ref(`rooms/${roomCode}/players`).on('value', snap=>{
       const players=snap.val()||{};
       const count=Object.keys(players).length;
@@ -1048,6 +1101,8 @@
       if(tsb) tsb.disabled=count<2;
       const wsb=document.getElementById('way-start-btn');
       if(wsb) wsb.disabled=count<2;
+      const lsb=document.getElementById('likely-start-btn');
+      if(lsb) lsb.disabled=count<2;
       document.getElementById('waiting-msg').textContent=
         count<2?'Need at least 2 players':`${count} player${count>1?'s':''} in lobby`;
       const wflMsg = document.getElementById('waiting-for-leader-msg');
@@ -1101,9 +1156,11 @@
     const cat   = catSnap.val()   || 'mixed';
     const total = totalSnap.val() || 5;
 
+    // avoid repeat words
     const histSnap  = await dbGet(`rooms/${roomCode}/history`);
     const history   = histSnap.val() || [];
     const usedWords = history.map(h=>h.word);
+    // mixed = all categories combined
     const fullList  = cat==='mixed'
       ? Object.values(WORDS).flat()
       : WORDS[cat];
@@ -1111,10 +1168,12 @@
     const wordList  = pool.length>0 ? pool : fullList;
     const word      = wordList[Math.floor(Math.random()*wordList.length)];
 
+    // random imposter, just never the same person twice in a row
     const lastImposterId = history.length>0 ? history[history.length-1].imposterId : null;
     const eligible = ids.length>1 ? ids.filter(id => id!==lastImposterId) : ids;
     const imposterId = eligible[Math.floor(Math.random()*eligible.length)];
 
+    // reset flags
     tallyDone=false;
     readyAdvanceDone=false;
 
@@ -1155,6 +1214,7 @@
 
   function updateReadyStatus(room){
     const players=room.players||{};
+    // only count players who are active in this round (have a word assigned)
     const active=Object.values(players).filter(p=>p.word);
     const readyCount=active.filter(p=>p.ready).length;
     const el=document.getElementById('ready-status');
@@ -1218,6 +1278,7 @@
 
   function updateVoteCounts(room){
     const players=room.players||{};
+    // build: targetId -> list of voter names
     const voterMap={};
     Object.entries(players).forEach(([voterId,p])=>{
       if(p.vote){
@@ -1248,6 +1309,7 @@
       }
     });
 
+    // show who voted for ME
     const myVoters = voterMap[myId] || [];
     const mySection = document.getElementById('votes-on-me-section');
     const myNames   = document.getElementById('votes-on-me-names');
@@ -1290,6 +1352,8 @@
     const imposterId=room.imposter, word=room.word;
     const round=room.currentRound, total=room.totalRounds;
 
+    // individual scoring: each crewmate who voted FOR the imposter gets +3
+    // imposter gets +5 if nobody caught them, +0 if caught by anyone
     const caughtBy = Object.entries(players)
       .filter(([id, p]) => p.vote === imposterId)
       .map(([id]) => id);
@@ -1299,12 +1363,15 @@
     Object.entries(players).forEach(([id,p])=>{
       const cur=p.score||0;
       if(id===imposterId){
+        // imposter: +5 if nobody voted them, +0 if at least one person got them
         u[`rooms/${roomCode}/players/${id}/score`] = cur + (caught ? 0 : 5);
       } else {
+        // crewmate: +3 if they personally voted for the imposter, else +0
         u[`rooms/${roomCode}/players/${id}/score`] = cur + (p.vote===imposterId ? 3 : 0);
       }
     });
 
+    // for history display: who got the most votes (to show who was "voted out")
     const counts={};
     Object.values(players).forEach(p=>{ if(p.vote) counts[p.vote]=(counts[p.vote]||0)+1; });
     let maxVotes=0, votedOutId=null;
@@ -1465,6 +1532,10 @@
       u[`rooms/${roomCode}/players/${id}/score`]=0;
       u[`rooms/${roomCode}/players/${id}/wayWord`]=null;
       u[`rooms/${roomCode}/players/${id}/wayReady`]=false;
+      u[`rooms/${roomCode}/players/${id}/likelyVote`]=null;
+      u[`rooms/${roomCode}/players/${id}/likelyImposterVote`]=null;
+      u[`rooms/${roomCode}/players/${id}/likelyReadyImposter`]=false;
+      u[`rooms/${roomCode}/players/${id}/likelyQuestion`]=null;
     });
     u[`rooms/${roomCode}/phase`]='waiting';
     u[`rooms/${roomCode}/currentRound`]=0;
@@ -1473,6 +1544,7 @@
     await db.ref('/').update(u);
   };
 
+  // kick a player (leader only)
   window.kickPlayer = async (targetId) => {
     if(!isLeader) return;
     const snap = await dbGet(`rooms/${roomCode}/players/${targetId}`);
@@ -1482,13 +1554,15 @@
     toast('Player kicked!');
   };
 
+  // detect if WE got kicked (our entry disappeared mid-game)
   function watchNotifications(){
     db.ref(`rooms/${roomCode}/notifications`).on('value', snap=>{
       if(!snap.exists()) return;
       const n = snap.val();
       if(!n || !n.ts || !n.msg) return;
-      if(n.ts <= lastNotifTs) return;
+      if(n.ts <= lastNotifTs) return; // already shown
       lastNotifTs = n.ts;
+      // show as a styled broadcast toast (different from normal toast)
       showBroadcast(n.msg);
     });
   }
@@ -1500,14 +1574,19 @@
     setTimeout(() => el.classList.remove('show'), 3500);
   }
 
-  let leavingIntentionally = false;
+  let leavingIntentionally = false; // flag so watchForKick ignores voluntary leave
 
   function watchForKick(){
     const savedRoom = roomCode;
     db.ref(`rooms/${savedRoom}/players/${myId}`).on('value', async snap=>{
+      // ignore if: entry still exists, we're leaving voluntarily, or room is already cleared
       if(snap.exists() || leavingIntentionally || !roomCode) return;
+
+      // double-check the room itself still exists — if not, it was just cleaned up normally
       const roomSnap = await dbGet(`rooms/${savedRoom}`);
-      if(!roomSnap.exists()) return;
+      if(!roomSnap.exists()) return; // room deleted, not a kick
+
+      // room exists but our player entry is gone → we were kicked
       if(roomListener){ roomListener.off(); roomListener=null; }
       db.ref(`rooms/${savedRoom}/players`).off();
       db.ref(`rooms/${savedRoom}/players/${myId}`).off();
@@ -1519,7 +1598,9 @@
   }
 
   window.leaveRoom = async () => {
-    leavingIntentionally = true;
+    leavingIntentionally = true; // tell watchForKick to ignore the deletion
+
+    // detach all listeners before deleting so they don't react to our own removal
     if(roomListener){ roomListener.off(); roomListener=null; }
     db.ref(`rooms/${roomCode}/players`).off();
     db.ref(`rooms/${roomCode}/players/${myId}`).off();
@@ -1527,9 +1608,11 @@
 
     const savedRoom = roomCode;
     const savedId   = myId;
-    roomCode=''; myId=''; isLeader=false;
+    roomCode=''; myId=''; isLeader=false; // clear state immediately
 
     await dbDel(`rooms/${savedRoom}/players/${savedId}`);
+
+    // only delete the whole room if it's now empty
     const snap = await dbGet(`rooms/${savedRoom}/players`);
     if(!snap.exists() || Object.keys(snap.val()).length===0){
       await dbDel(`rooms/${savedRoom}`);
@@ -1576,6 +1659,7 @@
     const catSnap=await dbGet(`rooms/${roomCode}/category`);
     const cat=catSnap.val()||'mixed';
     const fullList=cat==='mixed'?Object.values(WORDS).flat():WORDS[cat];
+    // pick random items
     const shuffled=[...fullList].sort(()=>Math.random()-.5);
     const items=shuffled.slice(0,selectedTierCount).map(w=>({id:w.replace(/[^a-z0-9]/gi,'_'),label:w,tier:null}));
 
@@ -1589,6 +1673,7 @@
     });
   };
 
+  // drag state
   let dragItem=null;
 
   function enterTierBuild(room){
@@ -1600,13 +1685,14 @@
   function updateTierBuild(room){
     const items=room.tierItems||[];
     const cat=room.category||'mixed';
-    const collaborators=room.tierCollaborators||{};
-    const doneBy=room.tierDoneBy||{};
+    const collaborators=room.tierCollaborators||{};  // {id: true}
+    const doneBy=room.tierDoneBy||{};                // {id: true}
     const isCollaborator=collaborators[myId]===true;
     const canRank=isLeader||isCollaborator;
 
     document.getElementById('tier-cat-title').textContent=`${cat.toUpperCase()} TIER\'D`;
 
+    // phase label & leader label
     if(isLeader){
       document.getElementById('tier-phase-label').textContent='// drag items into tiers';
       const collabNames=Object.keys(collaborators).map(id=>room.players[id]?.name).filter(Boolean);
@@ -1620,6 +1706,7 @@
       document.getElementById('tier-leader-label').textContent='';
     }
 
+    // show/hide collab button — check rejection cooldown
     const myRequest = (room.tierCollabRequests||{})[myId] || '';
     const isRejected = myRequest.startsWith('rejected:');
     if(isRejected && collabRejectedAt === 0){
@@ -1649,6 +1736,7 @@
     }
     document.getElementById('tier-done-btn-wrap').style.display=canRank&&!doneBy[myId]?'block':'none';
 
+    // done status: show how many rankers have clicked done
     const rankerIds=[room.leader,...Object.keys(collaborators)];
     const doneCount=rankerIds.filter(id=>doneBy[id]).length;
     const doneStatus=document.getElementById('tier-done-status');
@@ -1659,6 +1747,7 @@
       doneStatus.style.display='none';
     }
 
+    // build tier rows
     const tierRowsEl=document.getElementById('tier-rows');
     tierRowsEl.innerHTML='';
     TIER_LEVELS.forEach(tier=>{
@@ -1672,18 +1761,21 @@
       if(canRank) setupDropZone(slots,tier);
     });
 
+    // unranked pool
     const pool=document.getElementById('unranked-pool');
     pool.innerHTML='';
     const unranked=items.filter(it=>!it.tier);
     unranked.forEach(it=>pool.appendChild(makeChip(it.id,it.label,canRank)));
     if(canRank) setupDropZone(pool,null);
 
+    // viewer message
     document.getElementById('tier-viewer-msg').style.display=canRank?'none':'block';
     if(!canRank){
       const ranked=items.filter(it=>it.tier).length;
       document.getElementById('tier-viewer-msg').textContent=`${ranked}/${items.length} items ranked — discuss!`;
     }
 
+    // leader: watch for pending collab requests and show popup
     if(isLeader){
       const requests=room.tierCollabRequests||{};
       const pending=Object.entries(requests).find(([id,v])=>v==='pending'&&id!==myId);
@@ -1701,6 +1793,7 @@
   }
 
   let pendingCollabId=null;
+
   let collabRejectedAt = 0;
   let _collabCooldownTimer = null;
 
@@ -1724,8 +1817,9 @@
   }
 
   window.requestCollaborate=async()=>{
+    // cooldown check
     const elapsed = Date.now() - collabRejectedAt;
-    const cooldown = 60000;
+    const cooldown = 60000; // 60 seconds
     if(elapsed < cooldown){
       const secs = Math.ceil((cooldown - elapsed) / 1000);
       toast(`Wait ${secs}s before requesting again`);
@@ -1754,7 +1848,9 @@
   };
 
   window.tierDone=async()=>{
+    // mark this player as done
     await dbSet(`rooms/${roomCode}/tierDoneBy/${myId}`,true);
+    // check if all rankers are done
     const roomSnap=await dbGet(`rooms/${roomCode}`);
     const room=roomSnap.val();
     const collaborators=room.tierCollaborators||{};
@@ -1783,6 +1879,7 @@
         el.classList.remove('dragging');
         dragItem=null;
       });
+      // touch support
       el.addEventListener('touchstart',onTouchStart,{passive:true});
       el.addEventListener('touchmove',onTouchMove,{passive:false});
       el.addEventListener('touchend',onTouchEnd,{passive:true});
@@ -1813,6 +1910,7 @@
     await dbSet(`rooms/${roomCode}/tierItems`,items);
   }
 
+  // ── Touch drag support ──
   let _touchDragId=null, _touchClone=null;
 
   function onTouchStart(e){
@@ -1843,7 +1941,9 @@
     _touchDragId=null;
   }
 
+  // ── Vote screen ──
   function enterTierVote(room){
+    // always reset buttons fresh — critical for play again
     document.getElementById('btn-approve').disabled=false;
     document.getElementById('btn-disapprove').disabled=false;
     showScreen('screen-tier-vote');
@@ -1857,11 +1957,13 @@
     const votes=room.tierVotes||{};
     const total=Object.keys(players).length;
     const voteCount=Object.keys(votes).length;
+    // update button state
     if(votes[myId]){
       document.getElementById('btn-approve').disabled=true;
       document.getElementById('btn-disapprove').disabled=true;
     }
     document.getElementById('tier-vote-tally').textContent=`${voteCount}/${total} voted`;
+    // if all voted and leader → advance
     if(voteCount>=total&&isLeader){
       dbUpd(`rooms/${roomCode}`,{phase:'tier-result'});
     }
@@ -1874,6 +1976,7 @@
     toast(v==='approve'?'👍 Approved!':'👎 Disapproved!');
   };
 
+  // ── Result screen ──
   function enterTierResult(room){
     const items=room.tierItems||[];
     const players=room.players||{};
@@ -1890,6 +1993,7 @@
 
     renderReadonlyTiers(items,'tier-result-rows');
 
+    // player votes
     const votesEl=document.getElementById('tier-result-votes');
     votesEl.innerHTML='';
     const pctBar=document.createElement('div');
@@ -1932,6 +2036,7 @@
       row.appendChild(slots);
       el.appendChild(row);
     });
+    // show unranked if any
     const unranked=items.filter(it=>!it.tier);
     if(unranked.length>0){
       const row=document.createElement('div');
@@ -2011,7 +2116,7 @@
     ]
   };
 
-  let chatListeners = {};
+  let chatListeners = {}; // keyed by roomCode+screen to avoid dupes
 
   function buildChatWidget(containerEl, chatPath){
     const makeButtons = (presets) => presets.map(p =>
@@ -2029,6 +2134,7 @@
         ${makeButtons(CHAT_PRESETS.energy)}
       </div>
     `;
+    // attach listener once
     if(chatListeners[chatPath]) return;
     chatListeners[chatPath] = true;
     db.ref(chatPath).limitToLast(40).on('child_added', snap=>{
@@ -2056,9 +2162,9 @@
   // ════════════════════════════════════════
   //   HEADS UP (single device)
   // ════════════════════════════════════════
-  const HU_TIMES = [1, 2, 3];
+  const HU_TIMES = [1, 2, 3]; // minutes
   let huCategory = 'mixed';
-  let huTimeLimit = 1;
+  let huTimeLimit = 1; // minutes
   let huWords = [];
   let huIndex = 0;
   let huCorrectList = [];
@@ -2100,6 +2206,7 @@
   }
 
   window.startHeadsUp = () => {
+    // build shuffled word list
     const pool = huCategory === 'mixed'
       ? Object.values(WORDS).flat()
       : WORDS[huCategory];
@@ -2116,10 +2223,12 @@
     updateHuTimer();
     showHuWord();
 
+    // small countdown before starting so player can get ready
     let countdown = 3;
     document.getElementById('hu-word').textContent = 'GET READY';
     document.getElementById('hu-timer').textContent = countdown + '...';
     document.getElementById('hu-timer').className = 'hu-timer';
+    // disable zones during countdown
     document.getElementById('hu-top-zone').style.pointerEvents = 'none';
     document.getElementById('hu-bottom-zone').style.pointerEvents = 'none';
 
@@ -2143,6 +2252,7 @@
     if(huIndex < huWords.length){
       el.textContent = huWords[huIndex];
     } else {
+      // ran out of words — end game
       huEndGame();
     }
   }
@@ -2278,6 +2388,7 @@
     document.getElementById('way-round-num').textContent=round;
     document.getElementById('way-cat-display').textContent=cat.toUpperCase();
 
+    // others grid
     const grid=document.getElementById('way-others-grid');
     grid.innerHTML='';
     Object.entries(players).forEach(([id,p])=>{
@@ -2292,11 +2403,13 @@
       grid.appendChild(row);
     });
 
+    // ready status
     const allPlayers=Object.values(players);
     const readyCount=allPlayers.filter(p=>p.wayReady).length;
     const total=allPlayers.length;
     document.getElementById('way-ready-status').textContent=`${readyCount}/${total} ready for next round`;
 
+    // hide ready btn if already clicked
     const btn=document.getElementById('way-next-btn');
     if(players[myId]?.wayReady){
       btn.disabled=true;
@@ -2306,6 +2419,7 @@
       btn.textContent='✓ READY FOR NEXT ROUND';
     }
 
+    // if all ready and leader → next round
     if(readyCount>=total && total>0 && isLeader){
       launchWayRound(players, round+1);
     }
@@ -2317,76 +2431,561 @@
     await dbSet(`rooms/${roomCode}/players/${myId}/wayReady`,true);
   };
 
+
+  // ════════════════════════════════════════
+  //   LIKELY? GAME
+  // ════════════════════════════════════════
+  const LIKELY_QUESTIONS = [
+    "never watch a movie till the end",
+    "cry during a sad movie scene",
+    "spoil a movie for the whole group",
+    "fall asleep during a movie",
+    "get scared during a horror film",
+    "laugh at the wrong moment in a movie",
+    "rewatch the same movie 10 times",
+    "quote movie dialogues in real life",
+    "watch a film in 2x speed",
+    "leave a theatre mid-movie",
+    "cry when a villain dies",
+    "defend a movie everyone hates",
+    "hate a movie everyone loves",
+    "watch movies with subtitles in their own language",
+    "know every dialogue of their favourite film",
+    "ghost someone for no reason",
+    "be late to their own birthday party",
+    "forget a friend's name in public",
+    "accidentally send the wrong text to the wrong person",
+    "laugh at their own joke before finishing it",
+    "pretend to be busy to avoid plans",
+    "order food and eat it before it even reaches the table",
+    "trip and fall in front of everyone and play it off",
+    "argue with a stranger on the internet for 3 hours",
+    "reply 'on my way' while still at home",
+    "take 45 minutes to decide what to eat and then order the same thing",
+    "be the last one to understand a joke",
+    "overshare at the worst possible moment",
+    "make everything about themselves",
+    "start drama and then act innocent",
+    "cry over a fictional character",
+    "say 'I'm not even that hungry' and then eat the most",
+    "turn a 5 minute story into a 30 minute one",
+    "forget why they walked into a room",
+    "cancel plans at the last second",
+    "bring up an embarrassing thing you did 5 years ago",
+    "snoop through someone's phone if given the chance",
+    "pretend they didn't see a text",
+    "have 47 unread notifications and not care",
+    "sleep through an important alarm",
+    "blame autocorrect for a typo that was definitely intentional",
+    "be the peacemaker in a fight",
+    "be the one to start a fight",
+    "be caught talking behind someone's back",
+    "be the group's therapist",
+    "always have a hot take nobody asked for",
+    "be the loudest in the group",
+    "be the most responsible one",
+    "be the one who needs to be babysat",
+    "go viral for doing something embarrassing",
+    "become famous one day",
+    "move abroad and never come back",
+    "end up on a reality TV show",
+    "become a completely different person in 5 years",
+    "eat the last piece without asking",
+    "be the one who always asks 'wait what happened' mid-movie",
+    "have a parasocial relationship with a celebrity",
+    "screenshot a conversation and send it to someone else",
+    "have the most controversial opinion in the room",
+    "be the one everyone calls at 2am",
+  ];
+
+  let likelySelectedRounds = 5;
+  let likelySelectedVote = null, likelyHasVoted = false;
+  let likelySelectedImposterVote = null, likelyHasImposterVoted = false;
+  let likelyHasMarkedReadyImposter = false;
+  let likelyTallyDone = false, likelyImposterTallyDone = false, likelyReadyImposterDone = false;
+
+  function renderLikelyRoundOptions(){
+    const el = document.getElementById('likely-rounds-selector'); el.innerHTML='';
+    [3,5,7,10].forEach(n => {
+      const b = document.createElement('div');
+      b.className = 'rounds-btn' + (n===likelySelectedRounds?' selected':'');
+      b.style.cssText = n===likelySelectedRounds ? 'border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,.1)' : '';
+      b.textContent = n;
+      b.onclick = () => { likelySelectedRounds=n; dbUpd(`rooms/${roomCode}`,{totalRounds:n}); renderLikelyRoundOptions(); };
+      el.appendChild(b);
+    });
+  }
+
+  window.startLikelyGame = async () => {
+    if(!isLeader) return;
+    const snap = await dbGet(`rooms/${roomCode}/players`);
+    const players = snap.val();
+    if(Object.keys(players).length < 2){ toast('Need at least 2 players!'); return; }
+    await launchLikelyRound(players, 1);
+  };
+
+  async function launchLikelyRound(players, roundNum){
+    const totalSnap = await dbGet(`rooms/${roomCode}/totalRounds`);
+    const total = totalSnap.val() || 5;
+
+    const histSnap = await dbGet(`rooms/${roomCode}/history`);
+    const history = histSnap.val() || [];
+    const usedQs = history.map(h => h.question);
+    const pool = LIKELY_QUESTIONS.filter(q => !usedQs.includes(q));
+    const qList = pool.length > 0 ? pool : LIKELY_QUESTIONS;
+    const question = qList[Math.floor(Math.random() * qList.length)];
+
+    const ids = Object.keys(players);
+    const lastImposter = history.length > 0 ? history[history.length-1].imposterId : null;
+    const eligible = ids.length > 1 ? ids.filter(id => id !== lastImposter) : ids;
+    const imposterId = eligible[Math.floor(Math.random() * eligible.length)];
+
+    // pick a different question for imposter
+    const imposterPool = LIKELY_QUESTIONS.filter(q => q !== question);
+    const imposterQ = imposterPool[Math.floor(Math.random() * imposterPool.length)];
+
+    likelyTallyDone = false; likelyImposterTallyDone = false; likelyReadyImposterDone = false;
+
+    const u = {};
+    ids.forEach(id => {
+      u[`rooms/${roomCode}/players/${id}/likelyReady`] = false;
+      u[`rooms/${roomCode}/players/${id}/likelyVote`] = null;
+      u[`rooms/${roomCode}/players/${id}/likelyImposterVote`] = null;
+      u[`rooms/${roomCode}/players/${id}/likelyReadyImposter`] = false;
+      u[`rooms/${roomCode}/players/${id}/likelyQuestion`] = id===imposterId ? imposterQ : question;
+    });
+    u[`rooms/${roomCode}/likelyQuestion`] = question;
+    u[`rooms/${roomCode}/likelyImposterQ`] = imposterQ;
+    u[`rooms/${roomCode}/likelyImposter`] = imposterId;
+    u[`rooms/${roomCode}/currentRound`] = roundNum;
+    u[`rooms/${roomCode}/totalRounds`] = total;
+    u[`rooms/${roomCode}/phase`] = 'likely-reveal';
+    await db.ref('/').update(u);
+  }
+
+  function enterLikelyReveal(room){
+    likelySelectedVote=null; likelyHasVoted=false; likelyTallyDone=false;
+    const myQ = room.players[myId]?.likelyQuestion || '';
+    const isImposter = room.likelyImposter === myId;
+    const round = room.currentRound, total = room.totalRounds;
+    const displayQ = isImposter ? myQ : room.likelyQuestion;
+
+    document.getElementById('likely-reveal-phase-label').textContent = `round ${round}/${total} // who's most likely?`;
+    document.getElementById('likely-q-reveal-content').innerHTML = `
+      <div class="q-card ${isImposter?'imposter-q-card':''}">
+        <div class="q-label">${isImposter?'// your question (different from others)':'// your question'}</div>
+        <div class="q-text">${myQ}</div>
+      </div>`;
+
+    const qEl = document.getElementById('likely-lv-question-display');
+    qEl.textContent = displayQ;
+    if(isImposter){
+      qEl.style.color='var(--accent)'; qEl.style.borderColor='rgba(255,63,63,.3)'; qEl.style.background='rgba(255,63,63,.06)';
+    } else {
+      qEl.style.color='var(--purple)'; qEl.style.borderColor='rgba(192,132,252,.2)'; qEl.style.background='rgba(192,132,252,.06)';
+    }
+
+    const grid = document.getElementById('likely-vote-grid');
+    grid.innerHTML = '';
+    Object.entries(room.players).forEach(([id,p]) => {
+      if(id === myId) return;
+      const btn = document.createElement('button');
+      btn.className = 'vote-btn likely-vote'; btn.dataset.id = id;
+      btn.innerHTML = `<div style="flex:1;text-align:left"><div>${p.name}</div><div class="vote-voters" id="likely-lvv-${id}"></div></div>`;
+      btn.onclick = () => {
+        document.querySelectorAll('#likely-vote-grid .vote-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        likelySelectedVote = id;
+        document.getElementById('likely-cast-btn').disabled = false;
+      };
+      grid.appendChild(btn);
+    });
+    document.getElementById('likely-cast-btn').disabled = true;
+    document.getElementById('likely-lv-status').textContent = '';
+    showScreen('screen-likely-reveal');
+  }
+
+  function updateLikelyVoteCounts(room){
+    const players = room.players || {};
+    const voterMap = {};
+    Object.entries(players).forEach(([id,p]) => {
+      if(p.likelyVote){ if(!voterMap[p.likelyVote]) voterMap[p.likelyVote]=[]; voterMap[p.likelyVote].push(p.name); }
+    });
+    Object.keys(players).forEach(id => {
+      const el = document.getElementById(`likely-lvv-${id}`);
+      if(el) el.innerHTML = (voterMap[id]||[]).map(n=>`<span class="voter-chip-purple">${n}</span>`).join('');
+    });
+    const active = Object.values(players).filter(p=>p.likelyQuestion!==undefined);
+    const voted = active.filter(p=>p.likelyVote).length;
+    const statusEl = document.getElementById('likely-lv-status');
+    if(statusEl) statusEl.textContent = `${voted}/${active.length} voted`;
+    if(voted===active.length && active.length>0 && isLeader && !likelyTallyDone){
+      likelyTallyDone = true;
+      dbUpd(`rooms/${roomCode}`,{phase:'likely-results'});
+    }
+  }
+
+  window.likelyCastVote = async () => {
+    if(!likelySelectedVote || likelyHasVoted) return;
+    likelyHasVoted = true;
+    document.getElementById('likely-cast-btn').disabled = true;
+    await dbUpd(`rooms/${roomCode}/players/${myId}`,{likelyVote: likelySelectedVote});
+    toast('Vote cast!');
+  };
+
+  function enterLikelyResults(room){
+    likelyHasMarkedReadyImposter = false; likelyReadyImposterDone = false;
+    const players = room.players || {};
+    const round = room.currentRound, total = room.totalRounds;
+    document.getElementById('likely-lr-phase-label').textContent = `round ${round}/${total} // the verdict`;
+    document.getElementById('likely-lr-question-display').textContent = room.likelyQuestion;
+
+    const voteCounts = {}, voterMap = {};
+    Object.entries(players).forEach(([id,p]) => {
+      if(p.likelyVote){
+        voteCounts[p.likelyVote] = (voteCounts[p.likelyVote]||0)+1;
+        if(!voterMap[p.likelyVote]) voterMap[p.likelyVote]=[];
+        voterMap[p.likelyVote].push(p.name);
+      }
+    });
+    const maxVotes = Math.max(0, ...Object.values(voteCounts));
+    const totalVotes = Object.values(voteCounts).reduce((a,b)=>a+b,0)||1;
+
+    const barsEl = document.getElementById('likely-results-bars'); barsEl.innerHTML='';
+    Object.entries(players).sort((a,b)=>(voteCounts[b[0]]||0)-(voteCounts[a[0]]||0)).forEach(([id,p]) => {
+      const count = voteCounts[id]||0;
+      const pct = Math.round((count/totalVotes)*100);
+      const isTop = count===maxVotes && count>0;
+      const row = document.createElement('div');
+      row.className = 'likely-result-row' + (isTop?' top-pick':'');
+      row.innerHTML = `<div class="likely-result-name">${p.name}${id===myId?' <span style="font-size:10px;color:var(--blue);font-family:\'DM Mono\',monospace">you</span>':''}</div><div class="likely-result-bar"><div class="likely-result-fill" style="width:${pct}%"></div></div><div class="likely-result-count">${count} vote${count===1?'':'s'}</div>`;
+      barsEl.appendChild(row);
+    });
+
+    const bdEl = document.getElementById('likely-vote-breakdown'); bdEl.innerHTML='';
+    Object.entries(players).forEach(([voterId,p]) => {
+      if(!p.likelyVote) return;
+      const targetName = players[p.likelyVote]?.name||'?';
+      const chip = document.createElement('div');
+      chip.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px';
+      chip.innerHTML=`<span style="font-weight:600;min-width:80px">${p.name}</span><span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px">voted</span><span style="color:var(--purple);font-weight:600">${targetName}</span>`;
+      bdEl.appendChild(chip);
+    });
+
+    document.getElementById('likely-ready-imposter-btn').disabled = false;
+    document.getElementById('likely-lr-ready-status').textContent = '';
+    showScreen('screen-likely-results');
+  }
+
+  function updateLikelyReadyImposter(room){
+    const players = room.players||{};
+    const active = Object.values(players).filter(p=>p.likelyQuestion!==undefined);
+    const readyCount = active.filter(p=>p.likelyReadyImposter).length;
+    const el = document.getElementById('likely-lr-ready-status');
+    if(el) el.textContent = `${readyCount}/${active.length} ready`;
+    if(readyCount===active.length && active.length>0 && isLeader && !likelyReadyImposterDone){
+      likelyReadyImposterDone = true;
+      dbUpd(`rooms/${roomCode}`,{phase:'likely-imposter-vote'});
+    }
+  }
+
+  window.likelyMarkReadyImposter = async () => {
+    if(likelyHasMarkedReadyImposter) return;
+    likelyHasMarkedReadyImposter = true;
+    document.getElementById('likely-ready-imposter-btn').disabled = true;
+    await dbUpd(`rooms/${roomCode}/players/${myId}`,{likelyReadyImposter:true});
+  };
+
+  function enterLikelyImposterVote(room){
+    likelySelectedImposterVote=null; likelyHasImposterVoted=false; likelyImposterTallyDone=false;
+    const round = room.currentRound, total = room.totalRounds;
+    document.getElementById('likely-iv-phase-label').textContent = `round ${round}/${total} // find the imposter`;
+
+    const grid = document.getElementById('likely-imposter-vote-grid'); grid.innerHTML='';
+    Object.entries(room.players).forEach(([id,p]) => {
+      if(id===myId) return;
+      const btn = document.createElement('button');
+      btn.className = 'vote-btn imposter-vote'; btn.dataset.id = id;
+      btn.innerHTML = `<div style="flex:1;text-align:left"><div>${p.name}</div><div class="vote-voters" id="likely-ivv-${id}"></div></div>`;
+      btn.onclick = () => {
+        document.querySelectorAll('#likely-imposter-vote-grid .vote-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        likelySelectedImposterVote = id;
+        document.getElementById('likely-cast-imposter-btn').disabled = false;
+      };
+      grid.appendChild(btn);
+    });
+    document.getElementById('likely-cast-imposter-btn').disabled = true;
+    document.getElementById('likely-iv-status').textContent = '';
+    document.getElementById('likely-iv-votes-on-me').style.display = 'none';
+    showScreen('screen-likely-imposter-vote');
+  }
+
+  function updateLikelyImposterVoteCounts(room){
+    const players = room.players||{};
+    const voterMap = {};
+    Object.entries(players).forEach(([id,p]) => {
+      if(p.likelyImposterVote){ if(!voterMap[p.likelyImposterVote]) voterMap[p.likelyImposterVote]=[]; voterMap[p.likelyImposterVote].push(p.name); }
+    });
+    Object.keys(players).forEach(id => {
+      const el = document.getElementById(`likely-ivv-${id}`);
+      if(el) el.innerHTML=(voterMap[id]||[]).map(n=>`<span class="voter-chip" style="background:rgba(255,63,63,.12);border-color:rgba(255,63,63,.25);color:var(--accent)">${n}</span>`).join('');
+    });
+    const myVoters = voterMap[myId]||[];
+    const mySection = document.getElementById('likely-iv-votes-on-me');
+    const myNames = document.getElementById('likely-iv-vom-names');
+    if(myVoters.length>0){
+      mySection.style.display='block';
+      myNames.innerHTML=myVoters.map(n=>`<span class="voter-chip" style="background:rgba(255,63,63,.12);border-color:rgba(255,63,63,.25);color:var(--accent)">${n}</span>`).join(' ');
+    } else { mySection.style.display='none'; }
+
+    const active = Object.values(players).filter(p=>p.likelyQuestion!==undefined);
+    const voted = active.filter(p=>p.likelyImposterVote).length;
+    const statusEl = document.getElementById('likely-iv-status');
+    if(statusEl) statusEl.textContent=`${voted}/${active.length} voted`;
+    if(voted===active.length && active.length>0 && isLeader && !likelyImposterTallyDone){
+      likelyImposterTallyDone=true;
+      likelyTallyImposter(players, room);
+    }
+  }
+
+  window.likelyCastImposterVote = async () => {
+    if(!likelySelectedImposterVote || likelyHasImposterVoted) return;
+    likelyHasImposterVoted = true;
+    document.getElementById('likely-cast-imposter-btn').disabled = true;
+    await dbUpd(`rooms/${roomCode}/players/${myId}`,{likelyImposterVote: likelySelectedImposterVote});
+    toast('Vote cast!');
+  };
+
+  async function likelyTallyImposter(players, room){
+    const imposterId = room.likelyImposter;
+    const caughtBy = Object.entries(players).filter(([id,p])=>p.likelyImposterVote===imposterId).map(([id])=>id);
+    const caught = caughtBy.length > 0;
+
+    const u = {};
+    Object.entries(players).forEach(([id,p]) => {
+      const cur = p.score||0;
+      u[`rooms/${roomCode}/players/${id}/score`] = id===imposterId
+        ? cur + (caught ? 0 : 3)
+        : cur + (p.likelyImposterVote===imposterId ? 1 : 0);
+    });
+
+    const histSnap = await dbGet(`rooms/${roomCode}/history`);
+    const history = histSnap.val()||[];
+    history.push({
+      round: room.currentRound,
+      question: room.likelyQuestion,
+      imposterQ: room.likelyImposterQ,
+      imposterId,
+      imposterName: players[imposterId]?.name||'?',
+      caught, caughtBy,
+    });
+    u[`rooms/${roomCode}/history`] = history;
+    u[`rooms/${roomCode}/phase`] = 'likely-round-result';
+    await db.ref('/').update(u);
+  }
+
+  function enterLikelyRoundResult(room){
+    const players = room.players, history = room.history||[];
+    const last = history[history.length-1];
+    const round = room.currentRound, total = room.totalRounds;
+    const caughtNames = (last.caughtBy||[]).map(id=>players[id]?.name).filter(Boolean);
+
+    document.getElementById('likely-rr-content').innerHTML = last.caught
+      ? `<div class="result-big win">CAUGHT!</div><p class="center small-muted">${last.imposterName} was the imposter.<br/>Caught by: <strong style="color:var(--green)">${caughtNames.join(', ')}</strong></p>`
+      : `<div class="result-big lose">ESCAPED!</div><p class="center small-muted">${last.imposterName} was the imposter & escaped with <strong style="color:var(--yellow)">+3 pts!</strong></p>`;
+
+    document.getElementById('likely-rr-content').innerHTML += `
+      <div class="imposter-reveal">
+        <div class="ir-label">// the real question was</div>
+        <div style="color:var(--text);font-size:15px;font-weight:600;margin-bottom:10px">${last.question}</div>
+        <div class="ir-label">// imposter got</div>
+        <div style="color:var(--muted);font-size:13px;font-style:italic">${last.imposterQ}</div>
+      </div>`;
+
+    const pct = Math.round((round/total)*100);
+    document.getElementById('likely-pb-label').textContent = `round ${round} of ${total}`;
+    document.getElementById('likely-pb-pct').textContent = `${pct}%`;
+    document.getElementById('likely-pb-fill').style.width = `${pct}%`;
+    document.getElementById('likely-lb-round-badge').textContent = `after round ${round}`;
+
+    likelyRenderLeaderboard(players,'likely-rr-lb-rows');
+    likelyRenderHistory(history,'likely-rr-rh-list');
+
+    const area = document.getElementById('likely-rr-action-area');
+    if(isLeader){
+      area.innerHTML = round>=total
+        ? `<button class="btn btn-green" onclick="likelyEndGame()">SEE FINAL RESULTS →</button>`
+        : `<button class="btn" style="background:var(--purple);color:#fff;font-weight:600" onclick="likelyNextRound()">NEXT ROUND →</button>`;
+    } else {
+      area.innerHTML = `<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p>`;
+    }
+    showScreen('screen-likely-round-result');
+  }
+
+  function enterLikelyWinner(room){
+    const players = room.players, history = room.history||[];
+    const sorted = Object.entries(players).map(([id,p])=>({id,name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const podium = document.getElementById('likely-winner-podium'); podium.innerHTML='';
+    [1,0,2].forEach((rank,col)=>{
+      const p=sorted[rank]; if(!p) return;
+      const el=document.createElement('div'); el.className='podium-place';
+      el.innerHTML=`<div class="podium-name">${p.name}</div><div class="podium-score">${p.score} pts</div><div class="podium-block ${['p2','p1','p3'][col]}">${rank+1}</div>`;
+      podium.appendChild(el);
+    });
+    likelyRenderLeaderboard(players,'likely-final-lb-rows');
+    likelyRenderHistory(history,'likely-final-rh-list');
+    const area = document.getElementById('likely-winner-action-area');
+    area.innerHTML = isLeader
+      ? `<button class="btn btn-green" onclick="likelyPlayAgain()">PLAY AGAIN</button><button class="btn btn-ghost" onclick="leaveRoom()">LEAVE ROOM</button>`
+      : `<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p><button class="btn btn-ghost mt" onclick="leaveRoom()">LEAVE ROOM</button>`;
+    showScreen('screen-likely-winner');
+  }
+
+  function likelyRenderLeaderboard(players, containerId){
+    const sorted=Object.entries(players).map(([id,p])=>({id,name:p.name,score:p.score||0})).sort((a,b)=>b.score-a.score);
+    const medals=['🥇','🥈','🥉'];
+    const el=document.getElementById(containerId); el.innerHTML='';
+    sorted.forEach((p,i)=>{
+      const row=document.createElement('div');
+      row.className='lb-row'+(p.id===myId?' me':'')+(i===0?' top':'');
+      row.innerHTML=`<div class="lb-rank">${i<3?medals[i]:i+1}</div><div class="lb-name">${p.name}${p.id===myId?'<span class="lb-you">YOU</span>':''}</div><div class="lb-score-block"><div class="lb-score">${p.score}</div><div class="lb-score-label">pts</div></div>`;
+      el.appendChild(row);
+    });
+  }
+
+  function likelyRenderHistory(history, containerId){
+    const el=document.getElementById(containerId); el.innerHTML='';
+    [...history].reverse().forEach(h=>{
+      const row=document.createElement('div'); row.className='rh-item';
+      row.innerHTML=`<div class="rh-num">#${h.round}</div><div class="rh-word">${h.question}</div><div class="rh-caught ${h.caught?'yes':'no'}">${h.caught?'CAUGHT':'ESCAPED'}</div>`;
+      el.appendChild(row);
+    });
+  }
+
+  window.likelyNextRound = async () => {
+    if(!isLeader) return;
+    const snap = await dbGet(`rooms/${roomCode}`);
+    const room = snap.val();
+    likelyTallyDone=false; likelyImposterTallyDone=false; likelyReadyImposterDone=false;
+    await launchLikelyRound(room.players, room.currentRound+1);
+  };
+
+  window.likelyEndGame = async () => {
+    if(!isLeader) return;
+    await dbUpd(`rooms/${roomCode}`,{phase:'likely-winner'});
+  };
+
+  window.likelyPlayAgain = async () => {
+    if(!isLeader) return;
+    const snap = await dbGet(`rooms/${roomCode}/players`);
+    const u = {};
+    Object.keys(snap.val()).forEach(id=>{
+      u[`rooms/${roomCode}/players/${id}/score`]=0;
+      u[`rooms/${roomCode}/players/${id}/likelyVote`]=null;
+      u[`rooms/${roomCode}/players/${id}/likelyImposterVote`]=null;
+      u[`rooms/${roomCode}/players/${id}/likelyReadyImposter`]=false;
+      u[`rooms/${roomCode}/players/${id}/likelyQuestion`]=null;
+    });
+    u[`rooms/${roomCode}/phase`]='waiting';
+    u[`rooms/${roomCode}/currentRound`]=0;
+    u[`rooms/${roomCode}/history`]=null;
+    likelyTallyDone=false; likelyImposterTallyDone=false; likelyReadyImposterDone=false;
+    await db.ref('/').update(u);
+  };
+
   // ── Init ─────────────────────────────────────
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase();
   const analytics = firebase.analytics();
 
+  // ── Analytics helpers ─────────────────────────
+  // Call these throughout the game to track key actions in GA4
   function logEvent(name, params={}) {
     try { analytics.logEvent(name, params); } catch(e) {}
   }
 
+  // Track: which game mode was selected
   const _origGoToLobby = window.goToLobby;
   window.goToLobby = (game) => {
     logEvent('select_game_mode', { game_mode: game });
     _origGoToLobby(game);
   };
 
+  // Track: room created
   const _origCreateRoom = window.createRoom;
   window.createRoom = async () => {
     logEvent('room_created', { game_mode: currentGame });
     await _origCreateRoom();
   };
 
+  // Track: room joined
   const _origJoinRoom = window.joinRoom;
   window.joinRoom = async () => {
     logEvent('room_joined', { game_mode: currentGame });
     await _origJoinRoom();
   };
 
+  // Track: game started
   const _origStartGame = window.startGame;
   window.startGame = async () => {
     logEvent('game_started', { game_mode: 'imposter' });
     await _origStartGame();
   };
 
+  // Track: vote cast
   const _origCastVote = window.castVote;
   window.castVote = async () => {
     logEvent('vote_cast');
     await _origCastVote();
   };
 
+  // Track: heads up started
   const _origStartHeadsUp = window.startHeadsUp;
   window.startHeadsUp = () => {
     logEvent('game_started', { game_mode: 'headsup', category: huCategory, time_limit: huTimeLimit });
     _origStartHeadsUp();
   };
 
+  // Track: tier'd started
   const _origStartTierGame = window.startTierGame;
   window.startTierGame = async () => {
     logEvent('game_started', { game_mode: 'tierlist', category: selectedCategory, item_count: selectedTierCount });
     await _origStartTierGame();
   };
 
+  // seed initial history entry so the first popstate has something to catch
   history.replaceState({ screen: 'screen-landing' }, '', '');
 
+  // ── URL param auto-launch ─────────────────────
+  // e.g. game.html?game=imposter → skip home, go straight to lobby
   (function(){
     const params = new URLSearchParams(window.location.search);
     const game   = params.get('game');
     const name   = params.get('name') || '';
     if(!game) return;
+
+    // pre-fill name if passed
     if(name){
       const nameInput = document.getElementById('player-name-input');
       if(nameInput) nameInput.value = name;
       myName = name;
     }
+
+    // if no name yet, show landing screen with the game pre-selected
+    // user types name then clicks the game — but highlight the right one
     const nameInput = document.getElementById('player-name-input');
     if(!myName && nameInput){
+      // focus name input and store intended game so we can launch after name entered
       showScreen('screen-lobby-choice');
       nameInput.focus();
       nameInput.placeholder = 'enter name to play ' + game.toUpperCase();
+      // override the specific card click to just work normally — goToLobby handles the toast
       return;
     }
+
+    // pre-select game — user still needs to enter name then click the game button
+    // just show landing, nothing more needed
   })();
 </script>
 </body>
