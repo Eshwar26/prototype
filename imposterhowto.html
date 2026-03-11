@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How to Play — Imposter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
+      --accent:#ff3f3f;--accent2:#ff8c42;--text:#e8e8f0;--muted:#7070a0;
+      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+
+    /* ── ambient ── */
+    .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .glow-1{width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(255,63,63,.1) 0%,transparent 65%);}
+    .glow-2{width:500px;height:500px;bottom:-150px;right:-100px;background:radial-gradient(circle,rgba(91,143,255,.08) 0%,transparent 65%);}
+
+    /* ── wrapper ── */
+    .wrapper{position:relative;z-index:1;width:100%;height:100vh;display:flex;flex-direction:column;}
+
+    /* ── top bar ── */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;flex-shrink:0;}
+    .topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);}
+    .topbar-logo span{color:var(--accent);}
+    .topbar-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:20px;}
+
+    /* ── progress dots ── */
+    .progress-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 24px 16px;flex-shrink:0;}
+    .prog-dot{height:3px;border-radius:3px;background:var(--border);transition:all .4s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+    .prog-dot.active{background:var(--accent);width:28px !important;}
+    .prog-dot.done{background:var(--muted);}
+
+    /* ── slide stage ── */
+    .stage{flex:1;overflow:hidden;position:relative;}
+    .slides-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+    .slide{min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;gap:16px;}
+
+    /* ── slide header ── */
+    .slide-num{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;}
+    .slide-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);letter-spacing:4px;text-align:center;line-height:1;}
+    .slide-desc{font-size:14px;color:var(--muted);text-align:center;line-height:1.7;max-width:360px;}
+
+    /* ── mock UI cards ── */
+    .mock{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:360px;position:relative;}
+    .mock-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;}
+
+    /* word reveal mock */
+    .mock-word-card{background:var(--surface2);border:1px solid var(--accent);border-radius:14px;padding:24px 20px;text-align:center;position:relative;overflow:hidden;}
+    .mock-word-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,63,63,.1),transparent 70%);}
+    .mock-word-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;position:relative;}
+    .mock-word{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:5px;color:var(--text);line-height:1;position:relative;}
+    .mock-word.red{color:var(--accent);animation:pulseRed 2s ease-in-out infinite;}
+    @keyframes pulseRed{0%,100%{opacity:1}50%{opacity:.6}}
+
+    /* imposter card */
+    .mock-imposter-card{background:var(--surface2);border:2px solid var(--accent);border-radius:14px;padding:24px 20px;text-align:center;position:relative;overflow:hidden;animation:pulseGlow 2s ease-in-out infinite;}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 rgba(255,63,63,0)}50%{box-shadow:0 0 40px rgba(255,63,63,.2)}}
+    .mock-imposter-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,63,63,.08),transparent 70%);}
+
+    /* player chips */
+    .mock-players{display:flex;flex-direction:column;gap:6px;}
+    .mock-player{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;position:relative;overflow:hidden;}
+    .mock-player .pip{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    .mock-player.you{border-color:var(--accent2);}
+    .mock-player .you-badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;color:var(--accent2);background:rgba(255,140,66,.12);padding:2px 7px;border-radius:5px;}
+    .mock-player.imposter-revealed{border-color:var(--accent);background:rgba(255,63,63,.06);}
+    .mock-player.imposter-revealed::after{content:'IMPOSTER';position:absolute;right:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:2px;}
+
+    /* vote buttons */
+    .mock-vote{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+    .mock-vote-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;cursor:default;}
+    .mock-vote-btn.selected{border-color:var(--accent);background:rgba(255,63,63,.1);}
+    .mock-vote-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+    .mock-vote-count.hot{color:var(--accent);}
+    .voter-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+    .vchip{font-family:'DM Mono',monospace;font-size:9px;background:rgba(255,63,63,.1);border:1px solid rgba(255,63,63,.2);color:var(--accent);padding:1px 6px;border-radius:4px;}
+
+    /* score rows */
+    .mock-score-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:5px;}
+    .mock-score-row.top{border-color:var(--yellow);}
+    .mock-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);width:24px;text-align:center;}
+    .mock-sname{font-size:13px;font-weight:600;flex:1;}
+    .mock-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);}
+
+    /* result big */
+    .mock-result{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:4px;text-align:center;line-height:1;margin-bottom:8px;}
+    .mock-result.win{color:var(--green);}
+    .mock-result.lose{color:var(--accent);}
+
+    /* discuss banner */
+    .mock-discuss{background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.2);border-radius:10px;padding:10px 14px;text-align:center;margin-top:8px;}
+    .mock-discuss-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent2);text-transform:uppercase;margin-bottom:4px;}
+    .mock-discuss-text{font-size:12px;color:var(--muted);}
+
+    /* code display */
+    .mock-code{font-family:'DM Mono',monospace;font-size:48px;letter-spacing:10px;color:var(--accent);text-align:center;margin:10px 0;}
+    .mock-code-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;text-align:center;margin-bottom:6px;}
+
+    /* animated entrance */
+    .slide .mock{opacity:0;transform:translateY(24px);}
+    .slide.in-view .mock{opacity:1;transform:translateY(0);transition:opacity .5s .2s ease, transform .5s .2s ease;}
+    .slide.in-view .slide-num{animation:slideUp .4s .05s ease both;}
+    .slide.in-view .slide-title{animation:slideUp .4s .1s ease both;}
+    .slide.in-view .slide-desc{animation:slideUp .4s .18s ease both;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* staggered mock children */
+    .slide.in-view .mock-player:nth-child(1){transition-delay:.25s !important;}
+    .slide.in-view .mock-player:nth-child(2){transition-delay:.32s !important;}
+    .slide.in-view .mock-player:nth-child(3){transition-delay:.39s !important;}
+    .slide.in-view .mock-player:nth-child(4){transition-delay:.46s !important;}
+    .mock-vote .mock-vote-btn{opacity:0;transform:translateX(-12px);transition:opacity .4s ease,transform .4s ease;}
+    .slide.in-view .mock-vote .mock-vote-btn:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.28s;}
+    .slide.in-view .mock-vote .mock-vote-btn:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.38s;}
+    .slide.in-view .mock-vote .mock-vote-btn:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.48s;}
+    .slide.in-view .mock-score-row:nth-child(1){opacity:0;transition:opacity .4s .3s,transform .4s .3s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row:nth-child(2){opacity:0;transition:opacity .4s .38s,transform .4s .38s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row:nth-child(3){opacity:0;transition:opacity .4s .46s,transform .4s .46s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row{opacity:1;transform:translateX(0);}
+
+    /* bottom nav */
+    .bottom-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 28px;flex-shrink:0;}
+    .nav-btn{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:12px 22px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;}
+    .nav-btn-prev{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+    .nav-btn-prev:hover{color:var(--text);border-color:var(--muted);}
+    .nav-btn-prev:disabled{opacity:.3;cursor:not-allowed;}
+    .nav-btn-next{background:var(--accent);color:#fff;font-weight:700;}
+    .nav-btn-next:hover{box-shadow:0 0 24px rgba(255,63,63,.4);}
+    .nav-btn-next.last{background:var(--green);color:#0a0a0f;}
+    .nav-btn-next.last:hover{box-shadow:0 0 24px rgba(63,255,160,.4);}
+    .slide-counter{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+
+    /* swipe hint */
+    .swipe-hint{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;opacity:0;animation:fadeHint 3s 1.5s ease forwards;}
+    @keyframes fadeHint{0%{opacity:0}20%{opacity:.6}80%{opacity:.6}100%{opacity:0}}
+
+    /* tag pill */
+    .tag-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 12px;border-radius:20px;border:1px solid;margin-bottom:4px;}
+    .tag-red{background:rgba(255,63,63,.1);color:var(--accent);border-color:rgba(255,63,63,.3);}
+    .tag-green{background:rgba(63,255,160,.1);color:var(--green);border-color:rgba(63,255,160,.3);}
+    .tag-yellow{background:rgba(255,217,61,.1);color:var(--yellow);border-color:rgba(255,217,61,.3);}
+  </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="wrapper">
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="topbar-logo">CINE<span>FIED</span></div>
+    <div class="topbar-tag">// how to play</div>
+  </div>
+
+  <!-- progress -->
+  <div class="progress-row" id="progress-row"></div>
+
+  <!-- slides -->
+  <div class="stage" id="stage">
+    <div class="slides-track" id="track">
+
+      <!-- SLIDE 1: What is Imposter -->
+      <div class="slide" id="slide-0">
+        <div class="slide-num">01 / 07</div>
+        <div class="slide-title">THE IMPOSTER<br/>GAME</div>
+        <div class="tag-pill tag-red">MULTIPLAYER · 2–8 PLAYERS</div>
+        <div class="slide-desc">One player secretly gets a different word. Everyone else tries to find them — before they blend in.</div>
+        <div class="mock">
+          <div class="mock-label">// players in lobby</div>
+          <div class="mock-players">
+            <div class="mock-player"><div class="pip"></div>Arjun<div class="you-badge">YOU</div></div>
+            <div class="mock-player"><div class="pip"></div>Rahul</div>
+            <div class="mock-player"><div class="pip"></div>Priya</div>
+            <div class="mock-player"><div class="pip"></div>Kiran</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: Create & Join -->
+      <div class="slide" id="slide-1">
+        <div class="slide-num">02 / 07</div>
+        <div class="slide-title">CREATE<br/>A ROOM</div>
+        <div class="slide-desc">The leader creates a room and gets a 6-letter code. Share it — friends join from any device instantly.</div>
+        <div class="mock">
+          <div class="mock-code-label">// your room code</div>
+          <div class="mock-code" id="mock-code-anim">XK49TW</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;letter-spacing:1px;margin-top:6px">tap to copy · share in group chat</div>
+          <div style="margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:2px;">// leader sets up</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <div style="background:rgba(255,63,63,.1);border:1px solid rgba(255,63,63,.3);color:var(--accent);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;">heroes</div>
+              <div style="background:rgba(255,140,66,.1);border:1px solid rgba(255,140,66,.3);color:var(--accent2);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;">movies</div>
+              <div style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;">directors</div>
+              <div style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;">mixed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: Word Reveal -->
+      <div class="slide" id="slide-2">
+        <div class="slide-num">03 / 07</div>
+        <div class="slide-title">YOUR<br/>WORD</div>
+        <div class="slide-desc">Everyone gets the same secret word — except one person. The imposter gets <span style="color:var(--accent);font-weight:700">IMPOSTER</span> instead.</div>
+        <div style="display:flex;gap:10px;width:100%;max-width:360px;">
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;">CREWMATE</div>
+            <div class="mock-word-card" style="padding:16px 12px;">
+              <div class="mock-word-label">// the word is</div>
+              <div class="mock-word" style="font-size:28px;letter-spacing:3px;">POKIRI</div>
+            </div>
+          </div>
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:10px;">IMPOSTER</div>
+            <div class="mock-imposter-card" style="padding:16px 12px;">
+              <div class="mock-word-label" style="color:var(--muted)">// you are</div>
+              <div class="mock-word red" style="font-size:22px;letter-spacing:2px;">IMPOSTER</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: Discussion -->
+      <div class="slide" id="slide-3">
+        <div class="slide-num">04 / 07</div>
+        <div class="slide-title">DISCUSS<br/>IT</div>
+        <div class="slide-desc">Everyone talks about the word out loud. Stay vague enough to confuse the imposter — but specific enough to prove you know it.</div>
+        <div class="mock">
+          <div class="mock-label">// the word is POKIRI</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;">
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue);margin-bottom:4px;">ARJUN</div>
+              <div style="font-size:13px;color:var(--text)">"one of the most iconic mass films ever"</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;">
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue);margin-bottom:4px;">PRIYA</div>
+              <div style="font-size:13px;color:var(--text)">"mahesh babu at his peak"</div>
+            </div>
+            <div style="background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.2);border-radius:10px;padding:10px 14px;">
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);margin-bottom:4px;">KIRAN <span style="opacity:.5">(actually imposter)</span></div>
+              <div style="font-size:13px;color:var(--text)">"yeah it's a really good movie..." 👀</div>
+            </div>
+          </div>
+          <div class="mock-discuss" style="margin-top:10px;">
+            <div class="mock-discuss-label">// tip</div>
+            <div class="mock-discuss-text">Imposter: listen carefully. try to blend in.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: Voting -->
+      <div class="slide" id="slide-4">
+        <div class="slide-num">05 / 07</div>
+        <div class="slide-title">CAST<br/>YOUR VOTE</div>
+        <div class="slide-desc">After the discussion, everyone votes on who they think is the imposter. Votes are visible in real time.</div>
+        <div class="mock">
+          <div class="mock-label">// who is the imposter?</div>
+          <div class="mock-vote">
+            <div class="mock-vote-btn">
+              <div>
+                <div>Rahul</div>
+                <div class="voter-chips"><span class="vchip">Priya</span></div>
+              </div>
+              <span class="mock-vote-count">1 vote</span>
+            </div>
+            <div class="mock-vote-btn selected">
+              <div>
+                <div>Kiran</div>
+                <div class="voter-chips"><span class="vchip">Arjun</span><span class="vchip">Rahul</span></div>
+              </div>
+              <span class="mock-vote-count hot">2 votes</span>
+            </div>
+            <div class="mock-vote-btn">
+              <div><div>Priya</div></div>
+              <span class="mock-vote-count">0 votes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: Result -->
+      <div class="slide" id="slide-5">
+        <div class="slide-num">06 / 07</div>
+        <div class="slide-title">THE<br/>VERDICT</div>
+        <div class="slide-desc">The imposter is revealed. See who was right — and watch the scores update.</div>
+        <div class="mock">
+          <div class="mock-result win">CAUGHT!</div>
+          <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px;">Kiran was the imposter · word was <strong style="color:var(--accent2)">POKIRI</strong></div>
+          <div class="mock-players">
+            <div class="mock-player imposter-revealed"><div class="pip" style="background:var(--accent)"></div>Kiran</div>
+            <div class="mock-player"><div class="pip"></div>Arjun <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)">+3 pts ✓</span></div>
+            <div class="mock-player"><div class="pip"></div>Rahul <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)">+3 pts ✓</span></div>
+            <div class="mock-player"><div class="pip"></div>Priya <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">+0 pts</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: Scoring -->
+      <div class="slide" id="slide-6">
+        <div class="slide-num">07 / 07</div>
+        <div class="slide-title">SCORING<br/>SYSTEM</div>
+        <div class="slide-desc">Play multiple rounds. The imposter gets more points for escaping — crewmates get points for catching them.</div>
+        <div class="mock">
+          <div class="mock-label">// how points work</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(63,255,160,.06);border:1px solid rgba(63,255,160,.2);border-radius:10px;padding:12px 14px;">
+              <div style="font-size:20px;">🎯</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--green)">You caught the imposter</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;">+3 pts for each correct voter</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.2);border-radius:10px;padding:12px 14px;">
+              <div style="font-size:20px;">🎭</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--accent)">Imposter escaped</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;">+5 pts for the imposter</div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-label" style="margin-top:4px;">// after 3 rounds</div>
+          <div class="mock-score-row top"><div class="mock-rank">🥇</div><div class="mock-sname">Arjun</div><div class="mock-pts">9</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+          <div class="mock-score-row"><div class="mock-rank">🥈</div><div class="mock-sname">Kiran</div><div class="mock-pts">5</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+          <div class="mock-score-row"><div class="mock-rank">🥉</div><div class="mock-sname">Priya</div><div class="mock-pts">3</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+        </div>
+      </div>
+
+    </div><!-- end track -->
+  </div><!-- end stage -->
+
+  <!-- bottom nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn nav-btn-prev" id="btn-prev" onclick="navigate(-1)" disabled>← PREV</button>
+    <div class="slide-counter" id="slide-counter">1 / 7</div>
+    <button class="nav-btn nav-btn-next" id="btn-next" onclick="navigate(1)">NEXT →</button>
+  </div>
+
+</div><!-- end wrapper -->
+
+<div class="swipe-hint">← swipe to navigate →</div>
+
+<script>
+  const TOTAL = 7;
+  let current = 0;
+  const track = document.getElementById('track');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const counter = document.getElementById('slide-counter');
+
+  // build progress dots
+  const progRow = document.getElementById('progress-row');
+  for(let i=0; i<TOTAL; i++){
+    const d = document.createElement('div');
+    d.className = 'prog-dot';
+    d.style.width = '8px';
+    d.onclick = () => goTo(i);
+    progRow.appendChild(d);
+  }
+
+  function updateDots(){
+    const dots = progRow.querySelectorAll('.prog-dot');
+    dots.forEach((d,i)=>{
+      d.classList.remove('active','done');
+      if(i===current) d.classList.add('active');
+      else if(i<current) d.classList.add('done');
+      d.style.width = i===current ? '28px' : '8px';
+    });
+  }
+
+  function goTo(idx){
+    // remove in-view from old
+    document.getElementById(`slide-${current}`)?.classList.remove('in-view');
+
+    current = Math.max(0, Math.min(TOTAL-1, idx));
+    track.style.transform = `translateX(-${current * 100}%)`;
+
+    // add in-view to new after a tiny delay (allow translate to start)
+    setTimeout(()=>{
+      document.getElementById(`slide-${current}`)?.classList.add('in-view');
+    }, 60);
+
+    btnPrev.disabled = current === 0;
+    btnNext.textContent = current === TOTAL-1 ? 'PLAY NOW →' : 'NEXT →';
+    btnNext.className = current === TOTAL-1 ? 'nav-btn nav-btn-next last' : 'nav-btn nav-btn-next';
+    counter.textContent = `${current+1} / ${TOTAL}`;
+    updateDots();
+  }
+
+  window.navigate = (dir) => {
+    if(current === TOTAL-1 && dir === 1){
+      // last slide — go to game
+      window.location.href = 'game.html';
+      return;
+    }
+    goTo(current + dir);
+  };
+
+  // touch/swipe
+  let touchStartX = 0, touchStartY = 0;
+  const stage = document.getElementById('stage');
+  stage.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY; }, {passive:true});
+  stage.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
+      navigate(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
+
+  // keyboard
+  window.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
+  });
+
+  // animated code display on slide 2
+  const codes = ['XK49TW','BM72RA','QP55ZX','GT18NL','CF93WD'];
+  let codeIdx = 0;
+  const codeEl = document.getElementById('mock-code-anim');
+  setInterval(()=>{
+    if(current === 1){
+      codeIdx = (codeIdx+1) % codes.length;
+      codeEl.style.opacity='0';
+      setTimeout(()=>{ codeEl.textContent=codes[codeIdx]; codeEl.style.opacity='1'; },200);
+    }
+  }, 2000);
+  codeEl.style.transition='opacity .2s';
+
+  // init
+  goTo(0);
+</script>
+</body>
+</html>
