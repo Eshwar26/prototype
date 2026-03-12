@@ -230,7 +230,7 @@
     .htp-cards{display:flex;flex-direction:column;gap:8px}
     .htp-card{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
     .htp-step-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1;flex-shrink:0;width:24px;text-align:center;margin-top:1px}
-    .htp-card-content{}
+    /* .htp-card-content{} */
     .htp-card-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent2);text-transform:uppercase;margin-bottom:4px}
     .htp-card-text{font-size:13px;color:var(--muted);line-height:1.55}
 
@@ -273,14 +273,14 @@
     <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px" onclick="goToLobby('imposter')"><span style="pointer-events:none">IMPOSTER</span><a href="imposterhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.5);color:rgba(255,255,255,0.7);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')">TIER'D</button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')"><span style="pointer-events:none">TIER'D</span><a href="tier'dhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
     <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()">HEADS UP</button>
-      <button class="btn" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')">BLINDSPOT</button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()"><span style="pointer-events:none">HEADS UP</span><a href="headsuphowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')"><span style="pointer-events:none">BLINDSPOT</span><a href="blindspothowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
     <div style="margin-top:8px">
-      <button class="btn" style="width:100%;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.35);color:var(--purple);margin:0" onclick="goToLobby('likely')">LIKELY?</button>
+      <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.35);color:var(--purple);margin:0" onclick="goToLobby('likely')"><span style="pointer-events:none">LIKELY?</span><a href="likelyhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(192,132,252,0.4);color:rgba(192,132,252,0.6);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
   </div>
 </div>
