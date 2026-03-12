@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How to Play — Likely?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
+      --accent:#c084fc;--accent-rgb:192,132,252;--text:#e8e8f0;--muted:#7070a0;
+      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;--red:#ff3f3f;--orange:#ff8c42;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+
+    /* ── ambient ── */
+    .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .glow-1{width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(192,132,252,.1) 0%,transparent 65%);}
+    .glow-2{width:500px;height:500px;bottom:-150px;right:-100px;background:radial-gradient(circle,rgba(192,132,252,.06) 0%,transparent 65%);}
+
+    /* ── wrapper ── */
+    .wrapper{position:relative;z-index:1;width:100%;height:100vh;display:flex;flex-direction:column;}
+
+    /* ── top bar ── */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;flex-shrink:0;}
+    .topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);}
+    .topbar-logo span{color:var(--accent);}
+    .topbar-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:20px;}
+
+    /* ── progress dots ── */
+    .progress-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 24px 16px;flex-shrink:0;}
+    .prog-dot{height:3px;border-radius:3px;background:var(--border);transition:all .4s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+    .prog-dot.active{background:var(--accent);width:28px !important;}
+    .prog-dot.done{background:var(--muted);}
+
+    /* ── slide stage ── */
+    .stage{flex:1;overflow:hidden;position:relative;}
+    .slides-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+    .slide{min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;gap:16px;}
+
+    /* ── slide header ── */
+    .slide-num{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;}
+    .slide-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);letter-spacing:4px;text-align:center;line-height:1;}
+    .slide-desc{font-size:14px;color:var(--muted);text-align:center;line-height:1.7;max-width:360px;}
+
+    /* ── mock cards ── */
+    .mock{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:360px;position:relative;}
+    .mock-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;}
+
+    /* player chips */
+    .mock-players{display:flex;flex-direction:column;gap:6px;}
+    .mock-player{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;}
+    .mock-player .pip{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    .mock-player.you{border-color:var(--accent);}
+    .mock-player .you-badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);background:rgba(var(--accent-rgb),.12);padding:2px 7px;border-radius:5px;}
+
+    /* room code */
+    .mock-code{font-family:'DM Mono',monospace;font-size:48px;letter-spacing:10px;color:var(--accent);text-align:center;margin:10px 0;}
+    .mock-code-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;text-align:center;margin-bottom:6px;}
+
+    /* question card */
+    .q-card{background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.22);border-radius:12px;padding:14px 16px;text-align:center;}
+    .q-card-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+    .q-card-text{font-size:15px;font-weight:600;color:var(--accent);line-height:1.4;}
+
+    /* imposter q card */
+    .q-card-imposter{background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.22);border-radius:12px;padding:14px 16px;text-align:center;}
+    .q-card-imposter .q-card-text{color:var(--red);}
+
+    /* vote buttons */
+    .mock-vote{display:flex;flex-direction:column;gap:6px;}
+    .mock-vote-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;}
+    .mock-vote-btn.selected{border-color:var(--accent);background:rgba(var(--accent-rgb),.1);}
+    .mock-vote-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+    .mock-vote-count.hot{color:var(--accent);}
+    .voter-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+    .vchip{font-family:'DM Mono',monospace;font-size:9px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);padding:1px 6px;border-radius:4px;}
+
+    /* result bars */
+    .result-bar-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:7px;}
+    .result-bar-row.top{border-color:var(--accent);}
+    .result-bar-name{font-size:13px;font-weight:600;width:52px;flex-shrink:0;}
+    .result-bar-row.top .result-bar-name{color:var(--accent);}
+    .result-bar-track{flex:1;height:6px;background:var(--surface);border-radius:4px;overflow:hidden;}
+    .result-bar-fill{height:100%;background:var(--accent);border-radius:4px;}
+    .result-bar-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:32px;text-align:right;}
+
+    /* imposter vote */
+    .mock-imposter-vote-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:6px;}
+    .mock-imposter-vote-btn.selected{border-color:var(--red);background:rgba(255,63,63,.1);}
+    .mock-imposter-vote-btn.revealed{border-color:var(--red);background:rgba(255,63,63,.06);}
+    .imposter-tag{font-family:'DM Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1px;}
+
+    /* score rows */
+    .mock-score-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:5px;}
+    .mock-score-row.top{border-color:var(--yellow);}
+    .mock-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);width:24px;text-align:center;}
+    .mock-sname{font-size:13px;font-weight:600;flex:1;}
+    .mock-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);}
+
+    /* animated entrance */
+    .slide .mock{opacity:0;transform:translateY(24px);}
+    .slide.in-view .mock{opacity:1;transform:translateY(0);transition:opacity .5s .2s ease,transform .5s .2s ease;}
+    .slide.in-view .slide-num{animation:slideUp .4s .05s ease both;}
+    .slide.in-view .slide-title{animation:slideUp .4s .1s ease both;}
+    .slide.in-view .slide-desc{animation:slideUp .4s .18s ease both;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* staggered */
+    .mock-player{opacity:0;transform:translateX(-10px);transition:opacity .4s ease,transform .4s ease;}
+    .slide.in-view .mock-player:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.25s;}
+    .slide.in-view .mock-player:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.32s;}
+    .slide.in-view .mock-player:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.39s;}
+    .slide.in-view .mock-player:nth-child(4){opacity:1;transform:translateX(0);transition-delay:.46s;}
+
+    .mock-vote-btn{opacity:0;transform:translateX(-10px);transition:opacity .4s ease,transform .4s ease;}
+    .slide.in-view .mock-vote-btn:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.28s;}
+    .slide.in-view .mock-vote-btn:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.36s;}
+    .slide.in-view .mock-vote-btn:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.44s;}
+    .slide.in-view .mock-vote-btn:nth-child(4){opacity:1;transform:translateX(0);transition-delay:.52s;}
+
+    .result-bar-row{opacity:0;transform:translateX(-10px);transition:opacity .4s ease,transform .4s ease;}
+    .slide.in-view .result-bar-row:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.25s;}
+    .slide.in-view .result-bar-row:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.33s;}
+    .slide.in-view .result-bar-row:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.41s;}
+    .slide.in-view .result-bar-row:nth-child(4){opacity:1;transform:translateX(0);transition-delay:.49s;}
+
+    .mock-imposter-vote-btn{opacity:0;transform:translateX(-10px);transition:opacity .4s ease,transform .4s ease;}
+    .slide.in-view .mock-imposter-vote-btn:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.25s;}
+    .slide.in-view .mock-imposter-vote-btn:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.33s;}
+    .slide.in-view .mock-imposter-vote-btn:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.41s;}
+    .slide.in-view .mock-imposter-vote-btn:nth-child(4){opacity:1;transform:translateX(0);transition-delay:.49s;}
+
+    .slide.in-view .mock-score-row:nth-child(1){opacity:0;transition:opacity .4s .3s,transform .4s .3s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row:nth-child(2){opacity:0;transition:opacity .4s .38s,transform .4s .38s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row:nth-child(3){opacity:0;transition:opacity .4s .46s,transform .4s .46s;transform:translateX(12px);}
+    .slide.in-view .mock-score-row{opacity:1;transform:translateX(0);}
+
+    /* bottom nav */
+    .bottom-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 28px;flex-shrink:0;}
+    .nav-btn{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:12px 22px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;}
+    .nav-btn-prev{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+    .nav-btn-prev:hover{color:var(--text);border-color:var(--muted);}
+    .nav-btn-prev:disabled{opacity:.3;cursor:not-allowed;}
+    .nav-btn-next{background:var(--accent);color:#0a0a0f;font-weight:700;}
+    .nav-btn-next:hover{box-shadow:0 0 24px rgba(var(--accent-rgb),.4);}
+    .nav-btn-next.last{background:var(--green);color:#0a0a0f;}
+    .nav-btn-next.last:hover{box-shadow:0 0 24px rgba(63,255,160,.4);}
+    .slide-counter{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+
+    /* swipe hint */
+    .swipe-hint{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;opacity:0;animation:fadeHint 3s 1.5s ease forwards;}
+    @keyframes fadeHint{0%{opacity:0}20%{opacity:.6}80%{opacity:.6}100%{opacity:0}}
+
+    /* tag pill */
+    .tag-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 12px;border-radius:20px;border:1px solid;margin-bottom:4px;}
+    .tag-purple{background:rgba(var(--accent-rgb),.1);color:var(--accent);border-color:rgba(var(--accent-rgb),.3);}
+    .tag-green{background:rgba(63,255,160,.1);color:var(--green);border-color:rgba(63,255,160,.3);}
+  </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="wrapper">
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="topbar-logo">CINE<span>FIED</span></div>
+    <div class="topbar-tag">// how to play</div>
+  </div>
+
+  <!-- progress -->
+  <div class="progress-row" id="progress-row"></div>
+
+  <!-- slides -->
+  <div class="stage" id="stage">
+    <div class="slides-track" id="track">
+
+      <!-- SLIDE 1: What is Likely? -->
+      <div class="slide" id="slide-0">
+        <div class="slide-num">01 / 07</div>
+        <div class="slide-title">THE LIKELY?<br/>GAME</div>
+        <div class="tag-pill tag-purple">MULTIPLAYER · 2–8 PLAYERS</div>
+        <div class="slide-desc">"Who's most likely to..." — but with a twist. Everyone gets the same question except one person. Find the imposter hiding in plain sight.</div>
+        <div class="mock">
+          <div class="mock-label">// players in lobby</div>
+          <div class="mock-players">
+            <div class="mock-player you"><div class="pip"></div>Arjun<div class="you-badge">YOU</div></div>
+            <div class="mock-player"><div class="pip"></div>Rahul</div>
+            <div class="mock-player"><div class="pip"></div>Priya</div>
+            <div class="mock-player"><div class="pip"></div>Kiran</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: Create a Room -->
+      <div class="slide" id="slide-1">
+        <div class="slide-num">02 / 07</div>
+        <div class="slide-title">CREATE<br/>A ROOM</div>
+        <div class="slide-desc">The leader creates a room and picks how many rounds to play. Share the code — everyone joins on their own device.</div>
+        <div class="mock">
+          <div class="mock-code-label">// your room code</div>
+          <div class="mock-code" id="mock-code-anim">CF93WD</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;letter-spacing:1px;margin-top:6px">tap to copy · share in group chat</div>
+          <div style="margin-top:12px;">
+            <div class="mock-label">// number of rounds</div>
+            <div style="display:flex;gap:6px;">
+              <div style="flex:1;padding:9px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center;border:1px solid var(--border);color:var(--muted);background:var(--surface2);">3</div>
+              <div style="flex:1;padding:9px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center;border:1px solid rgba(var(--accent-rgb),.4);color:var(--accent);background:rgba(var(--accent-rgb),.1);">5</div>
+              <div style="flex:1;padding:9px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center;border:1px solid var(--border);color:var(--muted);background:var(--surface2);">8</div>
+              <div style="flex:1;padding:9px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center;border:1px solid var(--border);color:var(--muted);background:var(--surface2);">10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: Everyone Gets a Question -->
+      <div class="slide" id="slide-2">
+        <div class="slide-num">03 / 07</div>
+        <div class="slide-title">ONE QUESTION<br/>ONE TWIST</div>
+        <div class="slide-desc">Everyone gets the same "who's most likely to..." question on their screen — except one person who gets a completely different one. They're the imposter.</div>
+        <div style="display:flex;gap:10px;width:100%;max-width:360px;">
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;">EVERYONE ELSE</div>
+            <div class="q-card">
+              <div class="q-card-label">// your question</div>
+              <div class="q-card-text" id="q-cycle-main">"most likely to rewatch the same movie 10 times"</div>
+            </div>
+          </div>
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--red);margin-bottom:8px;">THE IMPOSTER</div>
+            <div class="q-card-imposter">
+              <div class="q-card-label" style="color:var(--muted);">// your question</div>
+              <div class="q-card-text">"most likely to spoil a movie for the whole group"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: Vote Who's Most Likely -->
+      <div class="slide" id="slide-3">
+        <div class="slide-num">04 / 07</div>
+        <div class="slide-title">VOTE WHO'S<br/>MOST LIKELY</div>
+        <div class="slide-desc">Based on your question, vote for who you think fits it best. Everyone votes at the same time — results stay hidden until all votes are in.</div>
+        <div class="mock">
+          <div class="mock-label">// who is most likely to...</div>
+          <div class="q-card" style="margin-bottom:12px;">
+            <div class="q-card-text" style="font-size:13px;" id="q-cycle-vote">"rewatch the same movie 10 times"</div>
+          </div>
+          <div class="mock-vote">
+            <div class="mock-vote-btn selected">
+              <div><div>Rahul</div><div class="voter-chips"><span class="vchip">Arjun</span><span class="vchip">Priya</span></div></div>
+              <span class="mock-vote-count hot">2 votes</span>
+            </div>
+            <div class="mock-vote-btn">
+              <div><div>Priya</div><div class="voter-chips"><span class="vchip">Kiran</span></div></div>
+              <span class="mock-vote-count">1 vote</span>
+            </div>
+            <div class="mock-vote-btn">
+              <div><div>Kiran</div></div>
+              <span class="mock-vote-count">0 votes</span>
+            </div>
+            <div class="mock-vote-btn">
+              <div><div>Arjun</div></div>
+              <span class="mock-vote-count">0 votes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: Results + Discuss -->
+      <div class="slide" id="slide-4">
+        <div class="slide-num">05 / 07</div>
+        <div class="slide-title">RESULTS &<br/>DISCUSS</div>
+        <div class="slide-desc">See who the room picked and who voted for whom. Talk it out — and notice if someone's answers seem… off. That's your imposter tell.</div>
+        <div class="mock">
+          <div class="mock-label">// who's most likely to rewatch a movie 10 times</div>
+          <div class="result-bar-row top">
+            <div class="result-bar-name">Rahul</div>
+            <div class="result-bar-track"><div class="result-bar-fill" style="width:50%"></div></div>
+            <div class="result-bar-count">2 votes</div>
+          </div>
+          <div class="result-bar-row">
+            <div class="result-bar-name">Priya</div>
+            <div class="result-bar-track"><div class="result-bar-fill" style="width:25%"></div></div>
+            <div class="result-bar-count">1 vote</div>
+          </div>
+          <div class="result-bar-row">
+            <div class="result-bar-name">Kiran</div>
+            <div class="result-bar-track"><div class="result-bar-fill" style="width:0%"></div></div>
+            <div class="result-bar-count">0 votes</div>
+          </div>
+          <div class="result-bar-row">
+            <div class="result-bar-name">Arjun</div>
+            <div class="result-bar-track"><div class="result-bar-fill" style="width:25%"></div></div>
+            <div class="result-bar-count">1 vote</div>
+          </div>
+          <div style="margin-top:10px;background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.15);border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;">
+            // discuss · then vote for who you think got a different question
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: Find the Imposter -->
+      <div class="slide" id="slide-5">
+        <div class="slide-num">06 / 07</div>
+        <div class="slide-title">FIND THE<br/>IMPOSTER</div>
+        <div class="slide-desc">After discussion, vote for who you think got a different question. Did their answer feel weird? Did they hesitate? Trust your gut.</div>
+        <div class="mock">
+          <div class="mock-label">// who got a different question?</div>
+          <div class="mock-imposter-vote-btn">
+            <div>Rahul</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">1 vote</div>
+          </div>
+          <div class="mock-imposter-vote-btn selected">
+            <div>Kiran</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);">2 votes</div>
+          </div>
+          <div class="mock-imposter-vote-btn">
+            <div>Priya</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">0 votes</div>
+          </div>
+          <div class="mock-imposter-vote-btn">
+            <div>Arjun</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">1 vote</div>
+          </div>
+          <div style="margin-top:10px;background:rgba(255,63,63,.05);border:1px solid rgba(255,63,63,.15);border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;">
+            // kiran's question was: "most likely to spoil a movie"
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: Scoring -->
+      <div class="slide" id="slide-6">
+        <div class="slide-num">07 / 07</div>
+        <div class="slide-title">SCORING<br/>SYSTEM</div>
+        <div class="slide-desc">Catch the imposter and earn points. Get the most votes on the "most likely" question — that's a point too. Play as many rounds as you set.</div>
+        <div class="mock">
+          <div class="mock-label">// how points work</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.15);border-radius:10px;padding:11px 14px;">
+              <div style="font-size:18px;">🎯</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--accent);">Correctly caught the imposter</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;">+2 pts per correct voter</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,63,63,.05);border:1px solid rgba(255,63,63,.15);border-radius:10px;padding:11px 14px;">
+              <div style="font-size:18px;">🎭</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--red);">Imposter escaped detection</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;">+3 pts for the imposter</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,217,61,.05);border:1px solid rgba(255,217,61,.15);border-radius:10px;padding:11px 14px;">
+              <div style="font-size:18px;">🔥</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--yellow);">Got the most "most likely" votes</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;">+1 pt · the room has spoken</div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-label" style="margin-top:4px;">// after 3 rounds</div>
+          <div class="mock-score-row top"><div class="mock-rank">🥇</div><div class="mock-sname">Kiran</div><div class="mock-pts">7</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+          <div class="mock-score-row"><div class="mock-rank">🥈</div><div class="mock-sname">Rahul</div><div class="mock-pts">5</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+          <div class="mock-score-row"><div class="mock-rank">🥉</div><div class="mock-sname">Arjun</div><div class="mock-pts">3</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">pts</div></div>
+        </div>
+      </div>
+
+    </div><!-- end track -->
+  </div><!-- end stage -->
+
+  <!-- bottom nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn nav-btn-prev" id="btn-prev" onclick="navigate(-1)" disabled>← PREV</button>
+    <div class="slide-counter" id="slide-counter">1 / 7</div>
+    <button class="nav-btn nav-btn-next" id="btn-next" onclick="navigate(1)">NEXT →</button>
+  </div>
+
+</div><!-- end wrapper -->
+
+<div class="swipe-hint">← swipe to navigate →</div>
+
+<script>
+  const TOTAL = 7;
+  let current = 0;
+  const track = document.getElementById('track');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const counter = document.getElementById('slide-counter');
+
+  // build progress dots
+  const progRow = document.getElementById('progress-row');
+  for(let i=0; i<TOTAL; i++){
+    const d = document.createElement('div');
+    d.className = 'prog-dot';
+    d.style.width = '8px';
+    d.onclick = () => goTo(i);
+    progRow.appendChild(d);
+  }
+
+  function updateDots(){
+    const dots = progRow.querySelectorAll('.prog-dot');
+    dots.forEach((d,i)=>{
+      d.classList.remove('active','done');
+      if(i===current) d.classList.add('active');
+      else if(i<current) d.classList.add('done');
+      d.style.width = i===current ? '28px' : '8px';
+    });
+  }
+
+  function goTo(idx){
+    document.getElementById(`slide-${current}`)?.classList.remove('in-view');
+    current = Math.max(0, Math.min(TOTAL-1, idx));
+    track.style.transform = `translateX(-${current * 100}%)`;
+    setTimeout(()=>{
+      document.getElementById(`slide-${current}`)?.classList.add('in-view');
+    }, 60);
+    btnPrev.disabled = current === 0;
+    btnNext.textContent = current === TOTAL-1 ? 'PLAY NOW →' : 'NEXT →';
+    btnNext.className = current === TOTAL-1 ? 'nav-btn nav-btn-next last' : 'nav-btn nav-btn-next';
+    counter.textContent = `${current+1} / ${TOTAL}`;
+    updateDots();
+  }
+
+  window.navigate = (dir) => {
+    if(current === TOTAL-1 && dir === 1){
+      window.location.href = 'game.html';
+      return;
+    }
+    goTo(current + dir);
+  };
+
+  // touch/swipe
+  let touchStartX = 0, touchStartY = 0;
+  const stage = document.getElementById('stage');
+  stage.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY; }, {passive:true});
+  stage.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
+      navigate(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
+
+  // keyboard
+  window.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
+  });
+
+  // ── Slide 2: animated room code ──
+  const codes = ['CF93WD','XK49TW','BM72RA','QP55ZX','GT18NL'];
+  let codeIdx = 0;
+  const codeEl = document.getElementById('mock-code-anim');
+  setInterval(()=>{
+    if(current === 1){
+      codeIdx = (codeIdx+1) % codes.length;
+      codeEl.style.opacity = '0';
+      setTimeout(()=>{ codeEl.textContent = codes[codeIdx]; codeEl.style.opacity = '1'; }, 200);
+    }
+  }, 2000);
+  codeEl.style.transition = 'opacity .2s';
+
+  // ── Slide 3: cycle the main question ──
+  const mainQs = [
+    '"most likely to rewatch the same movie 10 times"',
+    '"most likely to fall asleep during a film"',
+    '"most likely to quote dialogues in real life"',
+    '"most likely to cry when a villain dies"',
+    '"most likely to defend a movie everyone hates"',
+  ];
+  let qIdx = 0;
+  const qMainEl = document.getElementById('q-cycle-main');
+  const qVoteEl = document.getElementById('q-cycle-vote');
+  setInterval(()=>{
+    if(current === 2){
+      qIdx = (qIdx+1) % mainQs.length;
+      qMainEl.style.opacity = '0';
+      setTimeout(()=>{ qMainEl.textContent = mainQs[qIdx]; qMainEl.style.opacity = '1'; }, 200);
+    }
+    if(current === 3){
+      const short = mainQs[qIdx].replace(/^"|"$/g,'');
+      qVoteEl.style.opacity = '0';
+      setTimeout(()=>{ qVoteEl.textContent = `"${short}"`; qVoteEl.style.opacity = '1'; }, 200);
+    }
+  }, 2800);
+  qMainEl.style.transition = 'opacity .2s';
+  qVoteEl.style.transition = 'opacity .2s';
+
+  // init
+  goTo(0);
+</script>
+</body>
+</html>
