@@ -235,8 +235,8 @@
     .htp-card-text{font-size:13px;color:var(--muted);line-height:1.55}
 
     /* ── LIKELY game ── */
-    .q-card{background:var(--surface2);border:2px solid var(--purple);border-radius:20px;padding:28px 24px;text-align:center;margin:20px 0;width:100%;max-width:440px;position:relative;overflow:hidden}
-    .q-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(192,132,252,.08),transparent 70%)}
+    .q-card{background:var(--surface2);border:2px solid var(--blue);border-radius:20px;padding:28px 24px;text-align:center;margin:20px 0;width:100%;max-width:440px;position:relative;overflow:hidden}
+    .q-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(91,143,255,.08),transparent 70%)}
     .q-card .q-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;position:relative}
     .q-card .q-text{font-size:clamp(16px,4vw,24px);font-weight:600;color:var(--text);line-height:1.5;position:relative}
     .q-card.imposter-q-card{border-color:var(--accent)}
@@ -245,18 +245,18 @@
     .likely-result-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px}
     .likely-result-name{font-size:14px;font-weight:600;flex:1}
     .likely-result-bar{flex:2;height:6px;background:var(--surface);border-radius:4px;overflow:hidden}
-    .likely-result-fill{height:100%;background:var(--purple);border-radius:4px;transition:width .6s ease}
+    .likely-result-fill{height:100%;background:var(--blue);border-radius:4px;transition:width .6s ease}
     .likely-result-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:40px;text-align:right}
-    .likely-result-row.top-pick{border-color:var(--purple)}
-    .likely-result-row.top-pick .likely-result-name{color:var(--purple)}
-    .discuss-banner{background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.25);border-radius:12px;padding:14px 18px;text-align:center;margin:12px 0}
-    .discuss-banner .db-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--purple);text-transform:uppercase;margin-bottom:6px}
+    .likely-result-row.top-pick{border-color:var(--blue)}
+    .likely-result-row.top-pick .likely-result-name{color:var(--blue)}
+    .discuss-banner{background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.25);border-radius:12px;padding:14px 18px;text-align:center;margin:12px 0}
+    .discuss-banner .db-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--blue);text-transform:uppercase;margin-bottom:6px}
     .discuss-banner .db-text{font-size:13px;color:var(--muted);line-height:1.5}
     .imposter-reveal{background:rgba(255,63,63,.06);border:1px solid rgba(255,63,63,.3);border-radius:12px;padding:16px 18px;margin:12px 0;max-width:440px;width:100%}
     .imposter-reveal .ir-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
-    .voter-chip-purple{display:inline-block;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:var(--purple);padding:1px 7px;border-radius:5px;margin:2px 2px 0 0;font-size:10px;letter-spacing:.5px}
-    .vote-btn.likely-vote:hover{border-color:var(--purple);background:rgba(192,132,252,.06)}
-    .vote-btn.likely-vote.selected{border-color:var(--purple);background:rgba(192,132,252,.12)}
+    .voter-chip-purple{display:inline-block;background:rgba(91,143,255,.12);border:1px solid rgba(91,143,255,.25);color:var(--blue);padding:1px 7px;border-radius:5px;margin:2px 2px 0 0;font-size:10px;letter-spacing:.5px}
+    .vote-btn.likely-vote:hover{border-color:var(--blue);background:rgba(91,143,255,.06)}
+    .vote-btn.likely-vote.selected{border-color:var(--blue);background:rgba(91,143,255,.12)}
     .vote-btn.imposter-vote:hover{border-color:var(--accent);background:rgba(255,63,63,.06)}
     .vote-btn.imposter-vote.selected{border-color:var(--accent);background:rgba(255,63,63,.12)}
   </style>
@@ -273,14 +273,17 @@
     <input type="text" id="player-name-input" placeholder="your name" maxlength="20" />
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px" onclick="goToLobby('imposter')"><span style="pointer-events:none">IMPOSTER</span><a href="imposterhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.5);color:rgba(255,255,255,0.7);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
-      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('tierlist')"><span style="pointer-events:none">TIER'D</span><a href="tier'dhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:rgba(255,140,66,.10);border:1px solid rgba(255,140,66,.32);color:#ff8c42;margin:0" onclick="goToLobby('tierlist')"><span style="pointer-events:none">TIER'D</span><a href="tier'dhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,140,66,0.4);color:rgba(255,140,66,0.6);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
     <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToHeadsUp()"><span style="pointer-events:none">HEADS UP</span><a href="headsuphowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
-      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);margin:0" onclick="goToLobby('whoareyou')"><span style="pointer-events:none">BLINDSPOT</span><a href="blindspothowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.45);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:rgba(63,255,160,.10);border:1px solid rgba(63,255,160,.32);color:#3fffa0;margin:0" onclick="goToHeadsUp()"><span style="pointer-events:none">HEADS UP</span><a href="headsuphowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(63,255,160,0.4);color:rgba(63,255,160,0.6);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
+      <button class="btn" style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:rgba(255,217,61,.10);border:1px solid rgba(255,217,61,.32);color:#ffd93d;margin:0" onclick="goToLobby('whoareyou')"><span style="pointer-events:none">BLINDSPOT</span><a href="blindspothowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,217,61,0.4);color:rgba(255,217,61,0.6);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
     <div style="margin-top:8px">
-      <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.35);color:var(--purple);margin:0" onclick="goToLobby('likely')"><span style="pointer-events:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px"><span>WHO'S MORE LIKELY?</span><span style="font-size:9px;letter-spacing:2px;color:rgba(192,132,252,0.55);font-family:'DM Mono',monospace;text-transform:lowercase;font-weight:400">// imposter version</span></span><a href="likelyhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(192,132,252,0.4);color:rgba(192,132,252,0.6);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
+      <button class="btn" style="width:100%;padding-left:16px;padding-right:16px;background:rgba(91,143,255,.10);border:1px solid rgba(91,143,255,.32);color:#5b8fff;margin:0" onclick="(function(){ var n=document.getElementById('player-name-input').value.trim(); window.location.href='likely.html'+(n?'?name='+encodeURIComponent(n):''); })()">WHO'S MORE LIKELY TO</button>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:10px;background:var(--surface2);border:1px solid rgba(255,63,63,.3);color:var(--text);margin:0" onclick="goToLobby('likely')"><span style="pointer-events:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px"><span>WHO'S MORE LIKELY TO?</span><span style="font-size:9px;letter-spacing:2px;color:#ff3f3f;font-family:'DM Mono',monospace;text-transform:lowercase;font-weight:500">// imposter version</span></span><a href="likelyhowto.html" onclick="event.stopPropagation()" style="width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);font-size:11px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;text-transform:none;flex-shrink:0">i</a></button>
     </div>
   </div>
 </div>
@@ -645,7 +648,7 @@
   <div class="card" style="max-width:440px;width:100%;margin-top:16px">
     <div class="card-title">// who is most likely to...</div>
     <div class="vote-grid" id="likely-vote-grid"></div>
-    <button class="btn" id="likely-cast-btn" onclick="likelyCastVote()" disabled style="background:var(--purple);color:#fff;font-weight:600;margin-top:10px">CAST VOTE</button>
+    <button class="btn" id="likely-cast-btn" onclick="likelyCastVote()" disabled style="background:var(--blue);color:#fff;font-weight:600;margin-top:10px">CAST VOTE</button>
     <div class="waiting-text" id="likely-lv-status"></div>
   </div>
 </div>
@@ -655,7 +658,7 @@
   <div class="phase-indicator" id="likely-lr-phase-label">round 1 // the verdict</div>
   <div class="card" style="max-width:440px;width:100%">
     <div class="card-title">// who's more likely to...</div>
-    <div id="likely-lr-question-display" style="font-size:15px;font-weight:600;color:var(--purple);margin-bottom:16px;line-height:1.4;text-align:center;padding:10px 14px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:10px"></div>
+    <div id="likely-lr-question-display" style="font-size:15px;font-weight:600;color:var(--blue);margin-bottom:16px;line-height:1.4;text-align:center;padding:10px 14px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.2);border-radius:10px"></div>
     <div id="likely-results-bars"></div>
     <hr class="divider" />
     <div class="card-title">// who voted whom</div>
@@ -664,7 +667,7 @@
       <div class="db-label">// discuss</div>
       <div class="db-text">Talk it out. Defend your vote. Then decide who the imposter is.</div>
     </div>
-    <button class="btn" id="likely-ready-imposter-btn" onclick="likelyMarkReadyImposter()" style="background:var(--purple);color:#fff;font-weight:600;margin-top:10px">READY TO VOTE IMPOSTER →</button>
+    <button class="btn" id="likely-ready-imposter-btn" onclick="likelyMarkReadyImposter()" style="background:var(--blue);color:#fff;font-weight:600;margin-top:10px">READY TO VOTE IMPOSTER →</button>
     <div class="waiting-text" id="likely-lr-ready-status"></div>
   </div>
 </div>
@@ -693,12 +696,12 @@
         <span id="likely-pb-label">round 1 of 5</span>
         <span id="likely-pb-pct">20%</span>
       </div>
-      <div class="progress-bar-track"><div class="progress-bar-fill" id="likely-pb-fill" style="width:20%;background:var(--purple)"></div></div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="likely-pb-fill" style="width:20%;background:var(--blue)"></div></div>
     </div>
     <hr class="divider" />
     <div class="lb-header">
       <div class="lb-title">SCORES</div>
-      <div class="lb-round-badge" id="likely-lb-round-badge" style="color:var(--purple);background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.25)">after round 1</div>
+      <div class="lb-round-badge" id="likely-lb-round-badge" style="color:var(--blue);background:rgba(91,143,255,.12);border-color:rgba(91,143,255,.25)">after round 1</div>
     </div>
     <div id="likely-rr-lb-rows"></div>
     <hr class="divider" />
@@ -2539,7 +2542,7 @@
     [3,5,7,10].forEach(n => {
       const b = document.createElement('div');
       b.className = 'rounds-btn' + (n===likelySelectedRounds?' selected':'');
-      b.style.cssText = n===likelySelectedRounds ? 'border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,.1)' : '';
+      b.style.cssText = n===likelySelectedRounds ? 'border-color:var(--blue);color:var(--blue);background:rgba(91,143,255,.1)' : '';
       b.textContent = n;
       b.onclick = () => { likelySelectedRounds=n; dbUpd(`rooms/${roomCode}`,{totalRounds:n}); renderLikelyRoundOptions(); };
       el.appendChild(b);
@@ -2684,7 +2687,7 @@
       const targetName = players[p.likelyVote]?.name||'?';
       const chip = document.createElement('div');
       chip.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px';
-      chip.innerHTML=`<span style="font-weight:600;min-width:80px">${p.name}</span><span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px">voted</span><span style="color:var(--purple);font-weight:600">${targetName}</span>`;
+      chip.innerHTML=`<span style="font-weight:600;min-width:80px">${p.name}</span><span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px">voted</span><span style="color:var(--blue);font-weight:600">${targetName}</span>`;
       bdEl.appendChild(chip);
     });
 
@@ -2832,7 +2835,7 @@
     if(isLeader){
       area.innerHTML = round>=total
         ? `<button class="btn btn-green" onclick="likelyEndGame()">SEE FINAL RESULTS →</button>`
-        : `<button class="btn" style="background:var(--purple);color:#fff;font-weight:600" onclick="likelyNextRound()">NEXT ROUND →</button>`;
+        : `<button class="btn" style="background:var(--blue);color:#fff;font-weight:600" onclick="likelyNextRound()">NEXT ROUND →</button>`;
     } else {
       area.innerHTML = `<p class="waiting-text">Waiting for leader<span class="loading-dots"></span></p>`;
     }
