@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Who's More Likely?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;
+      --accent:#3b82f6;--accent2:#60a5fa;--text:#e8e8f0;--muted:#7070a0;
+      --green:#3fffa0;--yellow:#ffd93d;--blue:#5b8fff;--red:#ff3f3f;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;
+      background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(59,130,246,.1) 0%,transparent 60%),
+                 radial-gradient(ellipse 40% 50% at 80% 90%,rgba(96,165,250,.07) 0%,transparent 60%);
+      pointer-events:none;z-index:0}
+
+    .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:24px 16px;animation:fadeIn .3s ease}
+    .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 rgba(59,130,246,0)}50%{box-shadow:0 0 36px rgba(59,130,246,.28)}}
+
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,11vw,82px);letter-spacing:4px;line-height:1;text-align:center}
+    .logo span{color:var(--accent)}
+    .tagline{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:6px;text-align:center}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:420px}
+    .card-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+    input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;letter-spacing:2px;outline:none;transition:border-color .2s;margin-bottom:12px}
+    input[type=text]::placeholder{color:var(--muted);letter-spacing:1px;font-size:13px}
+    input[type=text]:focus{border-color:var(--accent)}
+
+    .btn{display:block;width:100%;padding:15px;border:none;border-radius:10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;transition:transform .15s,box-shadow .2s}
+    .btn:active{transform:scale(.97)}
+    .btn:disabled{opacity:.35;cursor:not-allowed}
+    .btn-primary{background:var(--accent);color:#0a0a0f;font-weight:700}
+    .btn-primary:hover:not(:disabled){box-shadow:0 0 28px rgba(59,130,246,.5)}
+    .btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);margin-top:10px}
+    .btn-ghost{background:var(--surface2);color:var(--muted);margin-top:8px}
+
+    .room-code-display{text-align:center;margin:16px 0}
+    .room-code-display .label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+    .room-code-display .code{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:12px;color:var(--accent);line-height:1}
+    .copy-btn{margin-top:8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 14px;border-radius:8px;cursor:pointer;transition:border-color .2s,color .2s}
+    .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+    .player-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:8px}
+    .pip{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+    .badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--accent);background:rgba(59,130,246,.12);padding:3px 8px;border-radius:6px}
+    .kick-btn{margin-left:auto;background:rgba(255,63,63,.12);border:1px solid rgba(255,63,63,.25);color:var(--red);font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:6px;cursor:pointer}
+
+    .q-card{background:var(--surface2);border:2px solid var(--accent);border-radius:18px;padding:32px 24px;text-align:center;width:100%;max-width:440px;margin-bottom:16px;position:relative;overflow:hidden;animation:pulseGlow 2.5s ease-in-out infinite}
+    .q-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(59,130,246,.07),transparent 70%)}
+    .q-prefix{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:block;position:relative}
+    .q-text{font-family:'DM Sans',sans-serif;font-size:clamp(18px,4.5vw,24px);font-weight:600;color:var(--text);line-height:1.4;position:relative}
+
+    .vote-grid{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+    .vote-btn{display:flex;flex-direction:column;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:border-color .2s,background .2s;text-align:left;width:100%}
+    .vote-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(59,130,246,.06)}
+    .vote-btn.selected{border-color:var(--accent);background:rgba(59,130,246,.14)}
+    .voter-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+    .voter-chip{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--accent)}
+
+    .result-bar-track{height:5px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:6px}
+    .result-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+    .breakdown-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+    .breakdown-row:last-child{border-bottom:none}
+    .bv{font-weight:600;min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ba{color:var(--muted);font-family:'DM Mono',monospace;font-size:11px}
+    .bt{color:var(--accent);font-weight:600}
+
+    .divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+    .waiting-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+    .loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite}
+    @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+    .phase-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-align:center;text-transform:uppercase;margin-bottom:12px}
+    .spacer{height:16px}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--text);z-index:999;transition:transform .3s ease;white-space:nowrap}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div class="screen active" id="screen-landing">
+  <div class="logo">WHO'S MORE<br/><span>LIKELY?</span></div>
+  <div class="tagline">// the group knows you too well</div>
+  <div class="spacer"></div>
+  <div class="card">
+    <div class="card-title">// your name</div>
+    <input type="text" id="name-input" placeholder="enter name" maxlength="20" autocomplete="off"/>
+    <button class="btn btn-primary" onclick="goToLobby()">LET'S PLAY</button>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div class="screen" id="screen-lobby">
+  <div class="logo" style="font-size:38px">WHO'S MORE<br/><span>LIKELY?</span></div>
+  <div class="spacer"></div>
+  <div class="card">
+    <div class="card-title">// create a room</div>
+    <button class="btn btn-primary" onclick="createRoom()">CREATE ROOM</button>
+    <div class="divider"></div>
+    <div class="card-title">// join with code</div>
+    <input type="text" id="join-code-input" placeholder="room code" maxlength="8" autocomplete="off" style="text-transform:uppercase"/>
+    <button class="btn btn-secondary" id="join-btn" onclick="joinRoom()">JOIN ROOM</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-landing')">BACK</button>
+  </div>
+</div>
+
+<!-- WAITING ROOM -->
+<div class="screen" id="screen-waiting">
+  <div class="room-code-display">
+    <div class="label">// room code</div>
+    <div class="code" id="display-room-code">------</div>
+    <button class="copy-btn" onclick="copyCode()">COPY</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="card-title" style="margin:0">// players <span id="player-count">0</span></div>
+      <div id="waiting-msg" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"></div>
+    </div>
+    <div id="waiting-player-list"></div>
+    <div id="leader-controls" style="display:none">
+      <div class="divider"></div>
+      <button class="btn btn-primary" id="start-btn" onclick="nextQuestion()" disabled>START GAME</button>
+    </div>
+    <div id="waiting-for-leader" style="display:none" class="waiting-text">Waiting for leader to start<span class="loading-dots"></span></div>
+    <button class="btn btn-ghost" style="margin-top:12px" onclick="leaveRoom()">LEAVE</button>
+  </div>
+</div>
+
+<!-- VOTE SCREEN -->
+<div class="screen" id="screen-vote">
+  <div class="phase-label">// who's more likely to...</div>
+  <div class="q-card">
+    <span class="q-prefix">who is most likely to...</span>
+    <div class="q-text" id="vote-question"></div>
+  </div>
+  <div class="card" style="max-width:440px">
+    <div class="card-title">// pick someone</div>
+    <div class="vote-grid" id="vote-grid"></div>
+    <button class="btn btn-primary" id="cast-btn" onclick="castVote()" disabled style="margin-top:4px">CAST VOTE</button>
+    <div class="waiting-text" id="vote-status"></div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen" id="screen-results">
+  <div class="phase-label">// the verdict</div>
+  <div class="q-card" style="animation:none;border-color:var(--border)">
+    <span class="q-prefix">who is most likely to...</span>
+    <div class="q-text" id="results-question"></div>
+  </div>
+  <div class="card" style="max-width:440px;width:100%">
+    <div class="card-title">// results</div>
+    <div id="results-bars"></div>
+    <div class="divider"></div>
+    <div class="card-title">// who voted who</div>
+    <div id="results-breakdown"></div>
+    <div class="divider"></div>
+    <div id="results-action"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAOtPWgKV-J12jorj4Zmfgdxe8MaF-xR8M",
+    authDomain: "cinefied-4d389.firebaseapp.com",
+    databaseURL: "https://cinefied-4d389-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "cinefied-4d389",
+    storageBucket: "cinefied-4d389.firebasestorage.app",
+    messagingSenderId: "37019525498",
+    appId: "1:37019525498:web:016b0e372aa54c434876c3"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db  = firebase.database();
+  const dbSet = (p,v) => db.ref(p).set(v);
+  const dbGet = (p)   => db.ref(p).once('value');
+  const dbUpd = (p,v) => db.ref(p).update(v);
+
+  let myName='', myId='', roomCode='', isLeader=false;
+  let selectedVote=null, hasVoted=false, tallyDone=false;
+  let joiningRoom=false, roomListener=null;
+
+  // auto-fill name from game.html redirect
+  const _urlName = new URLSearchParams(window.location.search).get('name');
+  if(_urlName){
+    myName = _urlName;
+    document.getElementById('name-input').value = _urlName;
+    showScreen('screen-lobby');
+  }
+
+  const QUESTIONS = [
+    "ghost someone for no reason",
+    "be late to their own birthday party",
+    "forget a friend's name in public",
+    "accidentally send the wrong text to the wrong person",
+    "laugh at their own joke before finishing it",
+    "pretend to be busy to avoid plans",
+    "order food and eat it before it even reaches the table",
+    "trip and fall in front of everyone and play it off",
+    "argue with a stranger on the internet for 3 hours",
+    "reply 'on my way' while still at home",
+    "take 45 minutes to decide what to eat and then order the same thing",
+    "be the last one to understand a joke",
+    "overshare at the worst possible moment",
+    "make everything about themselves",
+    "start drama and then act innocent",
+    "cry over a fictional character",
+    "say 'I'm not even that hungry' and then eat the most",
+    "turn a 5 minute story into a 30 minute one",
+    "forget why they walked into a room",
+    "cancel plans at the last second",
+    "bring up an embarrassing thing you did 5 years ago",
+    "snoop through someone's phone if given the chance",
+    "pretend they didn't see a text",
+    "have 47 unread notifications and not care",
+    "sleep through an important alarm",
+    "blame autocorrect for a typo that was definitely intentional",
+    "be the peacemaker in a fight",
+    "be the one to start a fight",
+    "be caught talking behind someone's back",
+    "be the group's therapist",
+    "always have a hot take nobody asked for",
+    "be the loudest in the group",
+    "be the most responsible one",
+    "be the one who needs to be babysat",
+    "go viral for doing something embarrassing",
+    "become famous one day",
+    "move abroad and never come back",
+    "end up on a reality TV show",
+    "become a completely different person in 5 years",
+    "eat the last piece without asking",
+    "be the one who always asks 'wait what happened' mid-movie",
+    "have a parasocial relationship with a celebrity",
+    "screenshot a conversation and send it to someone else",
+    "have the most controversial opinion in the room",
+    "be the one everyone calls at 2am",
+    "never watch a movie till the end",
+    "cry during a sad movie scene",
+    "spoil a movie for the whole group",
+    "fall asleep during a movie",
+    "get scared during a horror film",
+    "laugh at the wrong moment in a movie",
+    "rewatch the same movie 10 times",
+    "quote movie dialogues in real life",
+    "leave a theatre mid-movie",
+    "cry when a villain dies",
+    "defend a movie everyone hates",
+    "hate a movie everyone loves",
+    "survive a zombie apocalypse",
+    "accidentally become a meme",
+    "cry at a wedding they weren't even invited to",
+    "show up to a costume party without a costume",
+    "confidently give wrong directions",
+    "talk to animals like they understand everything",
+    "get into an argument with a vending machine",
+    "spend 3 hours choosing a movie and then fall asleep 10 minutes in",
+    "introduce themselves with a fun fact nobody asked for",
+    "get emotionally attached to a plant",
+    "lose something they are currently holding",
+    "wave back at someone who wasn't waving at them",
+    "hold a grudge for 10 years over something tiny",
+    "accidentally ruin a surprise party",
+    "be way too competitive at board games",
+    "cry at an advertisement",
+    "accidentally like a 3-year-old photo while stalking someone's profile",
+    "have a full conversation in their head and forget to say it out loud",
+    "remember the weirdest most specific facts about random things",
+    "be completely unbothered in a crisis",
+    "panic over absolutely nothing",
+    "make friends with every stranger they meet",
+    "get competitive about something that doesn't matter at all",
+    "have the most embarrassing camera roll",
+    "text someone 'haha' when they have no idea what's going on",
+    "be the one to fall asleep first at a sleepover",
+    "still be awake at 4am for no reason",
+    "dramatically overreact to a minor inconvenience",
+    "be the last one to find out about drama",
+    "say 'I'll be ready in 5 minutes' and take 40",
+    "eat something weird and convince everyone it's good",
+    "forget someone's birthday even after being reminded",
+    "have the worst sense of direction"
+  ];
+
+  function genCode(){ return Math.random().toString(36).substring(2,8).toUpperCase(); }
+  function genId(){   return Math.random().toString(36).substring(2,12); }
+
+  function toast(msg, dur=2500){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, dur);
+  }
+
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    history.pushState({screen:id},'','');
+  }
+
+  window.addEventListener('popstate', function(){
+    var cur=document.querySelector('.screen.active');
+    if(!cur) return;
+    var mid=['screen-waiting','screen-vote','screen-results'];
+    if(mid.indexOf(cur.id)!==-1){
+      history.pushState({screen:cur.id},'','');
+      if(confirm('Leave the game?')) leaveRoom();
+    }
+  });
+
+  history.replaceState({screen:'screen-landing'},'','');
+
+  function pickQuestion(usedQs){
+    var pool=QUESTIONS.filter(function(q){ return usedQs.indexOf(q)===-1; });
+    var list=pool.length>0?pool:QUESTIONS;
+    return list[Math.floor(Math.random()*list.length)];
+  }
+
+  function goToLobby(){
+    myName=document.getElementById('name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); return; }
+    showScreen('screen-lobby');
+  }
+
+  async function createRoom(){
+    myName=myName||document.getElementById('name-input').value.trim();
+    if(!myName){ toast('Enter your name first!'); showScreen('screen-landing'); return; }
+    try{
+      roomCode=genCode(); myId=genId(); isLeader=true;
+      await dbSet('rooms/'+roomCode, {
+        leader:myId, phase:'waiting', game:'wml', createdAt:Date.now()
+      });
+      await dbSet('rooms/'+roomCode+'/players/'+myId, {name:myName, vote:null});
+      db.ref('rooms/'+roomCode+'/players/'+myId).onDisconnect().remove();
+      enterWaitingRoom();
+    }catch(e){ toast('Error: '+e.message); console.error(e); }
+  }
+
+  async function joinRoom(){
+    if(joiningRoom) return;
+    joiningRoom=true;
+    var btn=document.getElementById('join-btn'); btn.disabled=true;
+    try{
+      var code=document.getElementById('join-code-input').value.trim().toUpperCase();
+      if(code.length<4){ toast('Enter a valid room code'); return; }
+      var snap=await dbGet('rooms/'+code);
+      if(!snap.exists()){ toast('Room not found!'); return; }
+      var room=snap.val();
+      if(room.game && room.game!=='wml'){ toast('That is a different game room!'); return; }
+      if(room.phase==='vote'){ toast('Round in progress, join after!'); return; }
+      var players=room.players||{};
+      var nameTaken=Object.values(players).some(function(p){
+        return p.name.toLowerCase()===myName.toLowerCase();
+      });
+      if(nameTaken){ toast('Name already taken in this room!'); return; }
+      roomCode=code; myId=genId(); isLeader=false;
+      await dbSet('rooms/'+roomCode+'/players/'+myId, {name:myName, vote:null});
+      db.ref('rooms/'+roomCode+'/players/'+myId).onDisconnect().remove();
+      enterWaitingRoom();
+    }catch(e){ toast('Error: '+e.message); console.error(e);
+    }finally{ joiningRoom=false; btn.disabled=false; }
+  }
+
+  function enterWaitingRoom(){
+    document.getElementById('display-room-code').textContent=roomCode;
+    document.getElementById('leader-controls').style.display=isLeader?'block':'none';
+    document.getElementById('waiting-for-leader').style.display=isLeader?'none':'block';
+    showScreen('screen-waiting');
+    attachRoomListener();
+
+    db.ref('rooms/'+roomCode+'/players').on('value', function(snap){
+      var players=snap.val()||{};
+      var count=Object.keys(players).length;
+      document.getElementById('player-count').textContent=count;
+      document.getElementById('waiting-msg').textContent=
+        count<2?'need at least 2':count+' player'+(count>1?'s':'')+' ready';
+      var sb=document.getElementById('start-btn');
+      if(sb) sb.disabled=count<2;
+      var list=document.getElementById('waiting-player-list'); list.innerHTML='';
+      Object.entries(players).forEach(function(entry){
+        var id=entry[0], p=entry[1];
+        var el=document.createElement('div'); el.className='player-item';
+        var isMe=id===myId;
+        var kick=isLeader&&!isMe?'<button class="kick-btn" onclick="kickPlayer(\''+id+'\')">KICK</button>':'';
+        el.innerHTML='<div class="pip"></div><span>'+p.name+'</span>'+(isMe?'<span class="badge">YOU</span>':'')+kick;
+        list.appendChild(el);
+      });
+    });
+  }
+
+  function copyCode(){ navigator.clipboard.writeText(roomCode).then(function(){ toast('Copied!'); }); }
+
+  async function kickPlayer(id){
+    await db.ref('rooms/'+roomCode+'/players/'+id).remove();
+  }
+
+  async function leaveRoom(){
+    if(roomListener){ roomListener.off(); roomListener=null; }
+    db.ref('rooms/'+roomCode+'/players').off();
+    if(roomCode&&myId){
+      await db.ref('rooms/'+roomCode+'/players/'+myId).remove();
+      if(isLeader) await dbUpd('rooms/'+roomCode, {phase:'ended'});
+    }
+    roomCode=''; myId=''; isLeader=false; tallyDone=false;
+    showScreen('screen-landing');
+  }
+
+  function attachRoomListener(){
+    if(roomListener) roomListener.off();
+    roomListener=db.ref('rooms/'+roomCode);
+    roomListener.on('value', function(snap){
+      if(!snap.exists()) return;
+      var room=snap.val();
+      var phase=room.phase;
+      var cur=document.querySelector('.screen.active');
+      if(!cur) return;
+      var curId=cur.id;
+
+      if(phase==='ended'&&!isLeader){ toast('Game ended by leader'); leaveRoom(); return; }
+      if(phase==='waiting'&&curId!=='screen-waiting') showScreen('screen-waiting');
+      if(phase==='vote'&&curId!=='screen-vote') enterVote(room);
+      if(phase==='results'&&curId!=='screen-results') enterResults(room);
+
+      if(phase==='vote'&&curId==='screen-vote') updateVoteLive(room);
+      if(phase==='results'&&curId==='screen-results') updateResultsLive(room);
+    });
+  }
+
+  async function nextQuestion(){
+    if(!isLeader) return;
+    tallyDone=false;
+    try{
+      var pSnap=await dbGet('rooms/'+roomCode+'/players');
+      var players=pSnap.val()||{};
+      var u={};
+      Object.keys(players).forEach(function(id){ u['rooms/'+roomCode+'/players/'+id+'/vote']=null; });
+
+      var histSnap=await dbGet('rooms/'+roomCode+'/usedQuestions');
+      var usedQs=histSnap.val()||[];
+      var q=pickQuestion(usedQs);
+      usedQs.push(q);
+
+      u['rooms/'+roomCode+'/currentQuestion']=q;
+      u['rooms/'+roomCode+'/usedQuestions']=usedQs;
+      u['rooms/'+roomCode+'/phase']='vote';
+      await db.ref('/').update(u);
+    }catch(e){ toast('Error: '+e.message); console.error(e); }
+  }
+
+  function enterVote(room){
+    selectedVote=null; hasVoted=false; tallyDone=false;
+    document.getElementById('vote-question').textContent=room.currentQuestion;
+    var castBtn=document.getElementById('cast-btn');
+    castBtn.disabled=true;
+    castBtn.textContent='CAST VOTE';
+    document.getElementById('vote-status').textContent='';
+
+    var grid=document.getElementById('vote-grid'); grid.innerHTML='';
+    Object.entries(room.players).forEach(function(entry){
+      var id=entry[0], p=entry[1];
+      var isMe=id===myId;
+      var btn=document.createElement('button');
+      btn.className='vote-btn'; btn.dataset.id=id;
+      btn.disabled=isMe;
+      btn.style.cssText=isMe?'cursor:default;opacity:.6':'';
+      btn.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span>'+p.name+'</span>'+(isMe?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);letter-spacing:1px">you</span>':'')+'</div><div class="voter-chips" id="chips-'+id+'"></div>';
+      if(!isMe){
+        btn.onclick=function(){
+          if(hasVoted) return;
+          document.querySelectorAll('#vote-grid .vote-btn').forEach(function(b){ b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          selectedVote=id;
+          document.getElementById('cast-btn').disabled=false;
+        };
+      }
+      grid.appendChild(btn);
+    });
+    showScreen('screen-vote');
+    updateVoteLive(room);
+  }
+
+  function updateVoteLive(room){
+    var players=room.players||{};
+    var voterMap={};
+    Object.entries(players).forEach(function(entry){
+      var id=entry[0], p=entry[1];
+      if(p.vote){
+        if(!voterMap[p.vote]) voterMap[p.vote]=[];
+        voterMap[p.vote].push(p.name);
+      }
+    });
+    Object.keys(players).forEach(function(id){
+      var el=document.getElementById('chips-'+id);
+      if(!el) return;
+      el.innerHTML=(voterMap[id]||[]).map(function(n){
+        return '<span class="voter-chip">'+n+'</span>';
+      }).join('');
+    });
+    var all=Object.values(players);
+    var voted=all.filter(function(p){ return p.vote; }).length;
+    var statusEl=document.getElementById('vote-status');
+    if(statusEl) statusEl.textContent=voted+'/'+all.length+' voted';
+
+    if(voted===all.length&&all.length>0&&isLeader&&!tallyDone){
+      tallyDone=true;
+      dbUpd('rooms/'+roomCode, {phase:'results'});
+    }
+  }
+
+  async function castVote(){
+    if(!selectedVote||hasVoted) return;
+    hasVoted=true;
+    var castBtn=document.getElementById('cast-btn');
+    castBtn.disabled=true;
+    castBtn.textContent='VOTED';
+    await dbUpd('rooms/'+roomCode+'/players/'+myId, {vote:selectedVote});
+  }
+
+  function enterResults(room){
+    var players=room.players||{};
+    document.getElementById('results-question').textContent=room.currentQuestion;
+    renderBars(players);
+    renderBreakdown(players);
+
+    var actionEl=document.getElementById('results-action');
+    if(isLeader){
+      actionEl.innerHTML='<button class="btn btn-primary" onclick="nextQuestion()">NEXT QUESTION</button><button class="btn btn-ghost" onclick="endGame()">END GAME</button>';
+    } else {
+      actionEl.innerHTML='<p class="waiting-text">Waiting for next question<span class="loading-dots"></span></p>';
+    }
+    showScreen('screen-results');
+  }
+
+  function updateResultsLive(room){
+    renderBars(room.players||{});
+    renderBreakdown(room.players||{});
+  }
+
+  function renderBars(players){
+    var voteCounts={};
+    Object.values(players).forEach(function(p){ if(p.vote) voteCounts[p.vote]=(voteCounts[p.vote]||0)+1; });
+    var maxVotes=Math.max.apply(null,[0].concat(Object.values(voteCounts)));
+    var totalVotes=Object.values(voteCounts).reduce(function(a,b){return a+b;},0)||1;
+
+    var el=document.getElementById('results-bars'); el.innerHTML='';
+    Object.entries(players)
+      .sort(function(a,b){ return (voteCounts[b[0]]||0)-(voteCounts[a[0]]||0); })
+      .forEach(function(entry){
+        var id=entry[0], p=entry[1];
+        var count=voteCounts[id]||0;
+        var pct=Math.round((count/totalVotes)*100);
+        var isTop=count===maxVotes&&count>0;
+        var row=document.createElement('div');
+        row.style.cssText='margin-bottom:14px';
+        var youLabel=id===myId?' <span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--blue)">you</span>':'';
+        row.innerHTML=
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'+
+            '<div style="font-size:14px;font-weight:600;'+(isTop?'color:var(--accent)':'')+'">'+p.name+youLabel+'</div>'+
+            '<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:'+(isTop?'var(--accent)':'var(--muted)')+'">'+count+' vote'+(count===1?'':'s')+'</div>'+
+          '</div>'+
+          '<div class="result-bar-track"><div class="result-bar-fill" style="width:0%" data-pct="'+pct+'%"></div></div>';
+        el.appendChild(row);
+      });
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        document.querySelectorAll('.result-bar-fill').forEach(function(b){ b.style.width=b.dataset.pct; });
+      });
+    });
+  }
+
+  function renderBreakdown(players){
+    var el=document.getElementById('results-breakdown'); el.innerHTML='';
+    var hasAny=Object.values(players).some(function(p){ return p.vote; });
+    if(!hasAny){
+      el.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">no votes yet</div>';
+      return;
+    }
+    Object.entries(players).forEach(function(entry){
+      var id=entry[0], p=entry[1];
+      if(!p.vote) return;
+      var targetName=players[p.vote]?players[p.vote].name:'?';
+      var row=document.createElement('div'); row.className='breakdown-row';
+      row.innerHTML='<span class="bv">'+p.name+'</span><span class="ba">voted</span><span class="bt">'+targetName+'</span>';
+      el.appendChild(row);
+    });
+  }
+
+  async function endGame(){
+    if(!isLeader) return;
+    var pSnap=await dbGet('rooms/'+roomCode+'/players');
+    var u={};
+    Object.keys(pSnap.val()||{}).forEach(function(id){ u['rooms/'+roomCode+'/players/'+id+'/vote']=null; });
+    u['rooms/'+roomCode+'/phase']='waiting';
+    u['rooms/'+roomCode+'/currentQuestion']=null;
+    u['rooms/'+roomCode+'/usedQuestions']=null;
+    await db.ref('/').update(u);
+  }
+
+  window.showScreen   = showScreen;
+  window.goToLobby    = goToLobby;
+  window.createRoom   = createRoom;
+  window.joinRoom     = joinRoom;
+  window.copyCode     = copyCode;
+  window.kickPlayer   = kickPlayer;
+  window.leaveRoom    = leaveRoom;
+  window.nextQuestion = nextQuestion;
+  window.castVote     = castVote;
+  window.endGame      = endGame;
+
+})();
+</script>
+</body>
+</html>
